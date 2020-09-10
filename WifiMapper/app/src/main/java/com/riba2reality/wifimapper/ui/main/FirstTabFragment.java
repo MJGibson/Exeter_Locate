@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -45,7 +46,7 @@ import static android.content.Context.LOCATION_SERVICE;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class FirstTabFragment extends Fragment  implements OnMapReadyCallback, LocationListener {
+public class FirstTabFragment extends Fragment implements OnMapReadyCallback, LocationListener {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -55,6 +56,10 @@ public class FirstTabFragment extends Fragment  implements OnMapReadyCallback, L
 
     float updateRange = 1.0f;
     long updateTimeMilliSecs = 1000;
+
+    public double lat;
+    public double lon;
+    public String time;
 
 
     final static int PERMISSION_ALL = 1;
@@ -91,9 +96,32 @@ public class FirstTabFragment extends Fragment  implements OnMapReadyCallback, L
 //        mapFragment.getMapAsync(this);
 
 
-        locationManager = (LocationManager) getActivity().
-                getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+
+
         mo = new MarkerOptions().position(new LatLng(0, 0)).title("My current location");
+
+        Criteria criteria = new Criteria();
+        criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(true);
+        criteria.setBearingRequired(true);
+        criteria.setSpeedRequired(true);
+        String provider = locationManager.getBestProvider(criteria, true);
+
+
+        if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        this.onLocationChanged(locationManager.getLastKnownLocation(provider));
+
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_ALL);
         } else requestlocation();
@@ -156,6 +184,7 @@ public class FirstTabFragment extends Fragment  implements OnMapReadyCallback, L
     public void onLocationChanged(@NonNull Location location) {
         LatLng myCords = new LatLng(location.getLatitude(), location.getLongitude());
 
+
         if (map!= null && marker != null) {
             marker.setPosition(myCords);
             map.moveCamera(CameraUpdateFactory.newLatLng(myCords));
@@ -165,7 +194,13 @@ public class FirstTabFragment extends Fragment  implements OnMapReadyCallback, L
 
             Toast myToast = Toast.makeText(getActivity().getBaseContext(), message, Toast.LENGTH_SHORT);
             myToast.show();
+
+            this.lat = location.getLatitude();
+            this.lon = location.getLongitude();
+            this.time = currentTime;
+
         }
+
 
 
     }// end of onLocationChanged

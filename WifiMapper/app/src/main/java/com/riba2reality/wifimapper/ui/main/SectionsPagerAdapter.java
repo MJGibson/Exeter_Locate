@@ -20,9 +20,18 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
     private final Context mContext;
 
+    private Fragment mapTab;
+    private Fragment wifiTab;
+
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
+
+        mapTab = FirstTabFragment.newInstance(1);
+        wifiTab = SecondTabFragment.newInstance(2);
+
+
+
     }
 
     @Override
@@ -33,16 +42,18 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         switch(position) {
             case 0:
-                return FirstTabFragment.newInstance(position + 1);
+                //return FirstTabFragment.newInstance(position + 1);
+                return mapTab;
 
             case 1:
-                return SecondTabFragment.newInstance(position + 1);
+                //return SecondTabFragment.newInstance(position + 1);
+                return wifiTab;
 
             // Other fragments
         }
 
         // default value
-        return FirstTabFragment.newInstance(1);
+        return null;
 
     }
 
