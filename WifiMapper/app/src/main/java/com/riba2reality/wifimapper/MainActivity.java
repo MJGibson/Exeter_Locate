@@ -114,10 +114,12 @@ public class MainActivity extends AppCompatActivity {
 
                 //String address = "127.0.0.1";
                 //String address = "10.0.2.2"; // local for computer the emulator
-                String address = "192.168.0.10";
+                //String address = "192.168.0.10";
                 //String port = "8000";
                 //String port = "27017";
 
+                //
+                String address = "82.46.100.70";
 
                 //String address = "httpbin.org/get";
 

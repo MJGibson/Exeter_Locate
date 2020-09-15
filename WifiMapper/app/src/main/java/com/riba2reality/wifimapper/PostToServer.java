@@ -153,6 +153,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
                     HostnameVerifier hv =
                             HttpsURLConnection.getDefaultHostnameVerifier();
                     return hv.verify("192.168.0.10", session);
+                    //return hv.verify("82.46.100.70", session);
 
                     //System.out.println(hostname);
 /*

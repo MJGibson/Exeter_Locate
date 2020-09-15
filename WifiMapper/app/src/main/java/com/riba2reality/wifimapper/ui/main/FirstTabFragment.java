@@ -182,6 +182,9 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
+
+        if(location==null)
+            return;
         LatLng myCords = new LatLng(location.getLatitude(), location.getLongitude());
 
 
