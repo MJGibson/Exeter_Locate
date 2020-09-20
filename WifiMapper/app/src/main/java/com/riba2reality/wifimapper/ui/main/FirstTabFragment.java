@@ -1,7 +1,9 @@
 package com.riba2reality.wifimapper.ui.main;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -35,7 +38,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.riba2reality.wifimapper.Constants;
+import com.riba2reality.wifimapper.MainActivity;
 import com.riba2reality.wifimapper.R;
+import com.riba2reality.wifimapper.TrackerScanner;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,6 +62,8 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
     float updateRange = 1.0f;
     long updateTimeMilliSecs = 1000;
+
+    boolean startTracking = false;
 
     public double lat;
     public double lon;
@@ -96,10 +104,14 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 //        mapFragment.getMapAsync(this);
 
 
+        mo = new MarkerOptions().position(new LatLng(0, 0)).title("My current location");
+
+        /*
+
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
 
-        mo = new MarkerOptions().position(new LatLng(0, 0)).title("My current location");
+
 
         Criteria criteria = new Criteria();
         criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
@@ -108,6 +120,8 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         criteria.setBearingRequired(true);
         criteria.setSpeedRequired(true);
         String provider = locationManager.getBestProvider(criteria, true);
+
+
 
 
         if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -120,16 +134,80 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        this.onLocationChanged(locationManager.getLastKnownLocation(provider));
+        //this.onLocationChanged(locationManager.getLastKnownLocation(provider));
 
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_ALL);
-        } else requestlocation();
-        if (!isLocationEnabled())
-            showAlert(1);
+        }
+        //else requestlocation();
+        //if (!isLocationEnabled())
+        //    showAlert(1);
+
+*/
 
 
     }// end of onCreate method
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == PERMISSION_ALL && grantResults.length > 0){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if(startTracking) {
+                    startLocationService();
+                    startTracking = false;
+                }
+            }else{
+                Toast.makeText(this.getActivity(), "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }// end of onRequestPermissionsResult
+
+    private boolean isLocationServiceRunning(){
+
+        ActivityManager activityManager =
+                (ActivityManager) getActivity().getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        if(activityManager != null){
+
+            for(ActivityManager.RunningServiceInfo service :
+                    activityManager.getRunningServices(Integer.MAX_VALUE)){
+
+                if(TrackerScanner.class.getName().equals(service.service.getClassName())){
+                    if(service.foreground){
+                        return true;
+                    }
+                }
+
+            }// end of looping
+            return false;
+        }// end of if activityManger not null
+        return false;
+    }// end of isLocationServiceRunning
+
+
+    private void startLocationService(){
+        if(!isLocationServiceRunning()){
+            Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+            getActivity().getApplicationContext().startService(intent);
+            Toast.makeText(this.getActivity(),"Location service started", Toast.LENGTH_SHORT).show();
+        }
+    }// end of startLocationService
+
+
+    private void stopLocationService(){
+        if(isLocationServiceRunning()){
+            Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+            intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+            //stopService(intent);//?!
+            getActivity().getApplicationContext().startService(intent);
+            Toast.makeText(this.getActivity(),"Location service stopped", Toast.LENGTH_SHORT).show();
+        }
+    }// end of startLocationService
+
+    /////private Intent _trackScannerIntent = null;
 
     @Override
     public View onCreateView(
@@ -137,10 +215,49 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+        //-----------
+        /////_trackScannerIntent = root.getApplicationContext()
 
 
 
+        //-----------
 
+/*
+        root.findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public  void onClick(View v){
+
+                if(ContextCompat.checkSelfPermission(
+                        getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                )!= PackageManager.PERMISSION_GRANTED){
+
+                    startTracking = true;
+
+                    ActivityCompat.requestPermissions(
+                            getActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            PERMISSION_ALL
+                    );
+                }else{
+                    startLocationService();
+
+                }
+
+
+            }
+
+        });
+
+        root.findViewById(R.id.stop_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                stopLocationService();
+            }
+        });
+
+
+
+ */
         //final TextView textView = root.findViewById(R.id.section_label);
 //        pageViewModel.getText().observe(this, new Observer<String>() {
 //            @Override
@@ -222,11 +339,13 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
 
     }//end of requestlocation
-
+/*
     private boolean isLocationEnabled(){
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ;
         //|| locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }//end of isLocationEnabled
+
+ */
 
     private boolean isPermissionGranted(){
         if(//checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==

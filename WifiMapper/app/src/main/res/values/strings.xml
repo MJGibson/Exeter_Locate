@@ -2,4 +2,6 @@
     <string name="app_name">WifiMapper</string>
     <string name="tab_text_1">Map</string>
     <string name="tab_text_2">Wifi</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>
