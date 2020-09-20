@@ -62,7 +62,7 @@ public class TrackerScanner extends Service {
                 String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
                 String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
 
-                lastLocation = locationResult.getLastLocation();
+                lastLocation = new Location(locationResult.getLastLocation());
 
                 //Log.d("LOCATION_UPDATE", message);
 
