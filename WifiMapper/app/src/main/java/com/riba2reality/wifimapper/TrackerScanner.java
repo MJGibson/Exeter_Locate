@@ -141,8 +141,14 @@ public class TrackerScanner extends Service {
 
         //------
 
-        double latitude = lastLocation.getLatitude();
-        double longitude = lastLocation.getLongitude();
+        double latitude;
+        double longitude;
+        if(lastLocation!=null) {
+            latitude = lastLocation.getLatitude();
+            longitude = lastLocation.getLongitude();
+        }else{
+            return;
+        }
 
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
@@ -300,13 +306,15 @@ public class TrackerScanner extends Service {
 
 
         try {
-            post.get();
+            if(post!= null)
+                post.get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        unregisterReceiver(wifiReceiver);
 
         stopForeground(true);
         stopSelf();
