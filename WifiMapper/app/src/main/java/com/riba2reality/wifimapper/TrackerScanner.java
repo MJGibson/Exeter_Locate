@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -23,14 +24,22 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.riba2reality.wifimapper.ui.main.FirstTabFragment;
+import com.riba2reality.wifimapper.ui.main.SecondTabFragment;
+
+import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TrackerScanner extends Service {
 
@@ -39,6 +48,7 @@ public class TrackerScanner extends Service {
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = new ArrayList<>();
     private List<ScanResult> results;
+    private Location lastLocation;
 
     private LocationCallback locationCallback = new LocationCallback(){
         @Override
@@ -52,6 +62,7 @@ public class TrackerScanner extends Service {
                 String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
                 String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
 
+                lastLocation = locationResult.getLastLocation();
 
                 //Log.d("LOCATION_UPDATE", message);
 
@@ -83,6 +94,7 @@ public class TrackerScanner extends Service {
             Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
             if(scanning)
                 scanWifi();
+            postResult();
 
         };
     };
@@ -118,6 +130,89 @@ public class TrackerScanner extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
         //return null;
     }
+
+    private void postResult(){
+        Map<String, String> parameters = new HashMap<>();
+
+        List<String> macAddressList = new ArrayList<>();
+
+        //------
+
+        double latitude = lastLocation.getLatitude();
+        double longitude = lastLocation.getLongitude();
+
+        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        //------
+
+
+
+        //ArrayList<String> wifiList = this.arrayList;
+        for (ScanResult scanResult : results) {
+
+            macAddressList.add(scanResult.BSSID);
+        }
+
+
+
+
+        //------
+
+
+
+
+
+//                parameters.put("TIME","12:01");
+//                parameters.put("X","42");
+//                parameters.put("Y","7");
+
+        parameters.put("TIME",currentTime);
+        parameters.put("X",Double.toString(latitude));
+        parameters.put("Y",Double.toString(longitude));
+
+        String macAddressJson = new Gson().toJson(macAddressList );
+
+
+        //parameters.put("MacAddresses",macAddressList.toString());
+        parameters.put("MacAddressesJson",macAddressJson);
+
+
+        String message = new JSONObject(parameters).toString();
+
+        //------
+
+        //String address = "127.0.0.1";
+        //String address = "10.0.2.2"; // local for computer the emulator
+        //String address = "192.168.0.10";
+        //String port = "8000";
+        //String port = "27017";
+
+        //
+        String address = "82.46.100.70";
+
+        //String address = "httpbin.org/get";
+
+
+        //String uri = "http://"+address+":"+port;
+
+        //String uri = "http://"+address;
+        String uri = "https://"+address;
+
+        //String uri = "http://example.com";
+        //String uri = "https://postman-echo.com/get";
+
+        //String message = "hello_message";
+
+        PostToServer post = new PostToServer();
+
+
+        post.is = getResources().openRawResource(R.raw.cert);
+
+
+
+
+        post.execute(uri,message);
+    }// end of postResult
 
 
     private void startLocationService(){
