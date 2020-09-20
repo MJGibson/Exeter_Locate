@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class TrackerScanner extends Service {
 
@@ -49,6 +50,8 @@ public class TrackerScanner extends Service {
     public ArrayList<String> arrayList = new ArrayList<>();
     private List<ScanResult> results;
     private Location lastLocation;
+
+    private PostToServer post;
 
     private LocationCallback locationCallback = new LocationCallback(){
         @Override
@@ -203,7 +206,8 @@ public class TrackerScanner extends Service {
 
         //String message = "hello_message";
 
-        PostToServer post = new PostToServer();
+        //PostToServer
+        post = new PostToServer();
 
 
         post.is = getResources().openRawResource(R.raw.cert);
@@ -293,6 +297,17 @@ public class TrackerScanner extends Service {
 
         LocationServices.getFusedLocationProviderClient(this)
                 .removeLocationUpdates(locationCallback);
+
+
+        try {
+            post.get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         stopForeground(true);
         stopSelf();
 
