@@ -151,15 +151,17 @@ public class TrackerScanner extends Service {
         double latitude;
         double longitude;
         double altitude;
+        double accuracy;
         if(lastLocation!=null) {
             latitude = lastLocation.getLatitude();
             longitude = lastLocation.getLongitude();
             altitude = lastLocation.getAltitude();
+            accuracy = lastLocation.getAccuracy();
         }else{
             return;
         }
 
-        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
 
 
         String messageOut = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude
@@ -198,6 +200,7 @@ public class TrackerScanner extends Service {
         parameters.put("Y",Double.toString(longitude));
 
         parameters.put("ALTITUDE",Double.toString(altitude));
+        parameters.put("ACC",Double.toString(accuracy));
 
         String macAddressJson = new Gson().toJson(macAddressList );
 
