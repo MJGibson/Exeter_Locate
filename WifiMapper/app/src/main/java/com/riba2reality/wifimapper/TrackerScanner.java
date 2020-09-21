@@ -47,6 +47,9 @@ public class TrackerScanner extends Service {
 
     private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
 
+    // make a user definable variable later
+    private final static String dataBase = "testTestTest";
+
 
     private boolean scanning;
     private WifiManager wifiManager;
@@ -65,14 +68,15 @@ public class TrackerScanner extends Service {
                 double latitude = locationResult.getLastLocation().getLatitude();
                 double longitude = locationResult.getLastLocation().getLongitude();
 
-                String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-                String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
+                //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
+                //System.out.println(message);
 
                 lastLocation = new Location(locationResult.getLastLocation());
 
                 //Log.d("LOCATION_UPDATE", message);
 
-                System.out.println(message);
+                //System.out.println(message);
 
                 //scanWifi();
 
@@ -146,14 +150,21 @@ public class TrackerScanner extends Service {
 
         double latitude;
         double longitude;
+        double altitude;
         if(lastLocation!=null) {
             latitude = lastLocation.getLatitude();
             longitude = lastLocation.getLongitude();
+            altitude = lastLocation.getAltitude();
         }else{
             return;
         }
 
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+
+        String messageOut = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude
+                + "\naltitude:" + altitude;
+        System.out.println(messageOut);
 
         //------
 
@@ -180,9 +191,13 @@ public class TrackerScanner extends Service {
 
         parameters.put("MAGIC_NUM",verificationCode);
 
+        parameters.put("DATABASE",dataBase);
+
         parameters.put("TIME",currentTime);
         parameters.put("X",Double.toString(latitude));
         parameters.put("Y",Double.toString(longitude));
+
+        parameters.put("ALTITUDE",Double.toString(altitude));
 
         String macAddressJson = new Gson().toJson(macAddressList );
 
@@ -276,6 +291,7 @@ public class TrackerScanner extends Service {
         locationRequest.setInterval(4000);
         locationRequest.setFastestInterval(2000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
 
         LocationServices.getFusedLocationProviderClient(this)
                 .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
