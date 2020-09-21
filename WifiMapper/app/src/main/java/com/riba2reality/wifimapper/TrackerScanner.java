@@ -45,6 +45,9 @@ import java.util.concurrent.ExecutionException;
 public class TrackerScanner extends Service {
 
 
+    private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
+
+
     private boolean scanning;
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = new ArrayList<>();
@@ -174,6 +177,8 @@ public class TrackerScanner extends Service {
 //                parameters.put("TIME","12:01");
 //                parameters.put("X","42");
 //                parameters.put("Y","7");
+
+        parameters.put("MAGIC_NUM",verificationCode);
 
         parameters.put("TIME",currentTime);
         parameters.put("X",Double.toString(latitude));
