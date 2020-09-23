@@ -10,8 +10,10 @@
     <ListView
         android:id="@+id/wifiList"
         android:layout_width="match_parent"
-        android:layout_height="312dp"
-        android:layout_weight="0.97"/>
+        android:layout_height="0dp"
+        android:layout_weight="0.97"
+        app:layout_constraintBottom_toTopOf="@+id/scanBtn"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/scanBtn"

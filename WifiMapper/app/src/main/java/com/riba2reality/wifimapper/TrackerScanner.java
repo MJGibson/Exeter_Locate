@@ -220,7 +220,8 @@ public class TrackerScanner extends Service {
         //String port = "27017";
 
         //
-        String address = "82.46.100.70";
+        //String address = "82.46.100.70";
+        String address = Constants.ServerAddress;
 
         //String address = "httpbin.org/get";
 
