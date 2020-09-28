@@ -1,0 +1,40 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Server">
+
+        <EditTextPreference
+            app:key="ServerAddress"
+            app:title="Server IP Address"
+            app:useSimpleSummaryProvider="true"
+
+            />
+
+        <ListPreference
+            app:defaultValue="Server"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="ServerList"
+            app:title="@string/reply_title"
+            app:useSimpleSummaryProvider="true"
+
+
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="@string/sync_title" />
+
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="attachment"
+            app:summaryOff="@string/attachment_summary_off"
+            app:summaryOn="@string/attachment_summary_on"
+            app:title="@string/attachment_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

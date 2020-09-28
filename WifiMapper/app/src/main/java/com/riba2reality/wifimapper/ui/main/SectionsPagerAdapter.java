@@ -17,11 +17,12 @@ import com.riba2reality.wifimapper.R;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2, R.string.Settings};
     private final Context mContext;
 
     private Fragment mapTab;
     private Fragment wifiTab;
+    private Fragment settings;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -30,6 +31,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         mapTab = FirstTabFragment.newInstance(1);
         wifiTab = SecondTabFragment.newInstance(2);
 
+        settings = SettingsFragment.newInstance(3);
 
 
     }
@@ -49,6 +51,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 //return SecondTabFragment.newInstance(position + 1);
                 return wifiTab;
 
+            case 2:
+                //return SecondTabFragment.newInstance(position + 1);
+                return settings;
+
+
             // Other fragments
         }
 
@@ -66,6 +73,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 2 total pages.
-        return 2;
+        return 3;
     }
 }
