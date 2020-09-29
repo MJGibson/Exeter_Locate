@@ -56,7 +56,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private PageViewModel pageViewModel;
+    //private PageViewModel pageViewModel;
 
     static final LatLng HAMBURG = new LatLng(53.558, 9.927);
 

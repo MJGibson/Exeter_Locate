@@ -7,6 +7,6 @@
 
     <string-array name="reply_values">
         <item>Custom</item>
-        <item>AWS1</item>
+        <item>35.178.191.244</item>
     </string-array>
 </resources>

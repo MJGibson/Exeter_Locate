@@ -41,15 +41,29 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                    public boolean onPreferenceChange(Preference preference, Object newValue) {
                        final String val = newValue.toString();
                        int index = itemList.findIndexOfValue(val);
-                       if(index==0)
-                       //if(val.equals(""))
+                       if(index==0) {
+                           //if(val.equals(""))
                            itemList2.setEnabled(true);
-                       else
+                           itemList2.setText("");
+                       }
+                       else {
                            itemList2.setEnabled(false);
+                           itemList2.setText(val);
+                       }
                        return true;
                    }
                });
 
+        itemList.setValueIndex(1);
+
+
+        EditTextPreference pref_interval = getPreferenceManager().findPreference("interval");
+        pref_interval.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
+            @Override
+            public void onBindEditText(@NonNull EditText editText) {
+                editText.setInputType(InputType.TYPE_CLASS_PHONE);
+            }
+        });
 
         EditTextPreference pref1 = getPreferenceManager().findPreference("ServerAddress");
         pref1.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {

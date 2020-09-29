@@ -1,4 +1,6 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    >
 
     <PreferenceCategory app:title="Server">
 
@@ -22,18 +24,19 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+    <PreferenceCategory app:title="Transmit to server settings">
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+        <EditTextPreference
+            app:key="interval"
+            app:title="Time interval between scans"
+            app:useSimpleSummaryProvider="true"
+            />
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+        <EditTextPreference
+            app:key="database"
+            app:title="Which database to use:"
+            app:useSimpleSummaryProvider="true"
+            />
 
     </PreferenceCategory>
 
