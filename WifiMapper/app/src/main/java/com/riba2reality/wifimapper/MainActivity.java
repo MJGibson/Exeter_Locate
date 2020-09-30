@@ -2,8 +2,10 @@ package com.riba2reality.wifimapper;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -23,12 +25,14 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -47,6 +51,22 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1;
 
+    BroadcastReceiver receiver;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onStop();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +76,27 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+
+
+
+        //------------
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
+                // do something here.
+
+                System.out.println("Message: "+message);
+
+                TextView logTextView = (TextView)findViewById(R.id.log);
+
+                logTextView.setText(logTextView.getText()+
+                        "####################\n"
+                        +message);
+
+            }
+        };
 
         //FloatingActionButton fab = findViewById(R.id.fab);
 

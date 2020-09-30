@@ -17,21 +17,28 @@ import com.riba2reality.wifimapper.R;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2, R.string.Settings};
+    private static final int[] TAB_TITLES = new int[]{R.string.HomeScreen,R.string.tab_text_1, R.string.tab_text_2, R.string.Settings};
     private final Context mContext;
 
     private Fragment mapTab;
     private Fragment wifiTab;
     private Fragment settings;
+    private Fragment homeScreen;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
 
-        mapTab = FirstTabFragment.newInstance(1);
-        wifiTab = SecondTabFragment.newInstance(2);
+        int i = 0;
 
-        settings = SettingsFragment.newInstance(3);
+        homeScreen = HomescreenFragment.newInstance(++i);
+
+        mapTab = FirstTabFragment.newInstance(++i);
+        wifiTab = SecondTabFragment.newInstance(++i);
+
+        settings = SettingsFragment.newInstance(++i);
+
+
 
 
     }
@@ -45,13 +52,16 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         switch(position) {
             case 0:
                 //return FirstTabFragment.newInstance(position + 1);
+                return homeScreen;
+            case 1:
+                //return FirstTabFragment.newInstance(position + 1);
                 return mapTab;
 
-            case 1:
+            case 2:
                 //return SecondTabFragment.newInstance(position + 1);
                 return wifiTab;
 
-            case 2:
+            case 3:
                 //return SecondTabFragment.newInstance(position + 1);
                 return settings;
 
@@ -73,6 +83,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 2 total pages.
-        return 3;
+        return 4;
     }
 }

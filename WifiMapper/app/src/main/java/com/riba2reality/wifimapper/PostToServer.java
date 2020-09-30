@@ -1,6 +1,9 @@
 package com.riba2reality.wifimapper;
 
+import android.content.Intent;
 import android.os.AsyncTask;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONObject;
 
@@ -29,19 +32,44 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostToServer extends AsyncTask<String, String, String> {
 
+    TrackerScanner _trackerScanner;
 
-    public PostToServer(){
+    public PostToServer(TrackerScanner trackerScanner){
         //set context variables if required
+//        broadcaster = LocalBroadcastManager.getInstance();
+
+        _trackerScanner = trackerScanner;
     }
 
     public InputStream is;
 
-
+//    LocalBroadcastManager broadcaster;
+//
+//    static final public String POST_TO_SERVER_RESULT = "com.riba2reality.wifimapper.PostToServer.REQUEST_PROCESSED";
+//
+//    static final public String POST_TO_SERVER_MESSAGE = "com.riba2reality.wifimapper.PostToServer.POST_TO_SERVER_MSG";
+//
+//    public void sendResult(String message) {
+//        Intent intent = new Intent(POST_TO_SERVER_RESULT);
+//        if(message != null)
+//            intent.putExtra(POST_TO_SERVER_MESSAGE, message);
+//        broadcaster.sendBroadcast(intent);
+//    }
 
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+    }
+
+    @Override
+    protected  void onPostExecute(String result){
+        super.onPostExecute(result);
+
+        if(_trackerScanner!=null){
+            _trackerScanner.sendResult(result);
+        }
+
     }
 
     @Override
@@ -124,7 +152,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             Certificate ca;
             try {
                 ca = cf.generateCertificate(caInput);
-                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+                //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
             } finally {
                 caInput.close();
             }
@@ -251,11 +279,14 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
                 String line;
 
+                //System.out.println("blah");
+
                 while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
-                    System.out.println(line);
+                    //System.out.println(line);
                 }
 
+                //System.out.println("blah...");
 
 
 
@@ -282,7 +313,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             //return "someting";
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return null;
+            return "Exception: "+e.getMessage();
         }
     }// end of do in background method
 

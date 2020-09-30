@@ -12,6 +12,7 @@ import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -48,7 +50,7 @@ public class TrackerScanner extends Service {
     private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
 
     // make a user definable variable later
-    private final static String dataBase = "testTestTest";
+    private final static String dataBase = "test";
 
 
     private boolean scanning;
@@ -58,6 +60,29 @@ public class TrackerScanner extends Service {
     private Location lastLocation;
 
     private PostToServer post;
+
+    LocalBroadcastManager broadcaster;
+
+    static final public String TRACKERSCANNER_RESULT = "com.riba2reality.wifimapper.TrackerScanner.REQUEST_PROCESSED";
+
+    static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MSG";
+
+    public void sendResult(String message) {
+        Intent intent = new Intent(TRACKERSCANNER_RESULT);
+        if(message != null)
+            intent.putExtra(TRACKERSCANNER_MESSAGE, message);
+        broadcaster.sendBroadcast(intent);
+    }
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        broadcaster = LocalBroadcastManager.getInstance(this);
+
+
+    }
 
     private LocationCallback locationCallback = new LocationCallback(){
         @Override
@@ -106,6 +131,7 @@ public class TrackerScanner extends Service {
                 scanWifi();
             postResult();
 
+
         };
     };
 
@@ -152,11 +178,14 @@ public class TrackerScanner extends Service {
         double longitude;
         double altitude;
         double accuracy;
+        String provider;
         if(lastLocation!=null) {
             latitude = lastLocation.getLatitude();
             longitude = lastLocation.getLongitude();
             altitude = lastLocation.getAltitude();
             accuracy = lastLocation.getAccuracy();
+
+            provider = lastLocation.getProvider();
         }else{
             return;
         }
@@ -167,6 +196,8 @@ public class TrackerScanner extends Service {
         String messageOut = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude
                 + "\naltitude:" + altitude;
         System.out.println(messageOut);
+
+        //System.out.println("Provider: "+provider);
 
         //------
 
@@ -185,6 +216,10 @@ public class TrackerScanner extends Service {
 
 
 
+
+
+
+        //------
 
 
 //                parameters.put("TIME","12:01");
@@ -237,7 +272,7 @@ public class TrackerScanner extends Service {
         //String message = "hello_message";
 
         //PostToServer
-        post = new PostToServer();
+        post = new PostToServer(this);
 
 
         post.is = getResources().openRawResource(R.raw.cert);
@@ -246,6 +281,11 @@ public class TrackerScanner extends Service {
 
 
         post.execute(uri,message);
+
+
+        //this.sendResult(message);
+
+
     }// end of postResult
 
 
