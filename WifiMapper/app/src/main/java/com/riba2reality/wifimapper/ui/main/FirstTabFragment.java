@@ -106,7 +106,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
         mo = new MarkerOptions().position(new LatLng(0, 0)).title("My current location");
 
-        /*
+
 
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
@@ -123,27 +123,27 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
 
 
-
-        if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        //this.onLocationChanged(locationManager.getLastKnownLocation(provider));
+//
+//        if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        //this.onLocationChanged(locationManager.getLastKnownLocation(provider));
 
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_ALL);
         }
-        //else requestlocation();
-        //if (!isLocationEnabled())
-        //    showAlert(1);
+        else requestlocation();
+        if (!isLocationEnabled())
+            showAlert(1);
 
-*/
+
 
 
     }// end of onCreate method
@@ -339,13 +339,13 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
 
     }//end of requestlocation
-/*
+
     private boolean isLocationEnabled(){
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ;
         //|| locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }//end of isLocationEnabled
 
- */
+
 
     private boolean isPermissionGranted(){
         if(//checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
