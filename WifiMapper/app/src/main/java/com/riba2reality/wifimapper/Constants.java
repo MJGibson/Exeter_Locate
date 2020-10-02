@@ -7,6 +7,11 @@ public class Constants {
     public static final String ACTION_STOP_LOCATION_SERVICE  = "stopLocationService";
 
     // variable constants
-    public static String ServerAddress = "35.178.191.244";
+    //public static String ServerAddress = "35.178.191.244"; // AWS1
+    //public static String ServerAddress = "192.168.0.10"; // local home
+    public static String ServerAddress = "144.173.33.81"; // University network - Emps-Gibson3.isad.isadroot.ex.ac.uk
+
+    public static String interval = "10";
+    public static String database = "alpha";
 
 }// end of class

@@ -254,6 +254,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
                 con.setRequestMethod(method);
 
+                // set time outs
+                con.setReadTimeout(1000);
+                con.setConnectTimeout(1500);
+
                 // set certificate
                 con.setSSLSocketFactory(context.getSocketFactory());
 
@@ -295,7 +299,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                return null;
+                //return null;
+                return "Exception: "+e.getMessage();
             } finally {
                 if (reader != null) {
                     try {

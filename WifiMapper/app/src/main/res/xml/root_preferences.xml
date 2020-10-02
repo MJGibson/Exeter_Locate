@@ -1,4 +1,6 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:asp="http://schemas.android.com/apk/res-auto"
 
     >
 
@@ -13,10 +15,10 @@
 
         <ListPreference
             app:defaultValue="Server"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
+            app:entries="@array/server_names"
+            app:entryValues="@array/server_values"
             app:key="ServerList"
-            app:title="@string/reply_title"
+            app:title="@string/server_select"
             app:useSimpleSummaryProvider="true"
 
 
@@ -26,15 +28,22 @@
 
     <PreferenceCategory app:title="Transmit to server settings">
 
-        <EditTextPreference
+        <SeekBarPreference
             app:key="interval"
-            app:title="Time interval between scans"
-            app:useSimpleSummaryProvider="true"
+            app:title="Time interval between scans (seconds)"
+            app:defaultValue="@integer/defaultVal"
+            app:min="@integer/min"
+
+
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:isPreferenceVisible="true"
+            app:showSeekBarValue="true"
             />
 
         <EditTextPreference
             app:key="database"
-            app:title="Which database to use:"
+            app:title="Database:"
             app:useSimpleSummaryProvider="true"
             />
 

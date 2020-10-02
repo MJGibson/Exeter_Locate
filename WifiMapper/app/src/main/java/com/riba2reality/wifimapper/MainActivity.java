@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView logTextView = (TextView)findViewById(R.id.log);
 
                 logTextView.setText(logTextView.getText()+
-                        "####################\n"
+                        "\n####################\n"
                         +message);
 
             }

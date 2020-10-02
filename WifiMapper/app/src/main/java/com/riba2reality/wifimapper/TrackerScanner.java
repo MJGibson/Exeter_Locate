@@ -50,7 +50,7 @@ public class TrackerScanner extends Service {
     private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
 
     // make a user definable variable later
-    private final static String dataBase = "test";
+    private final static String dataBase = "testTest";
 
 
     private boolean scanning;
