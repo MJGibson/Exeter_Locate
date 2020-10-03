@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -26,6 +27,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.EditTextPreference;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,9 +45,12 @@ import com.riba2reality.wifimapper.ui.main.SectionsPagerAdapter;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -87,13 +93,19 @@ public class MainActivity extends AppCompatActivity {
                 String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
                 // do something here.
 
-                System.out.println("Message: "+message);
+                //System.out.println("Message: "+message);
+
+                String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
 
                 TextView logTextView = (TextView)findViewById(R.id.log);
 
-                logTextView.setText(logTextView.getText()+
-                        "\n####################\n"
-                        +message);
+                if(logTextView!=null) {
+                    logTextView.setText(logTextView.getText() +
+                            "\n### " + currentTime + " ###" +
+                            "\n"
+                            + message);
+                }
 
             }
         };
@@ -308,6 +320,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void startLocationService(){
         if(!isLocationServiceRunning()){
+
+
+//            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+//            String serverAddress = sharedPref.getString("ServerAddress","");
+            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String serverAddress =SP.getString("ServerAddress", null);
+
+            //System.out.println("ServerAddress: "+serverAddress);
+
+            if(serverAddress.isEmpty()){
+                Toast.makeText(this,"Please set Server Address", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
             startService(intent);

@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -15,12 +16,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -50,7 +53,7 @@ public class TrackerScanner extends Service {
     private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
 
     // make a user definable variable later
-    private final static String dataBase = "testTest";
+    //private final static String dataBase = "testTest";
 
 
     private boolean scanning;
@@ -126,10 +129,24 @@ public class TrackerScanner extends Service {
                 ///adapter.notifyDataSetChanged();
             }
 
-            Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
-            if(scanning)
-                scanWifi();
             postResult();
+
+            Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
+            if(scanning) {
+
+
+
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int interval =SP.getInt("interval", 0);
+                int intervalmill = interval * 1000;
+
+                SystemClock.sleep(intervalmill);
+
+
+                scanWifi();
+
+            }
+
 
 
         };
@@ -214,8 +231,10 @@ public class TrackerScanner extends Service {
 
         //------
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address =SP.getString("ServerAddress", null);
 
-
+        String dataBase =SP.getString("database", null);
 
 
 
@@ -256,7 +275,8 @@ public class TrackerScanner extends Service {
 
         //
         //String address = "82.46.100.70";
-        String address = Constants.ServerAddress;
+        //////String address = Constants.ServerAddress;
+
 
         //String address = "httpbin.org/get";
 
