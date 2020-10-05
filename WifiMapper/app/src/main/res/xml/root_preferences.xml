@@ -49,4 +49,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Information">
+
+        <EditTextPreference
+            app:key="versionNum"
+            app:title="Version:"
+            app:useSimpleSummaryProvider="true"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

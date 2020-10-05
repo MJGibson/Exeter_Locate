@@ -19,6 +19,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SeekBarPreference;
 
+import com.riba2reality.wifimapper.BuildConfig;
 import com.riba2reality.wifimapper.Constants;
 import com.riba2reality.wifimapper.R;
 import com.riba2reality.wifimapper.TrackerScanner;
@@ -253,7 +254,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             }// end of onBindEditText
         });
 
- */
+        */
+
+
+        //----------------------------------------------------------------
+
+        // set default
+        EditTextPreference versionPref = getPreferenceManager().findPreference("versionNum");
+
+
+        versionPref.setEnabled(false);
+        versionPref.setText(BuildConfig.VERSION_NAME);
+
 
 
     }// end of onCreatePreferences
