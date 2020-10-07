@@ -175,6 +175,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         pref_interval.setValue(5);
 
+        // set lister for end results
+        pref_interval.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
         //----------------------------------------------------------------
 
         // set default
