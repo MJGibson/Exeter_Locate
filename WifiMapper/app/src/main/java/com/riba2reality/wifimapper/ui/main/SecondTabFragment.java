@@ -125,7 +125,7 @@ public class SecondTabFragment extends Fragment {
 
             for (ScanResult scanResult : results) {
                 //arrayList.add(scanResult.SSID + " - " + scanResult.capabilities);
-                arrayList.add(scanResult.SSID + " -" + scanResult.BSSID);
+                arrayList.add(scanResult.SSID + "("+scanResult.level+") -" + scanResult.BSSID);
                 //arrayList.add(scanResult.SSID + " - \""+scanResult. +"\""
                 adapter.notifyDataSetChanged();
             }

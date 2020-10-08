@@ -334,6 +334,7 @@ public class TrackerScanner extends Service implements LocationListener {
         Map<String, String> parameters = new HashMap<>();
 
         List<String> macAddressList = new ArrayList<>();
+        List<String> signalStrengths = new ArrayList<>();
 
         //------
 
@@ -371,6 +372,7 @@ public class TrackerScanner extends Service implements LocationListener {
         for (ScanResult scanResult : results) {
 
             macAddressList.add(scanResult.BSSID);
+            signalStrengths.add(Integer.toString(scanResult.level));
         }
 
         //------
@@ -413,6 +415,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //parameters.put("MacAddresses",macAddressList.toString());
         parameters.put("MacAddressesJson",macAddressJson);
 
+        parameters.put("signalStrengthsJson",new Gson().toJson(signalStrengths ));
+
 
         String message = new JSONObject(parameters).toString();
 
@@ -454,7 +458,7 @@ public class TrackerScanner extends Service implements LocationListener {
         post.execute(uri,message);
 
 
-        //this.sendResult(message);
+        this.sendResult("Sending: "+message.length()+" bytes");
 
 
     }// end of postResult
