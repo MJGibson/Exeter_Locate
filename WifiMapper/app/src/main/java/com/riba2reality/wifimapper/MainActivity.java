@@ -47,6 +47,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -321,15 +322,19 @@ public class MainActivity extends AppCompatActivity {
     private void startLocationService(){
         if(!isLocationServiceRunning()){
 
+            String[] server_values = getResources().getStringArray(R.array.server_values);
 
 //            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
 //            String serverAddress = sharedPref.getString("ServerAddress","");
             SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            String serverAddress =SP.getString("ServerAddress", null);
+            String serverAddress =SP.getString("ServerAddress", server_values[1]);
 
             //System.out.println("ServerAddress: "+serverAddress);
 
-            if(serverAddress.isEmpty()){
+
+            //List<String> server_valuesList = Arrays.asList(server_values);
+
+            if(serverAddress.isEmpty() || serverAddress.equals(server_values[0])){
                 Toast.makeText(this,"Please set Server Address", Toast.LENGTH_SHORT).show();
                 return;
             }

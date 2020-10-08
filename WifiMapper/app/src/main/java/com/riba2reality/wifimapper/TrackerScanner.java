@@ -384,10 +384,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //------
 
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address =SP.getString("ServerAddress", null);
+        String[] server_values = getResources().getStringArray(R.array.server_values);
 
-        String dataBase =SP.getString("database", null);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address =SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase =SP.getString("database", "alpha");
 
 
 
@@ -553,7 +555,13 @@ public class TrackerScanner extends Service implements LocationListener {
             e.printStackTrace();
         }
 
-        unregisterReceiver(wifiReceiver);
+        // if service stopped when scaned wifi, the reciever already unregisted
+        try {
+            unregisterReceiver(wifiReceiver);
+        }catch(IllegalArgumentException e) {
+
+            e.printStackTrace();
+        }
 
         stopForeground(true);
         stopSelf();
