@@ -21,6 +21,13 @@
             app:title="@string/server_select"
             app:useSimpleSummaryProvider="true"
 
+            />
+
+
+        <SwitchPreference
+            app:key="SSL_switch"
+            app:title="Use HTTPS (SSL)?"
+            android:defaultValue="True"
 
             />
 

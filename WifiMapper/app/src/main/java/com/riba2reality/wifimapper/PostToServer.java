@@ -1,9 +1,11 @@
 package com.riba2reality.wifimapper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 import org.json.JSONObject;
 
@@ -14,7 +16,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -76,11 +80,17 @@ public class PostToServer extends AsyncTask<String, String, String> {
     protected String doInBackground(String... params) {
         String urlString = params[0]; // URL to call
         String data = params[1]; //data to post
+
+        String useSSLString = params[2];
         OutputStream out = null;
+
+        boolean useSSL = Boolean.valueOf(useSSLString);
 
         try {
 
+            //------------------------------------------------------------------
 
+            //------------------------------------------------------------------
             /*
             URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -251,19 +261,28 @@ public class PostToServer extends AsyncTask<String, String, String> {
             try {
                 URL url = new URL(uri);
                 //HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setRequestMethod(method);
+
+                URLConnection con;
+                if (useSSL) {
+                    con = (HttpsURLConnection) url.openConnection();
+                    ((HttpsURLConnection)con).setRequestMethod(method);
+                }else{
+                    con = (HttpURLConnection) url.openConnection();
+                    ((HttpURLConnection)con).setRequestMethod(method);
+                }
+
 
                 // set time outs
                 con.setReadTimeout(1000);
                 con.setConnectTimeout(1500);
 
-                // set certificate
-                con.setSSLSocketFactory(context.getSocketFactory());
+                if(useSSL) {
+                    // set certificate
+                    ((HttpsURLConnection)con).setSSLSocketFactory(context.getSocketFactory());
 
-                // set host name
-                con.setHostnameVerifier(hostnameVerifier);
-
+                    // set host name
+                    ((HttpsURLConnection)con).setHostnameVerifier(hostnameVerifier);
+                }
 
 
                 if (method.equals("POST")) {
@@ -304,6 +323,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             } finally {
                 if (reader != null) {
                     try {
+                        
                         reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();

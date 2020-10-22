@@ -2,13 +2,17 @@
     <!-- Server Preference -->
     <string-array name="server_names">
         <item>Custom</item>
-        <item>AWS1</item>
+        <item>Amazon</item>
+        <item>Google</item>
+        <item>Azure</item>
         <item>emps-gibson3</item>
     </string-array>
 
     <string-array name="server_values">
         <item>Custom</item>
-        <item>35.177.143.202</item>
+        <item>3.9.100.243</item>
+        <item>34.105.172.80</item>
+        <item>51.11.144.99</item>
         <item>144.173.33.81</item>
     </string-array>
 

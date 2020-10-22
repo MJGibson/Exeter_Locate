@@ -391,6 +391,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String dataBase =SP.getString("database", "alpha");
 
+        boolean useSSL = SP.getBoolean("SSL_switch",true);
 
 
         //------
@@ -441,7 +442,14 @@ public class TrackerScanner extends Service implements LocationListener {
         //String uri = "http://"+address+":"+port;
 
         //String uri = "http://"+address;
-        String uri = "https://"+address;
+
+        String protocol = "http";
+        if(useSSL){
+            protocol+="s";
+        }
+
+        //String uri = "https://"+address;
+        String uri = protocol+"://"+address;
 
         //String uri = "http://example.com";
         //String uri = "https://postman-echo.com/get";
@@ -457,10 +465,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
 
-        post.execute(uri,message);
+        post.execute(uri,message, String.valueOf(useSSL));
 
 
-        this.sendResult("Sending: "+message.length()+" bytes");
+
+        this.sendResult("Sending["+protocol+"]: "+message.length()+" bytes");
 
 
     }// end of postResult
