@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
+import org.apache.http.conn.ssl.StrictHostnameVerifier;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -83,6 +84,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         String useSSLString = params[2];
         OutputStream out = null;
+
+        final String address = params[3];
 
         boolean useSSL = Boolean.valueOf(useSSLString);
 
@@ -193,21 +196,28 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 public boolean verify(String hostname, SSLSession session) {
                     HostnameVerifier hv =
                             HttpsURLConnection.getDefaultHostnameVerifier();
-                    return hv.verify("192.168.0.10", session);
+                    //new StrictHostnameVerifier();
+
+                    //return hv.verify(address, session);
+
+                    //return hv.verify("192.168.0.10", session);
+
+
                     //return hv.verify("82.46.100.70", session);
 
                     //System.out.println(hostname);
-/*
+
                     if(
-                            hostname.equals("192.168.0.10") ||
-                                    hostname.equals("10.0.2.2")
+                            //hostname.equals("192.168.0.10") ||
+                            //        hostname.equals("10.0.2.2")
+                            hostname.equals(address)
 
                     )
                         return true;
                     else
                         return false;
 
- */
+
                 }
             };
 
@@ -273,8 +283,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
 
                 // set time outs
-                con.setReadTimeout(1000);
-                con.setConnectTimeout(1500);
+                con.setReadTimeout(5000);
+                con.setConnectTimeout(5000);
 
                 if(useSSL) {
                     // set certificate
@@ -282,6 +292,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
                     // set host name
                     ((HttpsURLConnection)con).setHostnameVerifier(hostnameVerifier);
+
+
                 }
 
 

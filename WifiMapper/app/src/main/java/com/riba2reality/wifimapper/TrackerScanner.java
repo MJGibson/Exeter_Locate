@@ -460,12 +460,12 @@ public class TrackerScanner extends Service implements LocationListener {
         post = new PostToServer(this);
 
 
-        post.is = getResources().openRawResource(R.raw.cert);
+        post.is = getResources().openRawResource(R.raw.nginxselfsigned);
 
 
 
 
-        post.execute(uri,message, String.valueOf(useSSL));
+        post.execute(uri,message, String.valueOf(useSSL),address);
 
 
 
