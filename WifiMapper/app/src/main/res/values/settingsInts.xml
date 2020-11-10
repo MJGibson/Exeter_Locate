@@ -3,7 +3,11 @@
 
     <integer name="max">60</integer>
     <integer name="min">1</integer>
-    <integer name="defaultVal">5</integer>
+
     <integer name="increment">1</integer>
+
+    <integer name="defaultVal_post">1</integer>
+    <integer name="defaultVal_gps">1</integer>
+    <integer name="defaultVal_wifi">1</integer>
 
 </resources>

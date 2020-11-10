@@ -64,9 +64,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     private WifiManager wifiManager;
-    public ArrayList<String> arrayList = new ArrayList<>();
+    public ArrayList<String> arrayList = null;
     private List<ScanResult> results;
-    private Location lastLocation;
+    private Location lastLocation = null;
 
     private PostToServer post;
 
@@ -89,6 +89,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private boolean running = false;
 
+    private boolean updatingWifiResults = false;
+
     Handler handler = new Handler(Looper.getMainLooper());
     private Runnable periodicUpdate = new Runnable() {
         @Override
@@ -96,7 +98,8 @@ public class TrackerScanner extends Service implements LocationListener {
             if(running) {
 
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                int interval =SP.getInt("interval", 5);
+                int postInterval = getResources().getInteger(R.integer.defaultVal_post);
+                int interval =SP.getInt("interval_posts", postInterval);
 
                 handler.postDelayed(periodicUpdate, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
             }
@@ -114,6 +117,9 @@ public class TrackerScanner extends Service implements LocationListener {
             System.out.println(message);
 
 
+            postResult();
+
+/*
             if(scanning== false ) {
 
                 scanning= true;
@@ -126,9 +132,34 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             }
+*/
 
         }
     };
+
+
+    private Runnable periodicUpdate_wifi = new Runnable() {
+        @Override
+        public void run() {
+
+            //
+
+            String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+            String message = "Wifi;Time:" + currentTime;
+            //+ "\nLat:" + location.getLatitude() + "\nLong:" + location.getLongitude();
+
+//        Toast myToast = Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT);
+//        myToast.show();
+
+            System.out.println(message);
+
+
+            scanWifi();
+
+
+        }
+    };
+
 
     private void requestlocation() {
         Criteria criteria = new Criteria();
@@ -136,13 +167,18 @@ public class TrackerScanner extends Service implements LocationListener {
         criteria.setPowerRequirement(Criteria.POWER_HIGH);
         String provider = locationManager.getBestProvider(criteria, true);
 
-//        locationManager.requestLocationUpdates(provider,
-//                10,
-//                10,
-//                this);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
+        int interval =SP.getInt("interval_gps", gpsInterval);
 
 
-        locationManager.requestSingleUpdate(provider, this, Looper.getMainLooper());
+        locationManager.requestLocationUpdates(provider,
+                interval,
+                10,
+                this);
+
+
+        //locationManager.requestSingleUpdate(provider, this, Looper.getMainLooper());
 
 
 
@@ -196,13 +232,17 @@ public class TrackerScanner extends Service implements LocationListener {
 
         lastLocation = new Location(location);
 
+        this.sendResult("Location updated");
+
+
+        /*
         // set scanned bool
         locationScanned = true;
 
         if(wifiScanned){
             postResult();
         }
-
+*/
 
 
     }// end of onLocationChanged
@@ -257,12 +297,18 @@ public class TrackerScanner extends Service implements LocationListener {
             results = wifiManager.getScanResults();
             unregisterReceiver(wifiReceiver);
 
+            updatingWifiResults = true;
+            arrayList = new ArrayList<String>();
             for (ScanResult scanResult : results) {
                 //arrayList.add(scanResult.SSID + " - " + scanResult.capabilities);
                 arrayList.add(scanResult.SSID + " -" + scanResult.BSSID);
                 //arrayList.add(scanResult.SSID + " - \""+scanResult. +"\""
                 ///adapter.notifyDataSetChanged();
             }
+            updatingWifiResults = false;//?
+
+            sendResult("Wifi updated");
+
 
             //postResult();
 
@@ -286,6 +332,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
              */
 
+
+/*
             // set wifi scanned bool
             wifiScanned = true;
 
@@ -293,13 +341,29 @@ public class TrackerScanner extends Service implements LocationListener {
                 postResult();
             }
 
+ */
+
+            if(running) {
+
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
+                int interval =SP.getInt("interval_wifi", wifiInterval);
+
+                handler.postDelayed(periodicUpdate_wifi, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+            }
+            else
+                return;
 
 
         };
     };
 
     public void scanWifi() {
-        arrayList.clear();
+
+        //arrayList.clear();
+        //arrayList = null;
+
+
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
 
@@ -351,8 +415,28 @@ public class TrackerScanner extends Service implements LocationListener {
 
             provider = lastLocation.getProvider();
         }else{
+
+            this.sendResult("Post absent GPS");
+
             return;
         }
+
+
+        if(arrayList == null){
+
+            this.sendResult("Post absent WIFI");
+
+            return;
+        }
+
+        //ArrayList<String> wifiList = this.arrayList;
+        for (ScanResult scanResult : results) {
+
+            macAddressList.add(scanResult.BSSID);
+            signalStrengths.add(Integer.toString(scanResult.level));
+        }
+
+        //------
 
         String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
 
@@ -368,14 +452,6 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
 
-        //ArrayList<String> wifiList = this.arrayList;
-        for (ScanResult scanResult : results) {
-
-            macAddressList.add(scanResult.BSSID);
-            signalStrengths.add(Integer.toString(scanResult.level));
-        }
-
-        //------
 
         // results collected, switch scanning back on.
         scanning = false;
@@ -540,6 +616,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //----------
 
+
+        requestlocation();
+
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 
 
@@ -553,6 +632,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 //        LocationServices.getFusedLocationProviderClient(this)
 //                .removeLocationUpdates(locationCallback);
+
+        locationManager.removeUpdates(this);
 
 
         try {
@@ -583,6 +664,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         handler.removeCallbacks(periodicUpdate);
 
+        handler.removeCallbacks(periodicUpdate_wifi);
 
         running = false;
 
@@ -599,6 +681,8 @@ public class TrackerScanner extends Service implements LocationListener {
             String action = intent.getAction();
             if(action != null){
                 if(action.equals(Constants.ACTION_START_LOCATION_SERVICE)){
+
+
                     startLocationService();
 
                     wifiManager = (WifiManager)
@@ -615,11 +699,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     running = true;
 
-
-
-
-
                     handler.post(periodicUpdate);
+
+
+                    handler.post(periodicUpdate_wifi);
+
+
                     return START_STICKY;
                 }else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
                     //System.out.println("Stop intiated...");

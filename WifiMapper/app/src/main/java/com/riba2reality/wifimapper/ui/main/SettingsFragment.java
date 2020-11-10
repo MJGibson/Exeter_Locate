@@ -171,12 +171,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         pref_interval.setText(Constants.interval);
          */
 
-        SeekBarPreference pref_interval = getPreferenceManager().findPreference("interval");
+        SeekBarPreference pref_interval_post = getPreferenceManager().findPreference("interval_posts");
 
-        pref_interval.setValue(5);
+        int postInterval = getContext().getResources().getInteger(R.integer.defaultVal_post);
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+
+        pref_interval_post.setValue(postInterval);
 
         // set lister for end results
-        pref_interval.setOnPreferenceChangeListener(
+        pref_interval_post.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -186,6 +191,53 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 }
 
         );
+
+        //----------------------------------------------------------------
+
+        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_gps");
+
+        int gpsInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+
+        pref_interval_gps.setValue(gpsInterval);
+
+        // set lister for end results
+        pref_interval_gps.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
+        //----------------------------------------------------------------
+
+        SeekBarPreference pref_interval_wifi = getPreferenceManager().findPreference("interval_wifi");
+
+        int wifiInterval = getContext().getResources().getInteger(R.integer.defaultVal_wifi);
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+
+        pref_interval_wifi.setValue(wifiInterval);
+
+        // set lister for end results
+        pref_interval_wifi.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
 
         //----------------------------------------------------------------
 

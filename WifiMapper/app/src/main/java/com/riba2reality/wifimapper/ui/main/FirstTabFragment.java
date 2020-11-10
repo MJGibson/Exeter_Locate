@@ -139,7 +139,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_ALL);
         }
-        else requestlocation();
+        //////////else requestlocation();
         if (!isLocationEnabled())
             showAlert(1);
 

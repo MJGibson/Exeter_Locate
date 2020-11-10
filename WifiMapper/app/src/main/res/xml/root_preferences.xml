@@ -31,28 +31,50 @@
 
             />
 
+        <EditTextPreference
+            app:key="database"
+            app:title="Database:"
+            app:useSimpleSummaryProvider="true"
+            />
+
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Transmit to server settings">
+    <PreferenceCategory app:title="Time settings">
 
         <SeekBarPreference
-            app:key="interval"
-            app:title="Time interval between scans (seconds)"
-            app:defaultValue="@integer/defaultVal"
+            app:key="interval_posts"
+            app:title="Time interval between posts (seconds)"
+            app:defaultValue="@integer/defaultVal_post"
             app:min="@integer/min"
-
-
             android:max="@integer/max"
             app:adjustable="true"
             app:isPreferenceVisible="true"
             app:showSeekBarValue="true"
             />
 
-        <EditTextPreference
-            app:key="database"
-            app:title="Database:"
-            app:useSimpleSummaryProvider="true"
+        <SeekBarPreference
+            app:key="interval_gps"
+            app:title="Time interval between GPS scans (seconds)"
+            app:defaultValue="@integer/defaultVal_gps"
+            app:min="@integer/min"
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:isPreferenceVisible="true"
+            app:showSeekBarValue="true"
             />
+
+        <SeekBarPreference
+            app:key="interval_wifi"
+            app:title="Time interval between Wifi Scans (seconds)"
+            app:defaultValue="@integer/defaultVal_wifi"
+            app:min="@integer/min"
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:isPreferenceVisible="true"
+            app:showSeekBarValue="true"
+            />
+
+
 
     </PreferenceCategory>
 

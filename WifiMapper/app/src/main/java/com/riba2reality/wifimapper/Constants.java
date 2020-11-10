@@ -13,5 +13,7 @@ public class Constants {
 
     public static String interval = "10";
     public static String database = "alpha";
+    //public static String database = "test";
+
 
 }// end of class
