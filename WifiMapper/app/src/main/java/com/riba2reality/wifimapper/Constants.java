@@ -15,5 +15,7 @@ public class Constants {
     public static String database = "alpha";
     //public static String database = "test";
 
+    public static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
+
 
 }// end of class

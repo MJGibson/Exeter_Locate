@@ -45,12 +45,17 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 
 public class TrackerScanner extends Service implements LocationListener {
@@ -60,6 +65,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     // make a user definable variable later
     //private final static String dataBase = "testTest";
+
+    private Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
 
 
 
@@ -117,7 +124,8 @@ public class TrackerScanner extends Service implements LocationListener {
             System.out.println(message);
 
 
-            postResult();
+            //postResult();
+            postWifiResult();
 
 /*
             if(scanning== false ) {
@@ -174,7 +182,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         locationManager.requestLocationUpdates(provider,
                 interval,
-                10,
+                1,
                 this);
 
 
@@ -297,6 +305,11 @@ public class TrackerScanner extends Service implements LocationListener {
             results = wifiManager.getScanResults();
             unregisterReceiver(wifiReceiver);
 
+            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+            WifiScanResult result = new WifiScanResult();
+            result.dateTime = currentTime;
+            //result.wifiResult
+
             updatingWifiResults = true;
             arrayList = new ArrayList<String>();
             for (ScanResult scanResult : results) {
@@ -304,6 +317,15 @@ public class TrackerScanner extends Service implements LocationListener {
                 arrayList.add(scanResult.SSID + " -" + scanResult.BSSID);
                 //arrayList.add(scanResult.SSID + " - \""+scanResult. +"\""
                 ///adapter.notifyDataSetChanged();
+
+                WifiResult wifiResult = new WifiResult();
+                wifiResult.macAddress = scanResult.BSSID;
+                wifiResult.signalStrength = scanResult.level;
+
+
+                result.wifiResult.add(wifiResult);
+
+
             }
             updatingWifiResults = false;//?
 
@@ -313,6 +335,15 @@ public class TrackerScanner extends Service implements LocationListener {
             //postResult();
 
             Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
+
+
+
+
+
+
+            wifiScanResultQueue.add(result);
+
+
 
             /*
             if(scanning) {
@@ -393,6 +424,53 @@ public class TrackerScanner extends Service implements LocationListener {
         throw new UnsupportedOperationException("Not yet implemented");
         //return null;
     }
+
+    private void postWifiResult() {
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address =SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase =SP.getString("database", "alpha");
+        //
+        String deviceID =SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch",true);
+
+        String protocol = "http";
+        if(useSSL){
+            protocol+="s";
+        }
+
+
+        // empty the queue
+        while(this.wifiScanResultQueue.size() > 0) {
+
+            PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+
+            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+
+            thisPost.wifiScanResult = wifiScanResultQueue.poll();
+
+
+            thisPost.execute(
+                    address,
+                    protocol,
+                    String.valueOf(useSSL),
+                    deviceID,
+                    dataBase
+            );
+
+            this.sendResult("Removed Wifi result from queue to send.");
+
+
+        }// end of looping queue
+
+    }// end of postWifiResult
+
+
+
+
 
     private void postResult(){
         Map<String, String> parameters = new HashMap<>();

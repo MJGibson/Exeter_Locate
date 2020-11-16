@@ -4,6 +4,14 @@
 
     >
 
+
+    <EditTextPreference
+        app:key="DeviceID"
+        app:title="Device/User ID"
+        app:useSimpleSummaryProvider="true"
+
+        />
+
     <PreferenceCategory app:title="Server">
 
         <EditTextPreference

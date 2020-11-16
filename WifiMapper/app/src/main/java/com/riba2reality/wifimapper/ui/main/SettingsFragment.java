@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
 
@@ -45,7 +46,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
+        //----------------------------------------------------------------
 
+
+        EditTextPreference deviceIDPref = (EditTextPreference)findPreference("DeviceID");
+        deviceIDPref.setText(UUID.randomUUID().toString());
+
+
+
+
+        //----------------------------------------------------------------
 
         // only enable the server IP input if custom is selected, otherwise disable and enter relavtive IP
         final ListPreference serverAddressListPref = (ListPreference)findPreference("ServerList");
