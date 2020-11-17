@@ -12,6 +12,11 @@ dataBase = 'phoneTest_home'
 #db = client[dataBase]
 #collection = db['myCollection']
 
+wifiCollection = 'wifi'
+combinedCollection = 'combiColl'
+gpsCollection = 'gpsColl'
+
+
 @app.route("/", methods=['GET', 'POST'])
 def hello():
     if request.method == 'POST':
@@ -22,7 +27,7 @@ def hello():
 
         client = MongoClient('localhost',27017)
         db = client[dataBase]
-        collection = db['myCollection']
+        collection = db[combinedCollection]
         
         
         
@@ -40,10 +45,20 @@ def hello():
         if(jsonData["MAGIC_NUM"]!=magicNum):
             print("magic number mismatch")
             return
+            
+        if("UUID" not in jsonData.keys()):
+            print("no UUID")
+            #print("UUID:"+jsonData["UUID"])
+            return
         
         if("TIME" not in jsonData.keys()):
             print("no TIME")
             #print("TIME:"+jsonData["TIME"])
+            return
+            
+        if("GPSTIME" not in jsonData.keys()):
+            print("no GPSTIME")
+            #print("GPSTIME:"+jsonData["GPSTIME"])
             return
             
         if("X" not in jsonData.keys()):
@@ -67,7 +82,7 @@ def hello():
         if("DATABASE" in jsonData.keys()):
             #print("")
             db = client[jsonData["DATABASE"]]
-            collection = db['myCollection']
+            collection = db[combinedCollection]
         #-------------------------------------------
         
         MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
@@ -93,8 +108,28 @@ def hello():
                 "z":float(jsonData["ALTITUDE"]),
                 "acc":float(jsonData["ACC"]),
                 "level":int(signalStregth),
+                "uuid":jsonData["UUID"]
                 } } 
                 }
+            ,upsert=True
+            )
+        
+        
+        
+        
+        #-------------------------------------------
+        collection = db[gpsCollection]
+        
+        
+        collection.update({"UUID":jsonData["UUID"]},
+            { "$push": { "Scans": { 
+                "GPSTIME" : jsonData["GPSTIME"],
+                "x":float(jsonData["X"]),
+                "y":float(jsonData["Y"]),
+                "z":float(jsonData["ALTITUDE"]),
+                "acc":float(jsonData["ACC"]),
+            } } 
+            }
             ,upsert=True
             )
         
@@ -115,7 +150,7 @@ def wifi():
 
         client = MongoClient('localhost',27017)
         db = client[dataBase]
-        collection = db['wifi']
+        collection = db[wifiCollection]
         
         
         
@@ -155,7 +190,7 @@ def wifi():
         if("DATABASE" in jsonData.keys()):
             #print("")
             db = client[jsonData["DATABASE"]]
-            collection = db['wifi']
+            collection = db[wifiCollection]
         #-------------------------------------------
         
         MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
@@ -204,7 +239,7 @@ def wifi():
                 } 
             }
             
-#            ,upsert=True
+            ,upsert=True
             )
             
             

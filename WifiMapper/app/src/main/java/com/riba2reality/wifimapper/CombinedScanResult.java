@@ -1,0 +1,16 @@
+package com.riba2reality.wifimapper;
+
+import android.location.Location;
+
+import java.util.ArrayList;
+
+public class CombinedScanResult {
+
+    public String dateTime;
+
+    public ArrayList<WifiResult> wifiResult = new ArrayList<WifiResult>();
+
+    public Location location;
+
+
+}// end of class CombinedScanResult

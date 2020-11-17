@@ -68,6 +68,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
 
+    private Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
 
 
     private WifiManager wifiManager;
@@ -125,6 +126,10 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             //postResult();
+
+            postCombinedResult();
+
+
             postWifiResult();
 
 /*
@@ -240,8 +245,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         lastLocation = new Location(location);
 
+        CombinedScanResult combinedScanResult = new CombinedScanResult();
+        combinedScanResult.location = new Location(location);
+
+        combinedScanResultQueue.add(combinedScanResult);
+
         this.sendResult("Location updated");
 
+
+        scanWifi();
+
+
+        
 
         /*
         // set scanned bool
@@ -337,11 +352,21 @@ public class TrackerScanner extends Service implements LocationListener {
             Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
 
 
-
-
-
-
             wifiScanResultQueue.add(result);
+
+
+            if(combinedScanResultQueue.peek().dateTime == null){
+
+                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
+
+                combinedScanResult.dateTime = currentTime;
+
+                combinedScanResult.wifiResult = result.wifiResult;
+
+
+            }
+
+
 
 
 
@@ -467,6 +492,51 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of looping queue
 
     }// end of postWifiResult
+
+
+    private void postCombinedResult() {
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address =SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase =SP.getString("database", "alpha");
+        //
+        String deviceID =SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch",true);
+
+        String protocol = "http";
+        if(useSSL){
+            protocol+="s";
+        }
+
+
+        // empty the queue
+        while(this.combinedScanResultQueue.size() > 0) {
+
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            PostCombinedResultToServer thisPost = new PostCombinedResultToServer(this);
+
+            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+
+            thisPost.combinedScanResult = combinedScanResultQueue.poll();
+
+
+            thisPost.execute(
+                    address,
+                    protocol,
+                    String.valueOf(useSSL),
+                    deviceID,
+                    dataBase
+            );
+
+            this.sendResult("Removed Combined result from queue to send.");
+
+
+        }// end of looping queue
+
+    }// end of postCombinedResult
 
 
 
@@ -777,10 +847,20 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     running = true;
 
-                    handler.post(periodicUpdate);
+                    //handler.post(periodicUpdate);
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    int postInterval = getResources().getInteger(R.integer.defaultVal_post);
+                    int interval =SP.getInt("interval_posts", postInterval);
+                    handler.postDelayed(periodicUpdate, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
 
 
-                    handler.post(periodicUpdate_wifi);
+                    //handler.post(periodicUpdate_wifi);
+
+                    int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
+                    int interval_wifi =SP.getInt("interval_wifi", wifiInterval);
+
+                    handler.postDelayed(periodicUpdate_wifi, interval_wifi * 1000 - SystemClock.elapsedRealtime() % 1000);
+
 
 
                     return START_STICKY;
