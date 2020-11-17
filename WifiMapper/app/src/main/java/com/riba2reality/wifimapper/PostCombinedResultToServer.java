@@ -363,6 +363,11 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
                 return sb.toString();
 
             } catch (Exception e) {
+
+                // put it back in the queue
+                this._trackerScanner.combinedScanResultQueue.add(this.combinedScanResult);
+
+
                 e.printStackTrace();
                 //return null;
                 return "Exception: "+e.getMessage();
@@ -383,6 +388,11 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
 
             //return "someting";
         } catch (Exception e) {
+
+            // put it back in the queue
+            this._trackerScanner.combinedScanResultQueue.add(this.combinedScanResult);
+
+
             System.out.println(e.getMessage());
             return "Exception: "+e.getMessage();
         }

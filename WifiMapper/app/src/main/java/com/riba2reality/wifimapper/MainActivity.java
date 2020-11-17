@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,11 +102,22 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView logTextView = (TextView)findViewById(R.id.log);
 
+                final ScrollView scroll = (ScrollView) findViewById(R.id.logScroll);
+
+
                 if(logTextView!=null) {
                     logTextView.setText(logTextView.getText() +
                             "\n### " + currentTime + " ###" +
                             "\n"
                             + message);
+
+                    scroll.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scroll.fullScroll(ScrollView.FOCUS_DOWN);
+                        }
+                    });
+
                 }
 
             }

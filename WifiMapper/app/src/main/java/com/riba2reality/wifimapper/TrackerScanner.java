@@ -66,9 +66,9 @@ public class TrackerScanner extends Service implements LocationListener {
     // make a user definable variable later
     //private final static String dataBase = "testTest";
 
-    private Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
+    public Queue<WifiScanResult> wifiScanResultQueue;
 
-    private Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
+    public Queue<CombinedScanResult> combinedScanResultQueue;
 
 
     private WifiManager wifiManager;
@@ -205,6 +205,16 @@ public class TrackerScanner extends Service implements LocationListener {
     }
 
 
+    public TrackerScanner()
+    {
+        System.out.println("tracker created..");
+
+
+        wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
+        combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -212,6 +222,9 @@ public class TrackerScanner extends Service implements LocationListener {
 //        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 //        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wifiScanner:TrackerScanner");
 //        wl.acquire();
+
+
+
 
         broadcaster = LocalBroadcastManager.getInstance(this);
 
@@ -354,10 +367,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
             wifiScanResultQueue.add(result);
 
+            CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
 
-            if(combinedScanResultQueue.peek().dateTime == null){
+            if(combinedScanResult != null &&
+                    combinedScanResultQueue.peek().dateTime == null){
 
-                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
+
 
                 combinedScanResult.dateTime = currentTime;
 

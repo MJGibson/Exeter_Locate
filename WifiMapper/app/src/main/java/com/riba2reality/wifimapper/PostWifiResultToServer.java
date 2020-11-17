@@ -338,6 +338,12 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
                 return sb.toString();
 
             } catch (Exception e) {
+
+
+                // put it back in the queue
+                this._trackerScanner.wifiScanResultQueue.add(this.wifiScanResult);
+
+
                 e.printStackTrace();
                 //return null;
                 return "Exception: "+e.getMessage();
@@ -358,6 +364,10 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
             //return "someting";
         } catch (Exception e) {
+
+            // put it back in the queue
+            this._trackerScanner.wifiScanResultQueue.add(this.wifiScanResult);
+
             System.out.println(e.getMessage());
             return "Exception: "+e.getMessage();
         }
