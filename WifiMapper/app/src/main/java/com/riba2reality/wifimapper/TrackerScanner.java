@@ -187,7 +187,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         locationManager.requestLocationUpdates(provider,
                 interval,
-                1,
+                0,
                 this);
 
 
@@ -881,6 +881,10 @@ public class TrackerScanner extends Service implements LocationListener {
                     return START_STICKY;
                 }else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
                     //System.out.println("Stop intiated...");
+
+                    // empty the queues before the lose them
+                    postCombinedResult();
+                    postWifiResult();
 
                     stopLocationService();
                     stopService();

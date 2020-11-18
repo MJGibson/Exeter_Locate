@@ -103,6 +103,7 @@ def hello():
             collection.update_many({"phone":macAddresse},
             { "$push": { "points": { 
                 "Time":jsonData["TIME"],
+                "GPSTIME" : jsonData["GPSTIME"],
                 "x":float(jsonData["X"]),
                 "y":float(jsonData["Y"]),
                 "z":float(jsonData["ALTITUDE"]),

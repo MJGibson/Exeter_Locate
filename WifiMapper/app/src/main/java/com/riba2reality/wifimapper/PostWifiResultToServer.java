@@ -87,7 +87,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
         String dataBase = params[4];
 
-        String port = ":5000";
+        String port = "";
 
         final String endpoint = "/wifi/";
 

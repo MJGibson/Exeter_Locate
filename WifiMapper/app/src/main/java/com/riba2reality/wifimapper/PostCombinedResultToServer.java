@@ -89,7 +89,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
 
         String dataBase = params[4];
 
-        String port = ":5000";
+        String port = "";
 
         final String endpoint = "/";
 
