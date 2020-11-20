@@ -66,9 +66,11 @@ public class TrackerScanner extends Service implements LocationListener {
     // make a user definable variable later
     //private final static String dataBase = "testTest";
 
-    public Queue<WifiScanResult> wifiScanResultQueue;
+    private Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
+    public Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<WifiScanResult>();
 
-    public Queue<CombinedScanResult> combinedScanResultQueue;
+    private Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
+    public Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
 
 
     private WifiManager wifiManager;
@@ -205,14 +207,14 @@ public class TrackerScanner extends Service implements LocationListener {
     }
 
 
-    public TrackerScanner()
-    {
-        System.out.println("tracker created..");
-
-
-        wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
-        combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
-    }
+//    public TrackerScanner()
+//    {
+//        System.out.println("tracker created..");
+//
+//
+//        wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
+//        combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
+//    }
 
 
     @Override
@@ -483,6 +485,29 @@ public class TrackerScanner extends Service implements LocationListener {
         }
 
 
+        // empty the resend queue forst
+        while(this.wifiScanResultResendQueue.size() > 0) {
+
+            PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+
+            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+
+            thisPost.wifiScanResult = wifiScanResultQueue.poll();
+
+
+            thisPost.execute(
+                    address,
+                    protocol,
+                    String.valueOf(useSSL),
+                    deviceID,
+                    dataBase
+            );
+
+            this.sendResult("Removed Wifi result from resend queue to send.");
+
+
+        }// end of looping queue
+
         // empty the queue
         while(this.wifiScanResultQueue.size() > 0) {
 
@@ -526,6 +551,29 @@ public class TrackerScanner extends Service implements LocationListener {
             protocol+="s";
         }
 
+        // empty the resend queue first
+        while(this.combinedScanResultResendQueue.size() > 0) {
+
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            PostCombinedResultToServer thisPost = new PostCombinedResultToServer(this);
+
+            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+
+            thisPost.combinedScanResult = combinedScanResultQueue.poll();
+
+
+            thisPost.execute(
+                    address,
+                    protocol,
+                    String.valueOf(useSSL),
+                    deviceID,
+                    dataBase
+            );
+
+            this.sendResult("Removed Combined result from queue to send.");
+
+
+        }// end of looping queue
 
         // empty the queue
         while(this.combinedScanResultQueue.size() > 0) {

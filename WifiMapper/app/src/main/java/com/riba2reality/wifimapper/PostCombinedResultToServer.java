@@ -365,7 +365,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             } catch (Exception e) {
 
                 // put it back in the queue
-                this._trackerScanner.combinedScanResultQueue.add(this.combinedScanResult);
+                this._trackerScanner.combinedScanResultResendQueue.add(this.combinedScanResult);
 
 
                 e.printStackTrace();
@@ -390,7 +390,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
         } catch (Exception e) {
 
             // put it back in the queue
-            this._trackerScanner.combinedScanResultQueue.add(this.combinedScanResult);
+            this._trackerScanner.combinedScanResultResendQueue.add(this.combinedScanResult);
 
 
             System.out.println(e.getMessage());

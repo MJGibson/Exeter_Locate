@@ -341,7 +341,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
 
                 // put it back in the queue
-                this._trackerScanner.wifiScanResultQueue.add(this.wifiScanResult);
+                this._trackerScanner.wifiScanResultResendQueue.add(this.wifiScanResult);
 
 
                 e.printStackTrace();
@@ -366,7 +366,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
         } catch (Exception e) {
 
             // put it back in the queue
-            this._trackerScanner.wifiScanResultQueue.add(this.wifiScanResult);
+            this._trackerScanner.wifiScanResultResendQueue.add(this.wifiScanResult);
 
             System.out.println(e.getMessage());
             return "Exception: "+e.getMessage();
