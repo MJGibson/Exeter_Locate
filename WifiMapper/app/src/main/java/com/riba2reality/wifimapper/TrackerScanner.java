@@ -492,7 +492,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
 
-            thisPost.wifiScanResult = wifiScanResultQueue.poll();
+            thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
 
             thisPost.execute(
@@ -559,7 +559,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
 
-            thisPost.combinedScanResult = combinedScanResultQueue.poll();
+            thisPost.combinedScanResult = combinedScanResultResendQueue.poll();
 
 
             thisPost.execute(
