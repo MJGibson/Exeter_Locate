@@ -126,7 +126,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             signalStrengths.add(Integer.toString(wifiResult.signalStrength));
         }
 
-        String gpsTime = new SimpleDateFormat("HH:mm:ss",
+        String gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
                 Locale.getDefault()).format(new Date(combinedScanResult.location.getTime()));
 
 
