@@ -256,11 +256,16 @@ def wifi():
             )
         
         
-        if(len(MacAddressesJSON)>0):
-            collection.insert_many(
-                records
-                
-                )
+        if(len(records)>0):
+        
+            try:
+                collection.insert_many(
+                    records
+                    
+                    )
+            except:
+                print("Exception:"+records)
+                app.logger.info('Exeception: '+ records)
             
         
         
