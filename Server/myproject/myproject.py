@@ -93,7 +93,7 @@ def hello():
             return
         
         #-------------------------------------------
-        
+        '''
         # loop mac addresses
         for i in range(len(MacAddressesJSON)):
         
@@ -116,22 +116,56 @@ def hello():
             )
         
         
+        '''
+        
+        
+        
+        records = []
+        
+        # loop mac addresses
+        for i in range(len(MacAddressesJSON)):
+        
+            macAddresse = MacAddressesJSON[i]
+            signalStregth = signalStregthsJSON[i]
+        
+            records.append(
+                { 
+                    "UUID":jsonData["UUID"],
+                    "Time" : jsonData["TIME"],
+                    "Macs" : macAddresse,
+                    "level":int(signalStregth),
+                    
+                    "GPSTIME" : jsonData["GPSTIME"],
+                    "x":float(jsonData["X"]),
+                    "y":float(jsonData["Y"]),
+                    "z":float(jsonData["ALTITUDE"]),
+                    "acc":float(jsonData["ACC"])
+                    
+                } 
+            )
+        
+        
+        if(len(MacAddressesJSON)>0):
+            collection.insert_many(
+                records
+                
+                )
         
         
         #-------------------------------------------
         collection = db[gpsCollection]
         
         
-        collection.update({"UUID":jsonData["UUID"]},
-            { "$push": { "Scans": { 
+        collection.insert_one(
+            {
+                "UUID":jsonData["UUID"],
+            
                 "GPSTIME" : jsonData["GPSTIME"],
                 "x":float(jsonData["X"]),
                 "y":float(jsonData["Y"]),
                 "z":float(jsonData["ALTITUDE"]),
-                "acc":float(jsonData["ACC"]),
-            } } 
+                "acc":float(jsonData["ACC"])
             }
-            ,upsert=True
             )
         
         
@@ -204,46 +238,32 @@ def wifi():
         #-------------------------------------------
         
         
-        collection.update({"UUID":jsonData["UUID"]},
-            { "$push": { "Scans": { 
-                "Time" : jsonData["TIME"]
-                ,
-                "Macs" : []
-            } } 
-            }
-            ,upsert=True
-            )
-        
-        
+        records = []
         
         # loop mac addresses
         for i in range(len(MacAddressesJSON)):
         
             macAddresse = MacAddressesJSON[i]
             signalStregth = signalStregthsJSON[i]
-            
-            
-            
-            collection.update(
-            
-            {"UUID":jsonData["UUID"],
-             "Scans.Time" : jsonData["TIME"],
-                
-            },
-            
-            { 
-                "$push": { 
-                    "Scans.$.Macs": { 
-                        "Mac": macAddresse,
-                        "level":int(signalStregth)
-                    }
+        
+            records.append(
+                { 
+                    "UUID":jsonData["UUID"],
+                    "Time" : jsonData["TIME"],
+                    "Macs" : macAddresse,
+                    "level":int(signalStregth)
                 } 
-            }
-            
-            ,upsert=True
             )
+        
+        
+        if(len(MacAddressesJSON)>0):
+            collection.insert_many(
+                records
+                
+                )
             
-            
+        
+        
         
         
         #-------------------------------------------
