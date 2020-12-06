@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import json
 from pymongo import MongoClient
 
@@ -6,275 +6,187 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 magicNum = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9"
-dataBase = 'phoneTest_home'
+dataBase = "phoneTest_home"
 
-#client = MongoClient('localhost',27017)
-#db = client[dataBase]
-#collection = db['myCollection']
+wifiCollection = "wifi"
+combinedCollection = "combiColl"
+gpsCollection = "gpsColl"
 
-wifiCollection = 'wifi'
-combinedCollection = 'combiColl'
-gpsCollection = 'gpsColl'
+KEYS_REQUIRED_FOR_GPS = [
+    "MAGIC_NUM",
+    "UUID",
+    "GPSTIME",
+    "X",
+    "Y",
+    "ALTITUDE",
+    "ACC",
+]
+
+KEYS_REQUIRED_FOR_WIFI = [
+    "MAGIC_NUM",
+    "UUID",
+    "TIME",
+    "MacAddressesJson",
+    "signalStrengthsJson",
+]
+
+KEYS_REQUIRED_FOR_COMBINED = KEYS_REQUIRED_FOR_GPS + KEYS_REQUIRED_FOR_WIFI
 
 
-@app.route("/", methods=['GET', 'POST'])
-def hello():
-    if request.method == 'POST':
-    
-        
-        # get the data out of the immutable Dict object
-        fields = list(request.form.to_dict().keys())[0]
+def parse_request(request):
+    # get the data out of the immutable dict object
+    key_list = list(request.form.to_dict().keys())
 
-        client = MongoClient('localhost',27017)
-        db = client[dataBase]
-        collection = db[combinedCollection]
-        
-        
-        
+    # if we received no data, end here
+    if len(key_list) == 0:
+        raise ValueError("Empty request")
+
+    # convert to json
+    jsonData = json.loads(key_list[0])
+
+    # check we've not just been sent garbage
+    try:
+        jsonData.keys()
+    except AttributeError:
+        raise ValueError("Bad request")
+
+    return jsonData
+
+
+def print_and_jsonify(msg):
+    # converts msg to a string, print it and
+    # return a flask request
+    print(msg)
+    return jsonify({"ERROR": str(msg)})
+
+
+@app.route("/", methods=["GET", "POST"])
+def gps():
+    if request.method == "POST":
+        # ---- Error checking
+
+        # check we can parse the request
         try:
-            jsonData = json.loads(fields)
-        except ValueError as e:
-            return
-        
-        #-------------------------------------------
-        
-        if("MAGIC_NUM" not in jsonData.keys()):
-            print("no magic number")
-            return
-        
-        if(jsonData["MAGIC_NUM"]!=magicNum):
-            print("magic number mismatch")
-            return
-            
-        if("UUID" not in jsonData.keys()):
-            print("no UUID")
-            #print("UUID:"+jsonData["UUID"])
-            return
-        
-        if("TIME" not in jsonData.keys()):
-            print("no TIME")
-            #print("TIME:"+jsonData["TIME"])
-            return
-            
-        if("GPSTIME" not in jsonData.keys()):
-            print("no GPSTIME")
-            #print("GPSTIME:"+jsonData["GPSTIME"])
-            return
-            
-        if("X" not in jsonData.keys()):
-            print("no X")
-            return
-        
-        if("Y" not in jsonData.keys()):
-            print("no Y")
-            return
-            
-        if("ALTITUDE" not in jsonData.keys()):
-            print("no ALTITUDE")
-            return
-        
-        if("MacAddressesJson" not in jsonData.keys()):
-            print("no MacAddresses")
-            return
-        
-        #===========
-        
-        if("DATABASE" in jsonData.keys()):
-            #print("")
+            jsonData = parse_request(request)
+        except Exception as e:
+            return print_and_jsonify(e)
+
+        # check all the required fields are there
+        for key in KEYS_REQUIRED_FOR_COMBINED:
+            if key not in jsonData.keys():
+                msg = f"Missing: {key:s}"
+                return print_and_jsonify(msg)
+
+        # check the magic number matches
+        if jsonData["MAGIC_NUM"] != magicNum:
+            return print_and_jsonify("magic number mismatch")
+
+        # ---- connect to the db
+        client = MongoClient("localhost", 27017)
+        if "DATABASE" in jsonData.keys():
             db = client[jsonData["DATABASE"]]
-            collection = db[combinedCollection]
-        #-------------------------------------------
-        
+        else:
+            db = client[dataBase]
+
+        # ---- post data to the combined table
+
+        # extract the mac addresses and their signat strengths
         MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
         signalStregthsJSON = json.loads(jsonData["signalStrengthsJson"])
-        
-        if("MacAddressesJson" not in jsonData.keys()):
-            print("error reading mac addresses")
-            return
-        
-        #-------------------------------------------
-        '''
-        # loop mac addresses
-        for i in range(len(MacAddressesJSON)):
-        
-            macAddresse = MacAddressesJSON[i]
-            signalStregth = signalStregthsJSON[i]
-        
-            collection.update_many({"phone":macAddresse},
-            { "$push": { "points": { 
-                "Time":jsonData["TIME"],
-                "GPSTIME" : jsonData["GPSTIME"],
-                "x":float(jsonData["X"]),
-                "y":float(jsonData["Y"]),
-                "z":float(jsonData["ALTITUDE"]),
-                "acc":float(jsonData["ACC"]),
-                "level":int(signalStregth),
-                "uuid":jsonData["UUID"]
-                } } 
-                }
-            ,upsert=True
-            )
-        
-        
-        '''
-        
-        
-        
+
+        # combine each record into a list to update the db in one go
         records = []
-        
-        # loop mac addresses
-        for i in range(len(MacAddressesJSON)):
-        
-            macAddresse = MacAddressesJSON[i]
-            signalStregth = signalStregthsJSON[i]
-        
+        for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
             records.append(
-                { 
-                    "UUID":jsonData["UUID"],
-                    "Time" : jsonData["TIME"],
-                    "Macs" : macAddresse,
-                    "level":int(signalStregth),
-                    
-                    "GPSTIME" : jsonData["GPSTIME"],
-                    "x":float(jsonData["X"]),
-                    "y":float(jsonData["Y"]),
-                    "z":float(jsonData["ALTITUDE"]),
-                    "acc":float(jsonData["ACC"])
-                    
-                } 
+                {
+                    "UUID": jsonData["UUID"],
+                    "Time": jsonData["TIME"],
+                    "Macs": mac,
+                    "level": int(strength),
+                    "GPSTIME": jsonData["GPSTIME"],
+                    "x": float(jsonData["X"]),
+                    "y": float(jsonData["Y"]),
+                    "z": float(jsonData["ALTITUDE"]),
+                    "acc": float(jsonData["ACC"]),
+                }
             )
-        
-        
-        if(len(MacAddressesJSON)>0):
-            collection.insert_many(
-                records
-                
-                )
-        
-        
-        #-------------------------------------------
+
+        # select the collection and post the data if there is any
+        collection = db[combinedCollection]
+        if len(records) > 0:
+            collection.insert_many(records)
+
+        # ---- post data to the GPS table
         collection = db[gpsCollection]
-        
-        
         collection.insert_one(
             {
-                "UUID":jsonData["UUID"],
-            
-                "GPSTIME" : jsonData["GPSTIME"],
-                "x":float(jsonData["X"]),
-                "y":float(jsonData["Y"]),
-                "z":float(jsonData["ALTITUDE"]),
-                "acc":float(jsonData["ACC"])
+                "UUID": jsonData["UUID"],
+                "GPSTIME": jsonData["GPSTIME"],
+                "x": float(jsonData["X"]),
+                "y": float(jsonData["Y"]),
+                "z": float(jsonData["ALTITUDE"]),
+                "acc": float(jsonData["ACC"]),
             }
-            )
-        
-        
-        
-        
-        #-------------------------------------------
-        return "Data registered!"
-    return "<h1 style='color:blue'>RIBA2Reailty Server Active!</h1>"
+        )
 
-@app.route("/wifi/", methods=['GET', 'POST'])
+        return "GPS data stored!"
+    return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
+
+
+@app.route("/wifi/", methods=["GET", "POST"])
 def wifi():
-    if request.method == 'POST':
-    
-        
-        # get the data out of the immutable Dict object
-        fields = list(request.form.to_dict().keys())[0]
+    if request.method == "POST":
+        # ---- Error checking
 
-        client = MongoClient('localhost',27017)
-        db = client[dataBase]
-        collection = db[wifiCollection]
-        
-        
-        
+        # check we can parse the request
         try:
-            jsonData = json.loads(fields)
-        except ValueError as e:
-            return
-        
-        #-------------------------------------------
-        
-        if("MAGIC_NUM" not in jsonData.keys()):
-            print("no magic number")
-            return
-        
-        if(jsonData["MAGIC_NUM"]!=magicNum):
-            print("magic number mismatch")
-            return
-        
-        
-        if("UUID" not in jsonData.keys()):
-            print("no UUID")
-            #print("UUID:"+jsonData["UUID"])
-            return
-        
-        if("TIME" not in jsonData.keys()):
-            print("no TIME")
-            #print("TIME:"+jsonData["TIME"])
-            return
-            
-        
-        if("MacAddressesJson" not in jsonData.keys()):
-            print("no MacAddresses")
-            return
-        
-        #===========
-        
-        if("DATABASE" in jsonData.keys()):
-            #print("")
+            jsonData = parse_request(request)
+        except Exception as e:
+            return print_and_jsonify(e)
+
+        # check all the required fields are there
+        for key in KEYS_REQUIRED_FOR_WIFI:
+            if key not in jsonData.keys():
+                msg = f"Missing: {key:s}"
+                return print_and_jsonify(msg)
+
+        # check the magic number matches
+        if jsonData["MAGIC_NUM"] != magicNum:
+            return print_and_jsonify("magic number mismatch")
+
+        # ---- connect to the db
+        client = MongoClient("localhost", 27017)
+        if "DATABASE" in jsonData.keys():
             db = client[jsonData["DATABASE"]]
-            collection = db[wifiCollection]
-        #-------------------------------------------
-        
+        else:
+            db = client[dataBase]
+
+        # ---- post data to the WIFI table
+
+        # extract the mac addresses and their signal strengths
         MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
         signalStregthsJSON = json.loads(jsonData["signalStrengthsJson"])
-        
-        if("MacAddressesJson" not in jsonData.keys()):
-            print("error reading mac addresses")
-            return
-        
-        #-------------------------------------------
-        
-        
+
+        # combine each record into a list to update the db in one go
         records = []
-        
-        # loop mac addresses
-        for i in range(len(MacAddressesJSON)):
-        
-            macAddresse = MacAddressesJSON[i]
-            signalStregth = signalStregthsJSON[i]
-        
+        for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
             records.append(
-                { 
-                    "UUID":jsonData["UUID"],
-                    "Time" : jsonData["TIME"],
-                    "Macs" : macAddresse,
-                    "level":int(signalStregth)
-                } 
+                {
+                    "UUID": jsonData["UUID"],
+                    "Time": jsonData["TIME"],
+                    "Macs": mac,
+                    "level": int(strength),
+                }
             )
-        
-        
-        if(len(records)>0):
-        
-            try:
-                collection.insert_many(
-                    records
-                    
-                    )
-            except:
-                print("Exception:"+records)
-                app.logger.info('Exeception: '+ records)
-            
-        
-        
-        
-        
-        #-------------------------------------------
-        return "Data registered!"
-    return "<h1 style='color:blue'>RIBA2Reailty Server Active!</h1>"
+
+        # select the collection and post the data if there is any
+        collection = db[wifiCollection]
+        if len(records) > 0:
+            collection.insert_many(records)
+
+        return "WIFI data stored!"
+    return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0',debug=True)
+    app.run(host="0.0.0.0", debug=True)
