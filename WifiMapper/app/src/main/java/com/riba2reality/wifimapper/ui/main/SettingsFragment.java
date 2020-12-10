@@ -3,6 +3,7 @@ package com.riba2reality.wifimapper.ui.main;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -16,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SeekBarPreference;
 
@@ -46,11 +48,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences.Editor SPeditor = SP.edit();
         //----------------------------------------------------------------
 
-
         EditTextPreference deviceIDPref = (EditTextPreference)findPreference("DeviceID");
-        deviceIDPref.setText(UUID.randomUUID().toString());
+        String s = SP.getString("DeviceID", "");
+        if (s.equals("")) {
+            s = UUID.randomUUID().toString();
+        }
+        deviceIDPref.setText(s);
+        deviceIDPref.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                   public boolean onPreferenceChange(Preference preference, Object newValue) {
+                       SPeditor.putString("DeviceID", (String)newValue);
+                       SPeditor.apply();
+                       return true;
+                   };
+               }
+        );
 
 
 
@@ -183,11 +199,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         SeekBarPreference pref_interval_post = getPreferenceManager().findPreference("interval_posts");
 
-        int postInterval = getContext().getResources().getInteger(R.integer.defaultVal_post);
-
         //System.out.println("Post interval: "+Integer.toString(postInterval));
 
-
+        int postInterval = SP.getInt("defaultVal_post", -1);
+        if (postInterval == -1) {
+            postInterval = getContext().getResources().getInteger(R.integer.defaultVal_post);
+        }
         pref_interval_post.setValue(postInterval);
 
         // set lister for end results
@@ -195,6 +212,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_post", (int)newValue);
+                        SPeditor.apply();
                         stopLocationService();
                         return true;
                     }
@@ -206,11 +225,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_gps");
 
-        int gpsInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
-
         //System.out.println("Post interval: "+Integer.toString(postInterval));
 
-
+        int gpsInterval = SP.getInt("defaultVal_gps", -1);
+        if (gpsInterval == -1) {
+            gpsInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
+        }
         pref_interval_gps.setValue(gpsInterval);
 
         // set lister for end results
@@ -218,22 +238,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_gps", (int)newValue);
+                        SPeditor.apply();
                         stopLocationService();
                         return true;
                     }
                 }
-
         );
 
         //----------------------------------------------------------------
 
         SeekBarPreference pref_interval_wifi = getPreferenceManager().findPreference("interval_wifi");
 
-        int wifiInterval = getContext().getResources().getInteger(R.integer.defaultVal_wifi);
-
         //System.out.println("Post interval: "+Integer.toString(postInterval));
 
-
+        int wifiInterval = SP.getInt("defaultVal_wifi", -1);
+        if (wifiInterval == -1) {
+            wifiInterval = getContext().getResources().getInteger(R.integer.defaultVal_wifi);
+        }
         pref_interval_wifi.setValue(wifiInterval);
 
         // set lister for end results
@@ -241,6 +263,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_wifi", (int)newValue);
+                        SPeditor.apply();
                         stopLocationService();
                         return true;
                     }
