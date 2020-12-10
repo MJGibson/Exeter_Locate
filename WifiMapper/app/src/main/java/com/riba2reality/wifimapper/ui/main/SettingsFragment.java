@@ -53,20 +53,28 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         //----------------------------------------------------------------
 
         EditTextPreference deviceIDPref = (EditTextPreference)findPreference("DeviceID");
-        String s = SP.getString("DeviceID", "");
-        if (s.equals("")) {
-            s = UUID.randomUUID().toString();
-        }
-        deviceIDPref.setText(s);
         deviceIDPref.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
-                   public boolean onPreferenceChange(Preference preference, Object newValue) {
-                       SPeditor.putString("DeviceID", (String)newValue);
-                       SPeditor.apply();
-                       return true;
-                   };
-               }
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        String nV = (String)newValue;
+                        boolean empty = nV.equals("");
+
+                        // if the user entered an empty string, replace it with a randomly generated one
+                        if (empty) {
+                            nV = UUID.randomUUID().toString();
+                            ((EditTextPreference)preference).setText(nV);
+                        }
+
+                        SPeditor.putString("DeviceID", nV);
+                        SPeditor.apply();
+                        // true if the string was valid (so newValue is marked correct), else false
+                        // meaning that we've intercepted and replaced the user's input
+                        return !empty;
+                    };
+                }
         );
+        String s = SP.getString("DeviceID", UUID.randomUUID().toString());
+        deviceIDPref.setText(s);
 
 
 
