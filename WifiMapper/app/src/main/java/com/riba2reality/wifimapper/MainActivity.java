@@ -32,6 +32,7 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -106,10 +107,30 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if(logTextView!=null) {
-                    logTextView.setText(logTextView.getText() +
-                            "\n### " + currentTime + " ###" +
-                            "\n"
-                            + message);
+                    // append to the log text
+                    logTextView.append(
+                            "\n### " + currentTime + " ###"
+                            + "\n" + message
+                    );
+
+                    // count the number of lines to remove, i.e. the number of lines > the maximum
+                    int linesToRemove = logTextView.getLineCount() - getBaseContext().getResources().getInteger(R.integer.max_log_lines);
+
+                    // if there some to remove
+                    if (linesToRemove > 0) {
+                        // get the text from the logger and declare some variables we'll need
+                        Editable txt = logTextView.getEditableText();
+                        int lineStart, lineEnd, i;
+
+                        for (i = 0; i < linesToRemove; i++) {
+                            // get the start and end locations of the first line of the text
+                            lineStart = logTextView.getLayout().getLineStart(0);
+                            lineEnd = logTextView.getLayout().getLineEnd(0);
+
+                            // remove it
+                            txt.delete(lineStart, lineEnd);
+                        }
+                    }
 
                     scroll.post(new Runnable() {
                         @Override
