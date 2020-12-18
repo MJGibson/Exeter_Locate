@@ -66,10 +66,10 @@ public class TrackerScanner extends Service implements LocationListener {
     // make a user definable variable later
     //private final static String dataBase = "testTest";
 
-    private Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
+    private final Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
     public Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<WifiScanResult>();
 
-    private Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
+    private final Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
     public Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
 
 
@@ -93,8 +93,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private final int intervalSeconds = 1;
 
-    private boolean locationScanned = false;
-    private boolean wifiScanned     = false;
+    private final boolean locationScanned = false;
+    private final boolean wifiScanned     = false;
     private boolean scanning        = false;
 
     private boolean running = false;
@@ -102,7 +102,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private boolean updatingWifiResults = false;
 
     Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable periodicUpdate = new Runnable() {
+    private final Runnable periodicUpdate = new Runnable() {
         @Override
         public void run() {
             if(running) {
@@ -153,7 +153,7 @@ public class TrackerScanner extends Service implements LocationListener {
     };
 
 
-    private Runnable periodicUpdate_wifi = new Runnable() {
+    private final Runnable periodicUpdate_wifi = new Runnable() {
         @Override
         public void run() {
 
@@ -303,7 +303,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }
 
-    private LocationCallback locationCallback = new LocationCallback(){
+    private final LocationCallback locationCallback = new LocationCallback(){
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
@@ -431,7 +431,7 @@ public class TrackerScanner extends Service implements LocationListener {
                 return;
 
 
-        };
+        }
     };
 
     public void scanWifi() {

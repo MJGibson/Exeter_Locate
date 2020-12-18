@@ -35,7 +35,7 @@ public class SecondTabFragment extends Fragment {
     private WifiManager wifiManager;
     private ListView listView;
     private Button buttonScan;
-    private int size = 0;
+    private final int size = 0;
     private List<ScanResult> results;
     public ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
@@ -129,7 +129,7 @@ public class SecondTabFragment extends Fragment {
                 //arrayList.add(scanResult.SSID + " - \""+scanResult. +"\""
                 adapter.notifyDataSetChanged();
             }
-        };
+        }
     };
 
 

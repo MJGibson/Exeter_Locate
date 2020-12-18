@@ -70,7 +70,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                         // true if the string was valid (so newValue is marked correct), else false
                         // meaning that we've intercepted and replaced the user's input
                         return !empty;
-                    };
+                    }
                 }
         );
         String s = SP.getString("DeviceID", UUID.randomUUID().toString());
@@ -150,7 +150,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
                 editText.addTextChangedListener(new TextWatcher(){
                     boolean deleting = false;
-                    int lastCount = 0;
+                    final int lastCount = 0;
 
                     @Override
                     public void afterTextChanged(Editable s) {
@@ -168,12 +168,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (lastCount < count) {
-                            deleting = false;
-                        }
-                        else {
-                            deleting = true;
-                        }
+                        deleting = lastCount >= count;
                     }
 
                     @Override

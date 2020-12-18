@@ -1,2 +1,1 @@
-class FloatSeekBarPreference {
-}
+class FloatSeekBarPreference

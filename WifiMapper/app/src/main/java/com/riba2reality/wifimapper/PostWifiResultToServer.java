@@ -216,15 +216,9 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
                     //System.out.println(hostname);
 
-                    if(
-                        //hostname.equals("192.168.0.10") ||
-                        //        hostname.equals("10.0.2.2")
-                            hostname.equals(address)
-
-                    )
-                        return true;
-                    else
-                        return false;
+                    //hostname.equals("192.168.0.10") ||
+                    //        hostname.equals("10.0.2.2")
+                    return hostname.equals(address);
 
 
                 }

@@ -24,8 +24,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     //private Fragment mapTab;
     //private Fragment wifiTab;
-    private Fragment settings;
-    private Fragment homeScreen;
+    private final Fragment settings;
+    private final Fragment homeScreen;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
