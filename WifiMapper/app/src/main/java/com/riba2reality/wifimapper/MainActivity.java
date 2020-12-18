@@ -78,9 +78,9 @@ public class MainActivity extends AppCompatActivity {
                 String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
                 //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
 
-                TextView logTextView = (TextView)findViewById(R.id.log);
+                TextView logTextView = findViewById(R.id.log);
 
-                final ScrollView scroll = (ScrollView) findViewById(R.id.logScroll);
+                final ScrollView scroll = findViewById(R.id.logScroll);
 
 
                 if(logTextView!=null) {

@@ -56,11 +56,11 @@ public class TrackerScanner extends Service implements LocationListener {
     // make a user definable variable later
     //private final static String dataBase = "testTest";
 
-    private final Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<WifiScanResult>();
-    public Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<WifiScanResult>();
+    private final Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<>();
+    public final Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
-    public Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<CombinedScanResult>();
+    private final Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<>();
+    public final Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
 
     private WifiManager wifiManager;
@@ -81,17 +81,14 @@ public class TrackerScanner extends Service implements LocationListener {
 
     LocationManager locationManager;
 
-    private final int intervalSeconds = 1;
+    // private final int intervalSeconds = 1;
 
-    private final boolean locationScanned = false;
+    // private final boolean locationScanned = false;
     private final boolean wifiScanned     = false;
-    private boolean scanning        = false;
 
     private boolean running = false;
 
-    private boolean updatingWifiResults = false;
-
-    Handler handler = new Handler(Looper.getMainLooper());
+    final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable periodicUpdate = new Runnable() {
         @Override
         public void run() {
@@ -299,8 +296,8 @@ public class TrackerScanner extends Service implements LocationListener {
             super.onLocationResult(locationResult);
 
             if(locationResult != null && locationResult.getLastLocation() != null){
-                double latitude = locationResult.getLastLocation().getLatitude();
-                double longitude = locationResult.getLastLocation().getLongitude();
+                // double latitude = locationResult.getLastLocation().getLatitude();
+                // double longitude = locationResult.getLastLocation().getLongitude();
 
                 //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
                 //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
@@ -322,7 +319,7 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of onLocationresult
     };
 
-    BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+    final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             results = wifiManager.getScanResults();
@@ -333,8 +330,8 @@ public class TrackerScanner extends Service implements LocationListener {
             result.dateTime = currentTime;
             //result.wifiResult
 
-            updatingWifiResults = true;
-            arrayList = new ArrayList<String>();
+            boolean updatingWifiResults = true;
+            arrayList = new ArrayList<>();
             for (ScanResult scanResult : results) {
                 //arrayList.add(scanResult.SSID + " - " + scanResult.capabilities);
                 arrayList.add(scanResult.SSID + " -" + scanResult.BSSID);
@@ -350,7 +347,6 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             }
-            updatingWifiResults = false;//?
 
             sendResult("WiFi: Scan complete.");
 
@@ -417,8 +413,6 @@ public class TrackerScanner extends Service implements LocationListener {
 
                 handler.postDelayed(periodicUpdate_wifi, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
             }
-            else
-                return;
 
 
         }
@@ -617,7 +611,7 @@ public class TrackerScanner extends Service implements LocationListener {
             altitude = lastLocation.getAltitude();
             accuracy = lastLocation.getAccuracy();
 
-            provider = lastLocation.getProvider();
+            // provider = lastLocation.getProvider();
         }else{
 
             this.sendResult("Error: GPS location missing.");
@@ -658,7 +652,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
         // results collected, switch scanning back on.
-        scanning = false;
+        boolean scanning = false;
 
 
 

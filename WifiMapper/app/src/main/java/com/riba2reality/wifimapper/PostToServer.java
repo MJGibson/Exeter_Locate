@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -26,7 +25,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostToServer extends AsyncTask<String, String, String> {
 
-    TrackerScanner _trackerScanner;
+    final TrackerScanner _trackerScanner;
 
     public PostToServer(TrackerScanner trackerScanner){
         //set context variables if required
@@ -76,7 +75,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         final String address = params[3];
 
-        boolean useSSL = Boolean.valueOf(useSSLString);
+        boolean useSSL = Boolean.parseBoolean(useSSLString);
 
         try {
 
@@ -214,7 +213,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             //---------------------------------
             BufferedReader reader = null;
             String uri = urlString;
-            String method = "GET";
+            String method;
             Map<String, String> parameters = new HashMap<>();
 
             method = "POST";
@@ -255,14 +254,9 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 URL url = new URL(uri);
                 //HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-                URLConnection con;
-                if (useSSL) {
-                    con = (HttpsURLConnection) url.openConnection();
-                    ((HttpsURLConnection)con).setRequestMethod(method);
-                }else{
-                    con = (HttpURLConnection) url.openConnection();
-                    ((HttpURLConnection)con).setRequestMethod(method);
-                }
+                HttpURLConnection con;
+                con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod(method);
 
 
                 // set time outs
@@ -300,7 +294,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 //System.out.println("blah");
 
                 while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
+                    sb.append(line).append("\n");
                     //System.out.println(line);
                 }
 
@@ -347,7 +341,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
     public String getEncodedParams(Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
         for (String key : params.keySet()) {
-            String value = null;
+            String value;
             //try {
             //value = URLEncoder.encode(params.get(key), "UTF-8");
             value = params.get(key);
@@ -358,7 +352,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             if (sb.length() > 0) {
                 sb.append("&");
             }
-            sb.append(key + "=" + value);
+            sb.append(key).append("=").append(value);
         }
         return sb.toString();
     }

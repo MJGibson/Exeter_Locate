@@ -29,11 +29,8 @@ import java.util.List;
 public class SecondTabFragment extends Fragment {
 
     private WifiManager wifiManager;
-    private ListView listView;
-    private Button buttonScan;
     private final int size = 0;
-    private List<ScanResult> results;
-    public ArrayList<String> arrayList = new ArrayList<>();
+    public final ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
@@ -80,7 +77,7 @@ public class SecondTabFragment extends Fragment {
 //        });
 
 
-        buttonScan = root.findViewById(R.id.scanBtn);
+        Button buttonScan = root.findViewById(R.id.scanBtn);
         buttonScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +85,7 @@ public class SecondTabFragment extends Fragment {
             }
         });
 
-        listView = root.findViewById(R.id.wifiList);
+        ListView listView = root.findViewById(R.id.wifiList);
         wifiManager = (WifiManager) getActivity().
                 getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -113,10 +110,10 @@ public class SecondTabFragment extends Fragment {
         Toast.makeText(this.getActivity(), "Scanning WiFi ...", Toast.LENGTH_SHORT).show();
     }
 
-    BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+    final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            results = wifiManager.getScanResults();
+            List<ScanResult> results = wifiManager.getScanResults();
             getActivity().unregisterReceiver(this);
 
             for (ScanResult scanResult : results) {

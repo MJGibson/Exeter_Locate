@@ -8,7 +8,7 @@ public class CombinedScanResult {
 
     public String dateTime;
 
-    public ArrayList<WifiResult> wifiResult = new ArrayList<WifiResult>();
+    public ArrayList<WifiResult> wifiResult = new ArrayList<>();
 
     public Location location;
 

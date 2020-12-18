@@ -10,7 +10,7 @@ public class WifiScanResult {
 
     public String dateTime;
 
-    public ArrayList<WifiResult> wifiResult = new ArrayList<WifiResult>();
+    public final ArrayList<WifiResult> wifiResult = new ArrayList<>();
 
 
 

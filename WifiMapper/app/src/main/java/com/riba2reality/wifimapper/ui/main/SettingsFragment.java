@@ -49,7 +49,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         final SharedPreferences.Editor SPeditor = SP.edit();
         //----------------------------------------------------------------
 
-        EditTextPreference deviceIDPref = (EditTextPreference)findPreference("DeviceID");
+        EditTextPreference deviceIDPref = findPreference("DeviceID");
         deviceIDPref.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -79,8 +79,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         //----------------------------------------------------------------
 
         // only enable the server IP input if custom is selected, otherwise disable and enter relavtive IP
-        final ListPreference serverAddressListPref = (ListPreference)findPreference("ServerList");
-        final EditTextPreference serverAddressPref = (EditTextPreference)findPreference("ServerAddress");
+        final ListPreference serverAddressListPref = findPreference("ServerList");
+        final EditTextPreference serverAddressPref = findPreference("ServerAddress");
         serverAddressListPref.setOnPreferenceChangeListener(new
                Preference.OnPreferenceChangeListener() {
                    public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -133,8 +133,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                             }
                             else {
                                 String[] splits = resultingTxt.split("\\.");
-                                for (int i = 0; i < splits.length; i++) {
-                                    if (Integer.valueOf(splits[i]) > 255) {
+                                for (String split : splits) {
+                                    if (Integer.parseInt(split) > 255) {
                                         return "";
                                     }
                                 }
@@ -158,7 +158,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                             if (string.length() == 3 || string.equalsIgnoreCase("0")
                                     || (string.length() == 2 && Character.getNumericValue(string.charAt(0)) > 1)) {
                                 s.append('.');
-                                return;
                             }
                         }
                     }
@@ -386,28 +385,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             return false;
         }
 
-        switch (key) {
-            case "database": {
+        if ("database".equals(key)) {// get bad names from reasoruce list
+            String[] badNames = getResources().getStringArray(R.array.database_bad_names);
+            List<String> badNamesList = Arrays.asList(badNames);
 
-                // get bad names from reasoruce list
-                String[] badNames = getResources().getStringArray(R.array.database_bad_names);
-                List<String> badNamesList = Arrays.asList(badNames);
+            if (badNamesList.contains(newText)) {
+                editTextPreference.setText("");
+                Toast.makeText(getActivity(), "Dissallowed Database name", Toast.LENGTH_SHORT).show();
 
-                if(badNamesList.contains(newText)){
-                    editTextPreference.setText("");
-                    Toast.makeText(getActivity(),"Dissallowed Database name", Toast.LENGTH_SHORT).show();
-
-                }else{
-                    return true;
-                }
-
-
+            } else {
+                return true;
             }
 
 //            case USERNAME: {
 //                return text.length() > 0;
 //            }
-
         }
 
         return false;

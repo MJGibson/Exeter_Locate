@@ -51,8 +51,8 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
     static final LatLng HAMBURG = new LatLng(53.558, 9.927);
 
-    float updateRange = 1.0f;
-    long updateTimeMilliSecs = 1000;
+    final float updateRange = 1.0f;
+    final long updateTimeMilliSecs = 1000;
 
     boolean startTracking = false;
 
@@ -204,7 +204,6 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_main, container, false);
 
         //-----------
         /////_trackScannerIntent = root.getApplicationContext()
@@ -256,7 +255,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 //                textView.setText(s);
 //            }
 //        });
-        return root;
+        return inflater.inflate(R.layout.fragment_main, container, false);
 
     }// en dof onCreateView
 
