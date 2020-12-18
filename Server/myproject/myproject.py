@@ -129,7 +129,7 @@ def gps():
             }
         )
 
-        return "GPS data stored!"
+        return "Server: Combined GPS and WiFi data stored successfully."
     return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
 
 
@@ -184,7 +184,7 @@ def wifi():
         if len(records) > 0:
             collection.insert_many(records)
 
-        return "WIFI data stored!"
+        return "Server: WiFi data stored successfully."
     return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
 
 
