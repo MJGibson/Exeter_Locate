@@ -184,13 +184,16 @@ public class TrackerScanner extends Service implements LocationListener {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
-        int interval =SP.getInt("interval_gps", gpsInterval);
+        // interval needs to be in milliseconds -- scale accordingly
+        long interval = SP.getInt("interval_gps", gpsInterval) * 1000;
 
-
-        locationManager.requestLocationUpdates(provider,
+        // TODO: Check if permission available
+        locationManager.requestLocationUpdates(
+                provider,
                 interval,
                 0,
-                this);
+                this
+        );
 
 
         //locationManager.requestSingleUpdate(provider, this, Looper.getMainLooper());
