@@ -1,14 +1,6 @@
 package com.riba2reality.wifimapper;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.preference.PreferenceManager;
-
-import org.apache.http.conn.ssl.StrictHostnameVerifier;
-import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -23,10 +15,7 @@ import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
