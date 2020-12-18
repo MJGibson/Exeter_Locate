@@ -268,7 +268,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         combinedScanResultQueue.add(combinedScanResult);
 
-        this.sendResult("Location updated");
+        this.sendResult("GPS: Location updated.");
 
 
         scanWifi();
@@ -362,7 +362,7 @@ public class TrackerScanner extends Service implements LocationListener {
             }
             updatingWifiResults = false;//?
 
-            sendResult("Wifi updated");
+            sendResult("WiFi: Scan complete.");
 
 
             //postResult();
@@ -506,7 +506,7 @@ public class TrackerScanner extends Service implements LocationListener {
                     dataBase
             );
 
-            this.sendResult("Removed Wifi result from resend queue to send.");
+            this.sendResult("Sending to server: WiFi scan result (resend queue).");
 
 
         }// end of looping queue
@@ -529,7 +529,7 @@ public class TrackerScanner extends Service implements LocationListener {
                     dataBase
             );
 
-            this.sendResult("Removed Wifi result from queue to send.");
+            this.sendResult("Sending to server: WiFi scan result.");
 
 
         }// end of looping queue
@@ -573,7 +573,7 @@ public class TrackerScanner extends Service implements LocationListener {
                     dataBase
             );
 
-            this.sendResult("Removed Combined result from queue to send.");
+            this.sendResult("Sending to server: GPS location and WiFi scan (resend queue).");
 
 
         }// end of looping queue
@@ -597,7 +597,7 @@ public class TrackerScanner extends Service implements LocationListener {
                     dataBase
             );
 
-            this.sendResult("Removed Combined result from queue to send.");
+            this.sendResult("Sending to server: GPS location and WiFi scan.");
 
 
         }// end of looping queue
@@ -630,7 +630,7 @@ public class TrackerScanner extends Service implements LocationListener {
             provider = lastLocation.getProvider();
         }else{
 
-            this.sendResult("Post absent GPS");
+            this.sendResult("Error: GPS location missing.");
 
             return;
         }
@@ -638,7 +638,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if(arrayList == null){
 
-            this.sendResult("Post absent WIFI");
+            this.sendResult("Error: WiFi scan results missing.");
 
             return;
         }
@@ -927,11 +927,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     handler.postDelayed(periodicUpdate_wifi, interval_wifi * 1000 - SystemClock.elapsedRealtime() % 1000);
 
-
+                    this.sendResult("Started GPS and WiFi scanning.");
 
                     return START_STICKY;
                 }else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
                     //System.out.println("Stop intiated...");
+                    this.sendResult("Stopping GPS and WiFi scanning... sending all remaining scans.");
 
                     // empty the queues before the lose them
                     postCombinedResult();
