@@ -107,7 +107,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
         double longitude = 0.0;
         double altitude = 0.0;
         double accuracy = 0.0;
-        String provider = "";
+        // String provider = "";
         if (combinedScanResult.location != null) {
             latitude = combinedScanResult.location.getLatitude();
             longitude = combinedScanResult.location.getLongitude();
@@ -219,8 +219,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             HostnameVerifier hostnameVerifier = new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
-                    HostnameVerifier hv =
-                            HttpsURLConnection.getDefaultHostnameVerifier();
+                    // HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
                     //new StrictHostnameVerifier();
 
                     //return hv.verify(address, session);

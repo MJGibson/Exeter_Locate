@@ -31,19 +31,11 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationResult;
-import com.google.gson.Gson;
-
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -51,7 +43,7 @@ import java.util.concurrent.ExecutionException;
 public class TrackerScanner extends Service implements LocationListener {
 
 
-    private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
+    // private final static String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
 
     // make a user definable variable later
     //private final static String dataBase = "testTest";
@@ -65,8 +57,6 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = null;
-    private List<ScanResult> results;
-    private Location lastLocation = null;
 
     private PostToServer post;
 
@@ -229,7 +219,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         System.out.println(message);
 
-        lastLocation = new Location(location);
+        Location lastLocation = new Location(location);
 
         CombinedScanResult combinedScanResult = new CombinedScanResult();
         combinedScanResult.location = new Location(location);
@@ -271,39 +261,41 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }
 
-    private final LocationCallback locationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            super.onLocationResult(locationResult);
-
-            if (locationResult != null && locationResult.getLastLocation() != null) {
-                // double latitude = locationResult.getLastLocation().getLatitude();
-                // double longitude = locationResult.getLastLocation().getLongitude();
-
-                //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-                //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
-                //System.out.println(message);
-
-                lastLocation = new Location(locationResult.getLastLocation());
-
-                //Log.d("LOCATION_UPDATE", message);
-
-                //System.out.println(message);
-
-                //scanWifi();
-
-                //Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
-
-
-            }// end of if location not null
-
-        }// end of onLocationresult
-    };
+// --Commented out by Inspection START (19/12/2020 12:57):
+//    private final LocationCallback locationCallback = new LocationCallback() {
+//        @Override
+//        public void onLocationResult(LocationResult locationResult) {
+//            super.onLocationResult(locationResult);
+//
+//            if (locationResult != null && locationResult.getLastLocation() != null) {
+//                // double latitude = locationResult.getLastLocation().getLatitude();
+//                // double longitude = locationResult.getLastLocation().getLongitude();
+//
+//                //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+//                //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
+//                //System.out.println(message);
+//
+//                lastLocation = new Location(locationResult.getLastLocation());
+//
+//                //Log.d("LOCATION_UPDATE", message);
+//
+//                //System.out.println(message);
+//
+//                //scanWifi();
+//
+//                //Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
+//
+//
+//            }// end of if location not null
+//
+//        }// end of onLocationresult
+//    };
+// --Commented out by Inspection STOP (19/12/2020 12:57)
 
     final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            results = wifiManager.getScanResults();
+            List<ScanResult> results = wifiManager.getScanResults();
             unregisterReceiver(wifiReceiver);
 
             String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
@@ -311,7 +303,7 @@ public class TrackerScanner extends Service implements LocationListener {
             result.dateTime = currentTime;
             //result.wifiResult
 
-            boolean updatingWifiResults = true;
+            // boolean updatingWifiResults = true;
             arrayList = new ArrayList<>();
             for (ScanResult scanResult : results) {
                 //arrayList.add(scanResult.SSID + " - " + scanResult.capabilities);
@@ -572,155 +564,157 @@ public class TrackerScanner extends Service implements LocationListener {
     }// end of postCombinedResult
 
 
-    private void postResult() {
-        Map<String, String> parameters = new HashMap<>();
-
-        List<String> macAddressList = new ArrayList<>();
-        List<String> signalStrengths = new ArrayList<>();
-
-        //------
-
-        double latitude;
-        double longitude;
-        double altitude;
-        double accuracy;
-        String provider;
-        if (lastLocation != null) {
-            latitude = lastLocation.getLatitude();
-            longitude = lastLocation.getLongitude();
-            altitude = lastLocation.getAltitude();
-            accuracy = lastLocation.getAccuracy();
-
-            // provider = lastLocation.getProvider();
-        } else {
-
-            this.sendResult("Error: GPS location missing.");
-
-            return;
-        }
-
-
-        if (arrayList == null) {
-
-            this.sendResult("Error: WiFi scan results missing.");
-
-            return;
-        }
-
-        //ArrayList<String> wifiList = this.arrayList;
-        for (ScanResult scanResult : results) {
-
-            macAddressList.add(scanResult.BSSID);
-            signalStrengths.add(Integer.toString(scanResult.level));
-        }
-
-        //------
-
-        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
-
-
-        String messageOut = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude
-                + "\naltitude:" + altitude;
-        //System.out.println(messageOut);
-        System.out.println("post...");
-
-        //System.out.println("Provider: "+provider);
-
-        //------
-
-
-        // results collected, switch scanning back on.
-        boolean scanning = false;
-
-
-        //------
-
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
-
-
-        //------
-
-
-//                parameters.put("TIME","12:01");
-//                parameters.put("X","42");
-//                parameters.put("Y","7");
-
-        parameters.put("MAGIC_NUM", verificationCode);
-
-        parameters.put("DATABASE", dataBase);
-
-        parameters.put("TIME", currentTime);
-        parameters.put("X", Double.toString(latitude));
-        parameters.put("Y", Double.toString(longitude));
-
-        parameters.put("ALTITUDE", Double.toString(altitude));
-        parameters.put("ACC", Double.toString(accuracy));
-
-        String macAddressJson = new Gson().toJson(macAddressList);
-
-
-        //parameters.put("MacAddresses",macAddressList.toString());
-        parameters.put("MacAddressesJson", macAddressJson);
-
-        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
-
-
-        String message = new JSONObject(parameters).toString();
-
-        //------
-
-        //String address = "127.0.0.1";
-        //String address = "10.0.2.2"; // local for computer the emulator
-        //String address = "192.168.0.10";
-        //String port = "8000";
-        //String port = "27017";
-
-        //
-        //String address = "82.46.100.70";
-        //////String address = Constants.ServerAddress;
-
-
-        //String address = "httpbin.org/get";
-
-
-        //String uri = "http://"+address+":"+port;
-
-        //String uri = "http://"+address;
-
-        String protocol = "http";
-        if (useSSL) {
-            protocol += "s";
-        }
-
-        //String uri = "https://"+address;
-        String uri = protocol + "://" + address;
-
-        //String uri = "http://example.com";
-        //String uri = "https://postman-echo.com/get";
-
-        //String message = "hello_message";
-
-        //PostToServer
-        post = new PostToServer(this);
-
-
-        post.is = getResources().openRawResource(R.raw.nginxselfsigned);
-
-
-        post.execute(uri, message, String.valueOf(useSSL), address);
-
-
-        this.sendResult("Sending[" + protocol + "]: " + message.length() + " bytes");
-
-
-    }// end of postResult
+// --Commented out by Inspection START (19/12/2020 12:57):
+//    private void postResult() {
+//        Map<String, String> parameters = new HashMap<>();
+//
+//        List<String> macAddressList = new ArrayList<>();
+//        List<String> signalStrengths = new ArrayList<>();
+//
+//        //------
+//
+//        double latitude;
+//        double longitude;
+//        double altitude;
+//        double accuracy;
+//        String provider;
+//        if (lastLocation != null) {
+//            latitude = lastLocation.getLatitude();
+//            longitude = lastLocation.getLongitude();
+//            altitude = lastLocation.getAltitude();
+//            accuracy = lastLocation.getAccuracy();
+//
+//            // provider = lastLocation.getProvider();
+//        } else {
+//
+//            this.sendResult("Error: GPS location missing.");
+//
+//            return;
+//        }
+//
+//
+//        if (arrayList == null) {
+//
+//            this.sendResult("Error: WiFi scan results missing.");
+//
+//            return;
+//        }
+//
+//        //ArrayList<String> wifiList = this.arrayList;
+//        for (ScanResult scanResult : results) {
+//
+//            macAddressList.add(scanResult.BSSID);
+//            signalStrengths.add(Integer.toString(scanResult.level));
+//        }
+//
+//        //------
+//
+//        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+//
+//
+//        String messageOut = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude
+//                + "\naltitude:" + altitude;
+//        //System.out.println(messageOut);
+//        System.out.println("post...");
+//
+//        //System.out.println("Provider: "+provider);
+//
+//        //------
+//
+//
+//        // results collected, switch scanning back on.
+//        boolean scanning = false;
+//
+//
+//        //------
+//
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
+//
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
+//
+//
+//        //------
+//
+//
+////                parameters.put("TIME","12:01");
+////                parameters.put("X","42");
+////                parameters.put("Y","7");
+//
+//        parameters.put("MAGIC_NUM", verificationCode);
+//
+//        parameters.put("DATABASE", dataBase);
+//
+//        parameters.put("TIME", currentTime);
+//        parameters.put("X", Double.toString(latitude));
+//        parameters.put("Y", Double.toString(longitude));
+//
+//        parameters.put("ALTITUDE", Double.toString(altitude));
+//        parameters.put("ACC", Double.toString(accuracy));
+//
+//        String macAddressJson = new Gson().toJson(macAddressList);
+//
+//
+//        //parameters.put("MacAddresses",macAddressList.toString());
+//        parameters.put("MacAddressesJson", macAddressJson);
+//
+//        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
+//
+//
+//        String message = new JSONObject(parameters).toString();
+//
+//        //------
+//
+//        //String address = "127.0.0.1";
+//        //String address = "10.0.2.2"; // local for computer the emulator
+//        //String address = "192.168.0.10";
+//        //String port = "8000";
+//        //String port = "27017";
+//
+//        //
+//        //String address = "82.46.100.70";
+//        //////String address = Constants.ServerAddress;
+//
+//
+//        //String address = "httpbin.org/get";
+//
+//
+//        //String uri = "http://"+address+":"+port;
+//
+//        //String uri = "http://"+address;
+//
+//        String protocol = "http";
+//        if (useSSL) {
+//            protocol += "s";
+//        }
+//
+//        //String uri = "https://"+address;
+//        String uri = protocol + "://" + address;
+//
+//        //String uri = "http://example.com";
+//        //String uri = "https://postman-echo.com/get";
+//
+//        //String message = "hello_message";
+//
+//        //PostToServer
+//        post = new PostToServer(this);
+//
+//
+//        post.is = getResources().openRawResource(R.raw.nginxselfsigned);
+//
+//
+//        post.execute(uri, message, String.valueOf(useSSL), address);
+//
+//
+//        this.sendResult("Sending[" + protocol + "]: " + message.length() + " bytes");
+//
+//
+//    }// end of postResult
+// --Commented out by Inspection STOP (19/12/2020 12:57)
 
 
     private void startLocationService() {

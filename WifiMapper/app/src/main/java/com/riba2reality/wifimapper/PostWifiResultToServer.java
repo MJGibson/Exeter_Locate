@@ -191,8 +191,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
             HostnameVerifier hostnameVerifier = new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
-                    HostnameVerifier hv =
-                            HttpsURLConnection.getDefaultHostnameVerifier();
+                    // HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
                     //new StrictHostnameVerifier();
 
                     //return hv.verify(address, session);

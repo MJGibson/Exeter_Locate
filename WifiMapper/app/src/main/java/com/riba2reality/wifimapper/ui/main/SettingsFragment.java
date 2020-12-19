@@ -368,7 +368,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         EditTextPreference editTextPreference = (EditTextPreference) preference;
         String key = editTextPreference.getKey();
-        String text = editTextPreference.getText();// current
+        // String text = editTextPreference.getText();// current
         String newText = (String) value;
 
         System.out.println("Text :" + newText);

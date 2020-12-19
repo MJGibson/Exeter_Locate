@@ -29,9 +29,9 @@ import java.util.List;
 public class SecondTabFragment extends Fragment {
 
     private WifiManager wifiManager;
-    private final int size = 0;
+    // private final int size = 0;
     public final ArrayList<String> arrayList = new ArrayList<>();
-    private ArrayAdapter adapter;
+    private ArrayAdapter<String> adapter;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 

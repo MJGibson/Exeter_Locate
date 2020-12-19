@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
@@ -72,7 +71,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
         String data = params[1]; //data to post
 
         String useSSLString = params[2];
-        OutputStream out = null;
+        // OutputStream out = null;
 
         final String address = params[3];
 
@@ -178,8 +177,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             HostnameVerifier hostnameVerifier = new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
-                    HostnameVerifier hv =
-                            HttpsURLConnection.getDefaultHostnameVerifier();
+                    // HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
                     //new StrictHostnameVerifier();
 
                     //return hv.verify(address, session);
