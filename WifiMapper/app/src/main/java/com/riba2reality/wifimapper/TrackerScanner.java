@@ -84,9 +84,8 @@ public class TrackerScanner extends Service implements LocationListener {
     // private final int intervalSeconds = 1;
 
     // private final boolean locationScanned = false;
-    private final boolean wifiScanned     = false;
-
     private boolean running = false;
+    private boolean wifi_scan_in_queue = false;
 
     final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable periodicUpdate = new Runnable() {
@@ -105,12 +104,7 @@ public class TrackerScanner extends Service implements LocationListener {
             //
 
             String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-            String message = "Time:" + currentTime;
-            //+ "\nLat:" + location.getLatitude() + "\nLong:" + location.getLongitude();
-
-//        Toast myToast = Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT);
-//        myToast.show();
-
+            String message = currentTime + ": periodicUpdate (posting) activated";
             System.out.println(message);
 
 
@@ -143,22 +137,14 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Runnable periodicUpdate_wifi = new Runnable() {
         @Override
         public void run() {
-
-            //
-
             String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-            String message = "Wifi;Time:" + currentTime;
-            //+ "\nLat:" + location.getLatitude() + "\nLong:" + location.getLongitude();
-
-//        Toast myToast = Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT);
-//        myToast.show();
-
+            String message = currentTime + ": periodicUpdate_wifi activated";
             System.out.println(message);
-
 
             scanWifi();
 
-
+            // after we've ran the event, remove the in-queue flag
+            wifi_scan_in_queue = false;
         }
     };
 
@@ -404,16 +390,20 @@ public class TrackerScanner extends Service implements LocationListener {
             }
 
  */
+            // just for debug printing
+            if (wifi_scan_in_queue) {
+                System.out.println("New periodicUpdate_wifi NOT started as already queued.");
+            }
 
-            if(running) {
-
+            if(running && !wifi_scan_in_queue) {
+                System.out.println("Started new periodicUpdate_wifi thread.");
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
                 int interval =SP.getInt("interval_wifi", wifiInterval);
 
                 handler.postDelayed(periodicUpdate_wifi, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+                wifi_scan_in_queue = true;
             }
-
 
         }
     };
@@ -897,19 +887,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     running = true;
 
-                    //handler.post(periodicUpdate);
-                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    int postInterval = getResources().getInteger(R.integer.defaultVal_post);
-                    int interval =SP.getInt("interval_posts", postInterval);
-                    handler.postDelayed(periodicUpdate, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
-
-
-                    //handler.post(periodicUpdate_wifi);
-
-                    int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
-                    int interval_wifi =SP.getInt("interval_wifi", wifiInterval);
-
-                    handler.postDelayed(periodicUpdate_wifi, interval_wifi * 1000 - SystemClock.elapsedRealtime() % 1000);
+                    // fire off a new wifi and gps scan (these also start the timers post hoc)
+                    handler.post(periodicUpdate);
+                    handler.post(periodicUpdate_wifi);
 
                     this.sendResult("Started GPS and WiFi scanning.");
 
