@@ -92,16 +92,7 @@ public class TrackerScanner extends Service implements LocationListener {
                 return;
             //
 
-            String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-            String message = currentTime + ": periodicUpdate (posting) activated";
-            System.out.println(message);
-
-
-            //postResult();
-
             postCombinedResult();
-
-
             postWifiResult();
 
 /*
@@ -126,10 +117,6 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Runnable periodicUpdate_wifi = new Runnable() {
         @Override
         public void run() {
-            String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-            String message = currentTime + ": periodicUpdate_wifi activated";
-            System.out.println(message);
-
             scanWifi();
 
             // after we've ran the event, remove the in-queue flag
@@ -209,17 +196,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if (location == null)
             return;
-//        LatLng myCords = new LatLng(location.getLatitude(), location.getLongitude());
 
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         String message = "Time:" + currentTime + "\nLat:" + location.getLatitude() + "\nLong:" + location.getLongitude();
-
-//        Toast myToast = Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT);
-//        myToast.show();
-
         System.out.println(message);
 
-        Location lastLocation = new Location(location);
+        // Location lastLocation = new Location(location);
 
         CombinedScanResult combinedScanResult = new CombinedScanResult();
         combinedScanResult.location = new Location(location);
@@ -228,21 +210,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         this.sendResult("GPS: Location updated.");
 
-
         scanWifi();
-
-
-        
-
-        /*
-        // set scanned bool
-        locationScanned = true;
-
-        if(wifiScanned){
-            postResult();
-        }
-*/
-
 
     }// end of onLocationChanged
 
@@ -322,67 +290,18 @@ public class TrackerScanner extends Service implements LocationListener {
             }
 
             sendResult("WiFi: Scan complete.");
-
-
-            //postResult();
-
-            Log.d("WIFI_UPDATE", String.valueOf(arrayList.size()));
-
+            Log.d("WIFI_UPDATE: ", String.valueOf(arrayList.size()));
 
             wifiScanResultQueue.add(result);
 
             CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
 
-            if (combinedScanResult != null &&
-                    combinedScanResultQueue.peek().dateTime == null) {
-
-
+            if (combinedScanResult != null && combinedScanResultQueue.peek().dateTime == null) {
                 combinedScanResult.dateTime = currentTime;
-
                 combinedScanResult.wifiResult = result.wifiResult;
-
-
-            }
-
-
-
-
-
-            /*
-            if(scanning) {
-
-
-
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                int interval =SP.getInt("interval", 0);
-                int intervalmill = interval * 1000;
-
-
-
-
-                scanWifi();
-
-            }
-
-             */
-
-
-/*
-            // set wifi scanned bool
-            wifiScanned = true;
-
-            if(locationScanned){
-                postResult();
-            }
-
- */
-            // just for debug printing
-            if (wifi_scan_in_queue) {
-                System.out.println("New periodicUpdate_wifi NOT started as already queued.");
             }
 
             if (running && !wifi_scan_in_queue) {
-                System.out.println("Started new periodicUpdate_wifi thread.");
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
                 int interval = SP.getInt("interval_wifi", wifiInterval);
@@ -395,38 +314,14 @@ public class TrackerScanner extends Service implements LocationListener {
     };
 
     public void scanWifi() {
-
-        //arrayList.clear();
-        //arrayList = null;
-
-
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
-
-/*
-        Method startScanActiveMethod = null;
-        try {
-            Method method = WifiManager.class.getMethod("startScanActive");
-            method.setAccessible(true);
-            Object r = method.invoke(null);  // null for static hidden method
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }*/
-
-
-        //Toast.makeText(this, "Scanning WiFi ...", Toast.LENGTH_SHORT).show();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
-        //return null;
     }
 
     private void postWifiResult() {
@@ -436,7 +331,7 @@ public class TrackerScanner extends Service implements LocationListener {
         String address = SP.getString("ServerAddress", server_values[1]);
 
         String dataBase = SP.getString("database", "alpha");
-        //
+
         String deviceID = SP.getString("DeviceID", "");
 
         boolean useSSL = SP.getBoolean("SSL_switch", true);
@@ -447,7 +342,7 @@ public class TrackerScanner extends Service implements LocationListener {
         }
 
 
-        // empty the resend queue forst
+        // empty the resend queue first
         while (this.wifiScanResultResendQueue.size() > 0) {
 
             PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
@@ -455,7 +350,6 @@ public class TrackerScanner extends Service implements LocationListener {
             thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
 
             thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
-
 
             thisPost.execute(
                     address,
@@ -759,34 +653,8 @@ public class TrackerScanner extends Service implements LocationListener {
             }// end of if notificationManager not null
         }// end of if API 26 or greater
 
-//        LocationRequest locationRequest = new LocationRequest();
-//        locationRequest.setInterval(4000);
-//        locationRequest.setFastestInterval(2000);
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//
-//
-//        LocationServices.getFusedLocationProviderClient(this)
-//                .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-//
-//
-//        //----------
-//
-//        wifiManager = (WifiManager)
-//                getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-//
-//        if (!wifiManager.isWifiEnabled()) {
-//            Toast.makeText(this, "WiFi is disabled ... We need to enable it", Toast.LENGTH_LONG).show();
-//            wifiManager.setWifiEnabled(true);
-//        }
-
-
-        //----------
-
-
         requestlocation();
-
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
-
 
     }//end of startLocationService
 
@@ -817,8 +685,6 @@ public class TrackerScanner extends Service implements LocationListener {
 
         stopForeground(true);
         stopSelf();
-
-//        scanning =false;
 
     }// end of stopLocationService
 

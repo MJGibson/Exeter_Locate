@@ -59,9 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putCharSequence(
-                "textbox_contents", ((TextView) findViewById(R.id.log)).getText()
-        );
+        outState.putCharSequence("textbox_contents", ((TextView) findViewById(R.id.log)).getText());
     }
 
     @Override
@@ -71,9 +69,7 @@ public class MainActivity extends AppCompatActivity {
         // then load up the text previously in the text box
         if (savedInstanceState != null) {
             TextView logTextView = findViewById(R.id.log);
-            CharSequence cs = savedInstanceState.getCharSequence("textbox_contents");
-            System.out.println(cs);
-            logTextView.setText(cs);
+            logTextView.setText(savedInstanceState.getCharSequence("textbox_contents"));
         }
     }
 
