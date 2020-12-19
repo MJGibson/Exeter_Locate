@@ -53,6 +53,30 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    // enable the text box content to be save when rotating screen
+    // we can then extract the value and write it to the text box
+    // instead of having an empty text box after rotation
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(
+                "textbox_contents", ((TextView) findViewById(R.id.log)).getText()
+        );
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // if we've saved the state before (e.g. we rotated the screen),
+        // then load up the text previously in the text box
+        if (savedInstanceState != null) {
+            TextView logTextView = findViewById(R.id.log);
+            CharSequence cs = savedInstanceState.getCharSequence("textbox_contents");
+            System.out.println(cs);
+            logTextView.setText(cs);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
