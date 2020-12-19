@@ -57,9 +57,6 @@ public class SecondTabFragment extends Fragment {
 //        pageViewModel.setIndex(index);
 
 
-
-
-
     }// end of onCreate method
 
     @Override
@@ -105,7 +102,7 @@ public class SecondTabFragment extends Fragment {
     public void scanWifi() {
         arrayList.clear();
         getActivity().
-        registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
         Toast.makeText(this.getActivity(), "Scanning WiFi ...", Toast.LENGTH_SHORT).show();
     }
@@ -118,14 +115,12 @@ public class SecondTabFragment extends Fragment {
 
             for (ScanResult scanResult : results) {
                 //arrayList.add(scanResult.SSID + " - " + scanResult.capabilities);
-                arrayList.add(scanResult.SSID + "("+scanResult.level+") -" + scanResult.BSSID);
+                arrayList.add(scanResult.SSID + "(" + scanResult.level + ") -" + scanResult.BSSID);
                 //arrayList.add(scanResult.SSID + " - \""+scanResult. +"\""
                 adapter.notifyDataSetChanged();
             }
         }
     };
-
-
 
 
 }// end of class

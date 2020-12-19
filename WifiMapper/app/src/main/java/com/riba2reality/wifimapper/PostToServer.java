@@ -28,7 +28,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
     private final WeakReference<TrackerScanner> trackerscannerContainer;
 
-    public PostToServer(TrackerScanner trackerScanner){
+    public PostToServer(TrackerScanner trackerScanner) {
         //set context variables if required
 //        broadcaster = LocalBroadcastManager.getInstance();
 
@@ -57,10 +57,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected  void onPostExecute(String result){
+    protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        if(this.trackerscannerContainer!=null){
+        if (this.trackerscannerContainer != null) {
             this.trackerscannerContainer.get().sendResult(result);
         }
 
@@ -143,12 +143,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
             //BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
 
-
-
             //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
             InputStream caInput = new BufferedInputStream(this.is);
-
-
 
 
             Certificate ca;
@@ -174,7 +170,6 @@ public class PostToServer extends AsyncTask<String, String, String> {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, tmf.getTrustManagers(), null);
             //---------------------------------
-
 
 
             // Create an HostnameVerifier that hardwires the expected hostname.
@@ -203,12 +198,6 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
                 }
             };
-
-
-
-
-
-
 
 
             //---------------------------------
@@ -264,12 +253,12 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 con.setReadTimeout(5000);
                 con.setConnectTimeout(5000);
 
-                if(useSSL) {
+                if (useSSL) {
                     // set certificate
-                    ((HttpsURLConnection)con).setSSLSocketFactory(context.getSocketFactory());
+                    ((HttpsURLConnection) con).setSSLSocketFactory(context.getSocketFactory());
 
                     // set host name
-                    ((HttpsURLConnection)con).setHostnameVerifier(hostnameVerifier);
+                    ((HttpsURLConnection) con).setHostnameVerifier(hostnameVerifier);
 
 
                 }
@@ -302,19 +291,17 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 //System.out.println("blah...");
 
 
-
-
                 return sb.toString();
 
             } catch (Exception e) {
 
                 e.printStackTrace();
                 //return null;
-                return "Exception: "+e.getMessage();
+                return "Exception: " + e.getMessage();
             } finally {
                 if (reader != null) {
                     try {
-                        
+
                         reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -324,12 +311,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
             }
 
 
-
-
-            //return "someting";
+            //return "something";
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return "Exception: "+e.getMessage();
+            return "Exception: " + e.getMessage();
         }
     }// end of do in background method
 
@@ -357,11 +342,6 @@ public class PostToServer extends AsyncTask<String, String, String> {
         }
         return sb.toString();
     }
-
-
-
-
-
 
 
 }//end of Class

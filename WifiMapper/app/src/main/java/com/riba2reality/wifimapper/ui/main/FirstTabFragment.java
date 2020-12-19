@@ -98,10 +98,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         mo = new MarkerOptions().position(new LatLng(0, 0)).title("My current location");
 
 
-
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-
-
 
 
         Criteria criteria = new Criteria();
@@ -111,7 +108,6 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         criteria.setBearingRequired(true);
         criteria.setSpeedRequired(true);
         String provider = locationManager.getBestProvider(criteria, true);
-
 
 
 //
@@ -135,38 +131,36 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
             showAlert(1);
 
 
-
-
     }// end of onCreate method
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == PERMISSION_ALL && grantResults.length > 0){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                if(startTracking) {
+        if (requestCode == PERMISSION_ALL && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (startTracking) {
                     startLocationService();
                     startTracking = false;
                 }
-            }else{
+            } else {
                 Toast.makeText(this.getActivity(), "Permission denied!", Toast.LENGTH_SHORT).show();
             }
         }
 
     }// end of onRequestPermissionsResult
 
-    private boolean isLocationServiceRunning(){
+    private boolean isLocationServiceRunning() {
 
         ActivityManager activityManager =
                 (ActivityManager) getActivity().getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-        if(activityManager != null){
+        if (activityManager != null) {
 
-            for(ActivityManager.RunningServiceInfo service :
-                    activityManager.getRunningServices(Integer.MAX_VALUE)){
+            for (ActivityManager.RunningServiceInfo service :
+                    activityManager.getRunningServices(Integer.MAX_VALUE)) {
 
-                if(TrackerScanner.class.getName().equals(service.service.getClassName())){
-                    if(service.foreground){
+                if (TrackerScanner.class.getName().equals(service.service.getClassName())) {
+                    if (service.foreground) {
                         return true;
                     }
                 }
@@ -178,23 +172,23 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
     }// end of isLocationServiceRunning
 
 
-    private void startLocationService(){
-        if(!isLocationServiceRunning()){
+    private void startLocationService() {
+        if (!isLocationServiceRunning()) {
             Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
             getActivity().getApplicationContext().startService(intent);
-            Toast.makeText(this.getActivity(),"Location service started", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
 
 
-    private void stopLocationService(){
-        if(isLocationServiceRunning()){
+    private void stopLocationService() {
+        if (isLocationServiceRunning()) {
             Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
             intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
             //stopService(intent);//?!
             getActivity().getApplicationContext().startService(intent);
-            Toast.makeText(this.getActivity(),"Location service stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getActivity(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
 
@@ -207,7 +201,6 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
 
         //-----------
         /////_trackScannerIntent = root.getApplicationContext()
-
 
 
         //-----------
@@ -282,20 +275,18 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         mapFragment.getMapAsync(this);
 
 
-
-
     }
 
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
 
-        if(location==null)
+        if (location == null)
             return;
         LatLng myCords = new LatLng(location.getLatitude(), location.getLongitude());
 
 
-        if (map!= null && marker != null) {
+        if (map != null && marker != null) {
             marker.setPosition(myCords);
             map.moveCamera(CameraUpdateFactory.newLatLng(myCords));
 
@@ -312,7 +303,6 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         }
 
 
-
     }// end of onLocationChanged
 
     private void requestlocation() {
@@ -327,39 +317,37 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
                 this);
 
 
-
     }//end of requestlocation
 
-    private boolean isLocationEnabled(){
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ;
+    private boolean isLocationEnabled() {
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         //|| locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }//end of isLocationEnabled
 
 
-
-    private boolean isPermissionGranted(){
-        if(//checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
+    private boolean isPermissionGranted() {
+        if (//checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
             //     PackageManager.PERMISSION_GRANTED ||
                 getActivity().
-                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                        checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED
-        ){
-            Log.v("myLog","Permission is granted");
+        ) {
+            Log.v("myLog", "Permission is granted");
             return true;
-        }else{
-            Log.v("myLog","Permission NOT granted");
+        } else {
+            Log.v("myLog", "Permission NOT granted");
             return false;
         }
     }// end of isPermissionGranted
 
-    private void showAlert(final int status){
+    private void showAlert(final int status) {
         String message, title, btnText;
-        if(status == 1){
+        if (status == 1) {
             message = "You Location Settings is set to 'OFF'.\nPlease Enable Location to " +
                     "use this app";
             title = "Enable Location";
             btnText = "Location Settings";
-        }else{
+        } else {
             message = "Please allow this app to access location!";
             title = "permission access";
             btnText = "Grant";
@@ -382,7 +370,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         getActivity().
-                        finish();
+                                finish();
                     }
                 });
         dialog.show();
@@ -403,7 +391,6 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
     public void onProviderDisabled(String s) {
 
     }
-
 
 
 }// end of class

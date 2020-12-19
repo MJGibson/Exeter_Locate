@@ -43,8 +43,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         settings = SettingsFragment.newInstance(++i);
 
 
-
-
     }
 
     @NotNull
@@ -54,15 +52,15 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // Return a PlaceholderFragment (defined as a static inner class below).
         //return PlaceholderFragment.newInstance(position + 1);
 
-        switch(position) {
+        switch (position) {
             case 0:
                 //return FirstTabFragment.newInstance(position + 1);
                 return homeScreen;
             //case 1:
-                //return mapTab;
+            //return mapTab;
 
             //case 2:
-                //return wifiTab;
+            //return wifiTab;
 
             case 1:
                 //return SecondTabFragment.newInstance(position + 1);

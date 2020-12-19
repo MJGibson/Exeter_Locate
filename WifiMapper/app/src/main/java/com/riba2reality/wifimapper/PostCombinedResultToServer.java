@@ -40,7 +40,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
     //WifiScanResult wifiScanResult;
     CombinedScanResult combinedScanResult;
 
-    public PostCombinedResultToServer(TrackerScanner trackerscanner){
+    public PostCombinedResultToServer(TrackerScanner trackerscanner) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerscanner);
     }
@@ -67,10 +67,10 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
     }
 
     @Override
-    protected  void onPostExecute(String result){
+    protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        if(this.trackerscannerContainer!=null){
+        if (this.trackerscannerContainer != null) {
             this.trackerscannerContainer.get().sendResult(result);
         }
 
@@ -108,7 +108,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
         double altitude = 0.0;
         double accuracy = 0.0;
         String provider = "";
-        if(combinedScanResult.location!=null) {
+        if (combinedScanResult.location != null) {
             latitude = combinedScanResult.location.getLatitude();
             longitude = combinedScanResult.location.getLongitude();
             altitude = combinedScanResult.location.getAltitude();
@@ -137,37 +137,32 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
         Map<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM",Constants.verificationCode);
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID",deviceID);
+        parameters.put("UUID", deviceID);
 
-        parameters.put("DATABASE",dataBase);
+        parameters.put("DATABASE", dataBase);
 
-        parameters.put("TIME",combinedScanResult.dateTime);
+        parameters.put("TIME", combinedScanResult.dateTime);
 
 
-        parameters.put("GPSTIME",gpsTime);
+        parameters.put("GPSTIME", gpsTime);
 
-        parameters.put("X",Double.toString(latitude));
-        parameters.put("Y",Double.toString(longitude));
-        parameters.put("ALTITUDE",Double.toString(altitude));
-        parameters.put("ACC",Double.toString(accuracy));
+        parameters.put("X", Double.toString(latitude));
+        parameters.put("Y", Double.toString(longitude));
+        parameters.put("ALTITUDE", Double.toString(altitude));
+        parameters.put("ACC", Double.toString(accuracy));
 
-        String macAddressJson = new Gson().toJson(macAddressList );
+        String macAddressJson = new Gson().toJson(macAddressList);
 
 
         //parameters.put("MacAddresses",macAddressList.toString());
-        parameters.put("MacAddressesJson",macAddressJson);
+        parameters.put("MacAddressesJson", macAddressJson);
 
-        parameters.put("signalStrengthsJson",new Gson().toJson(signalStrengths ));
+        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
 
         String message = new JSONObject(parameters).toString();
-
-
-
-
-
 
 
         //------------------------------------------------------------------
@@ -189,12 +184,8 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             //BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
 
-
-
             //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
             InputStream caInput = new BufferedInputStream(this.is);
-
-
 
 
             Certificate ca;
@@ -220,7 +211,6 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, tmf.getTrustManagers(), null);
             //---------------------------------
-
 
 
             // Create an HostnameVerifier that hardwires the expected hostname.
@@ -249,12 +239,6 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
 
                 }
             };
-
-
-
-
-
-
 
 
             //---------------------------------
@@ -310,12 +294,12 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
                 con.setReadTimeout(5000);
                 con.setConnectTimeout(5000);
 
-                if(useSSL) {
+                if (useSSL) {
                     // set certificate
-                    ((HttpsURLConnection)con).setSSLSocketFactory(context.getSocketFactory());
+                    ((HttpsURLConnection) con).setSSLSocketFactory(context.getSocketFactory());
 
                     // set host name
-                    ((HttpsURLConnection)con).setHostnameVerifier(hostnameVerifier);
+                    ((HttpsURLConnection) con).setHostnameVerifier(hostnameVerifier);
 
 
                 }
@@ -348,8 +332,6 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
                 //System.out.println("blah...");
 
 
-
-
                 return sb.toString();
 
             } catch (Exception e) {
@@ -360,7 +342,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
 
                 e.printStackTrace();
                 //return null;
-                return "Exception: "+e.getMessage();
+                return "Exception: " + e.getMessage();
             } finally {
                 if (reader != null) {
                     try {
@@ -374,9 +356,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             }
 
 
-
-
-            //return "someting";
+            //return "something";
         } catch (Exception e) {
 
             // put it back in the queue
@@ -384,7 +364,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
 
 
             System.out.println(e.getMessage());
-            return "Exception: "+e.getMessage();
+            return "Exception: " + e.getMessage();
         }
     }// end of do in background method
 

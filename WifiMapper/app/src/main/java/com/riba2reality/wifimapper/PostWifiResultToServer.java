@@ -35,7 +35,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
     WifiScanResult wifiScanResult;
 
-    public PostWifiResultToServer(TrackerScanner trackerScanner){
+    public PostWifiResultToServer(TrackerScanner trackerScanner) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
     }
@@ -62,10 +62,10 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected  void onPostExecute(String result){
+    protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        if(this.trackerscannerContainer!=null){
+        if (this.trackerscannerContainer != null) {
             this.trackerscannerContainer.get().sendResult(result);
         }
 
@@ -112,34 +112,29 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
         Map<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM",Constants.verificationCode);
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID",deviceID);
+        parameters.put("UUID", deviceID);
 
-        parameters.put("DATABASE",dataBase);
+        parameters.put("DATABASE", dataBase);
 
-        parameters.put("TIME",wifiScanResult.dateTime);
+        parameters.put("TIME", wifiScanResult.dateTime);
 
 //        parameters.put("X",Double.toString(latitude));
 //        parameters.put("Y",Double.toString(longitude));
 //        parameters.put("ALTITUDE",Double.toString(altitude));
 //        parameters.put("ACC",Double.toString(accuracy));
 
-        String macAddressJson = new Gson().toJson(macAddressList );
+        String macAddressJson = new Gson().toJson(macAddressList);
 
 
         //parameters.put("MacAddresses",macAddressList.toString());
-        parameters.put("MacAddressesJson",macAddressJson);
+        parameters.put("MacAddressesJson", macAddressJson);
 
-        parameters.put("signalStrengthsJson",new Gson().toJson(signalStrengths ));
+        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
 
         String message = new JSONObject(parameters).toString();
-
-
-
-
-
 
 
         //------------------------------------------------------------------
@@ -161,12 +156,8 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
             //BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
 
-
-
             //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
             InputStream caInput = new BufferedInputStream(this.is);
-
-
 
 
             Certificate ca;
@@ -192,7 +183,6 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, tmf.getTrustManagers(), null);
             //---------------------------------
-
 
 
             // Create an HostnameVerifier that hardwires the expected hostname.
@@ -221,12 +211,6 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
                 }
             };
-
-
-
-
-
-
 
 
             //---------------------------------
@@ -282,12 +266,12 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
                 con.setReadTimeout(5000);
                 con.setConnectTimeout(5000);
 
-                if(useSSL) {
+                if (useSSL) {
                     // set certificate
-                    ((HttpsURLConnection)con).setSSLSocketFactory(context.getSocketFactory());
+                    ((HttpsURLConnection) con).setSSLSocketFactory(context.getSocketFactory());
 
                     // set host name
-                    ((HttpsURLConnection)con).setHostnameVerifier(hostnameVerifier);
+                    ((HttpsURLConnection) con).setHostnameVerifier(hostnameVerifier);
 
 
                 }
@@ -320,8 +304,6 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
                 //System.out.println("blah...");
 
 
-
-
                 return sb.toString();
 
             } catch (Exception e) {
@@ -333,7 +315,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
                 e.printStackTrace();
                 //return null;
-                return "Exception: "+e.getMessage();
+                return "Exception: " + e.getMessage();
             } finally {
                 if (reader != null) {
                     try {
@@ -347,8 +329,6 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
             }
 
 
-
-
             //return "someting";
         } catch (Exception e) {
 
@@ -356,7 +336,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
             this.trackerscannerContainer.get().wifiScanResultResendQueue.add(this.wifiScanResult);
 
             System.out.println(e.getMessage());
-            return "Exception: "+e.getMessage();
+            return "Exception: " + e.getMessage();
         }
     }// end of do in background method
 

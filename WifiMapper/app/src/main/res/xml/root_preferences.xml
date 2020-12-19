@@ -1,5 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
     >
 
@@ -32,55 +32,50 @@
 
 
         <SwitchPreference
+            android:defaultValue="True"
             app:key="SSL_switch"
             app:title="Use HTTPS (SSL)?"
-            android:defaultValue="True"
 
             />
 
         <EditTextPreference
             app:key="database"
             app:title="Database:"
-            app:useSimpleSummaryProvider="true"
-            />
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Time settings">
 
         <SeekBarPreference
-            app:key="interval_posts"
-            app:title="Time interval between posts (seconds)"
+            android:max="@integer/max"
+            app:adjustable="true"
             app:defaultValue="@integer/defaultVal_post"
-            app:min="@integer/min"
-            android:max="@integer/max"
-            app:adjustable="true"
             app:isPreferenceVisible="true"
+            app:key="interval_posts"
+            app:min="@integer/min"
             app:showSeekBarValue="true"
-            />
+            app:title="Time interval between posts (seconds)" />
 
         <SeekBarPreference
-            app:key="interval_gps"
-            app:title="Time interval between GPS scans (seconds)"
+            android:max="@integer/max"
+            app:adjustable="true"
             app:defaultValue="@integer/defaultVal_gps"
-            app:min="@integer/min"
-            android:max="@integer/max"
-            app:adjustable="true"
             app:isPreferenceVisible="true"
+            app:key="interval_gps"
+            app:min="@integer/min"
             app:showSeekBarValue="true"
-            />
+            app:title="Time interval between GPS scans (seconds)" />
 
         <SeekBarPreference
-            app:key="interval_wifi"
-            app:title="Time interval between Wifi Scans (seconds)"
-            app:defaultValue="@integer/defaultVal_wifi"
-            app:min="@integer/min"
             android:max="@integer/max"
             app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_wifi"
             app:isPreferenceVisible="true"
+            app:key="interval_wifi"
+            app:min="@integer/min"
             app:showSeekBarValue="true"
-            />
-
+            app:title="Time interval between Wifi Scans (seconds)" />
 
 
     </PreferenceCategory>
@@ -90,8 +85,7 @@
         <EditTextPreference
             app:key="versionNum"
             app:title="Version:"
-            app:useSimpleSummaryProvider="true"
-            />
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 

@@ -53,13 +53,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         deviceIDPref.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        String nV = (String)newValue;
+                        String nV = (String) newValue;
                         boolean empty = nV.equals("");
 
                         // if the user entered an empty string, replace it with a randomly generated one
                         if (empty) {
                             nV = UUID.randomUUID().toString();
-                            ((EditTextPreference)preference).setText(nV);
+                            ((EditTextPreference) preference).setText(nV);
                         }
 
                         SPeditor.putString("DeviceID", nV);
@@ -74,36 +74,33 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         deviceIDPref.setText(s);
 
 
-
-
         //----------------------------------------------------------------
 
-        // only enable the server IP input if custom is selected, otherwise disable and enter relavtive IP
+        // only enable the server IP input if custom is selected, otherwise disable and enter relative IP
         final ListPreference serverAddressListPref = findPreference("ServerList");
         final EditTextPreference serverAddressPref = findPreference("ServerAddress");
         serverAddressListPref.setOnPreferenceChangeListener(new
-               Preference.OnPreferenceChangeListener() {
-                   public boolean onPreferenceChange(Preference preference, Object newValue) {
-                       final String val = newValue.toString();
-                       int index = serverAddressListPref.findIndexOfValue(val);
-                       if(index==0) {
-                           //if(val.equals(""))
+                                                                    Preference.OnPreferenceChangeListener() {
+                                                                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                                                            final String val = newValue.toString();
+                                                                            int index = serverAddressListPref.findIndexOfValue(val);
+                                                                            if (index == 0) {
+                                                                                //if(val.equals(""))
 
-                           // stop is as new IP can be put through checks
-                           stopLocationService();
+                                                                                // stop is as new IP can be put through checks
+                                                                                stopLocationService();
 
 
-                           serverAddressPref.setEnabled(true);
-                           serverAddressPref.setText("");
+                                                                                serverAddressPref.setEnabled(true);
+                                                                                serverAddressPref.setText("");
 
-                       }
-                       else {
-                           serverAddressPref.setEnabled(false);
-                           serverAddressPref.setText(val);
-                       }
-                       return true;
-                   }
-               });
+                                                                            } else {
+                                                                                serverAddressPref.setEnabled(false);
+                                                                                serverAddressPref.setText(val);
+                                                                            }
+                                                                            return true;
+                                                                        }
+                                                                    });
 
         // set default value
         int ip_index = 1;
@@ -122,7 +119,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 editText.setInputType(InputType.TYPE_CLASS_PHONE);
                 //editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-                editText.setFilters(new InputFilter[] { new InputFilter(){
+                editText.setFilters(new InputFilter[]{new InputFilter() {
                     @Override
                     public CharSequence filter(CharSequence source, int start, int end, android.text.Spanned dest, int dstart, int dend) {
                         if (end > start) {
@@ -130,8 +127,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                             String resultingTxt = destTxt.substring(0, dstart) + source.subSequence(start, end) + destTxt.substring(dend);
                             if (!resultingTxt.matches("^\\d{1,3}(\\.(\\d{1,3}(\\.(\\d{1,3}(\\.(\\d{1,3})?)?)?)?)?)?")) {
                                 return "";
-                            }
-                            else {
+                            } else {
                                 String[] splits = resultingTxt.split("\\.");
                                 for (String split : splits) {
                                     if (Integer.parseInt(split) > 255) {
@@ -145,7 +141,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 }
                 });
 
-                editText.addTextChangedListener(new TextWatcher(){
+                editText.addTextChangedListener(new TextWatcher() {
                     boolean deleting = false;
                     final int lastCount = 0;
 
@@ -174,15 +170,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 });
 
 
-
-
-
             }// end of onBindEditText
         });
 
         //----------------------------------------------------------------
 
-        // make interval atleast have a number input dialog
+        // make interval at least have a number input dialog
         /*
         EditTextPreference pref_interval = getPreferenceManager().findPreference("interval");
         pref_interval.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
@@ -211,7 +204,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        SPeditor.putInt("defaultVal_post", (int)newValue);
+                        SPeditor.putInt("defaultVal_post", (int) newValue);
                         SPeditor.apply();
                         stopLocationService();
                         return true;
@@ -237,7 +230,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        SPeditor.putInt("defaultVal_gps", (int)newValue);
+                        SPeditor.putInt("defaultVal_gps", (int) newValue);
                         SPeditor.apply();
                         stopLocationService();
                         return true;
@@ -262,7 +255,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        SPeditor.putInt("defaultVal_wifi", (int)newValue);
+                        SPeditor.putInt("defaultVal_wifi", (int) newValue);
                         SPeditor.apply();
                         stopLocationService();
                         return true;
@@ -364,22 +357,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         versionPref.setText(BuildConfig.VERSION_NAME);
 
 
-
     }// end of onCreatePreferences
     //############################################################################################
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
-        if (! (preference instanceof EditTextPreference)) {
+        if (!(preference instanceof EditTextPreference)) {
             return false;
         }
 
-        EditTextPreference editTextPreference = (EditTextPreference)preference;
+        EditTextPreference editTextPreference = (EditTextPreference) preference;
         String key = editTextPreference.getKey();
         String text = editTextPreference.getText();// current
-        String newText = (String)value;
+        String newText = (String) value;
 
-        System.out.println("Text :"+newText);
+        System.out.println("Text :" + newText);
 
         if (key == null || key.isEmpty() || newText == null || newText.isEmpty()) {
             return false;
@@ -406,28 +398,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     }
 
 
-
-
-
-
-
-
-
-
-
-
     //############################################################################################
-    private boolean isLocationServiceRunning(){
+    private boolean isLocationServiceRunning() {
 
         ActivityManager activityManager =
                 (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
-        if(activityManager != null){
+        if (activityManager != null) {
 
-            for(ActivityManager.RunningServiceInfo service :
-                    activityManager.getRunningServices(Integer.MAX_VALUE)){
+            for (ActivityManager.RunningServiceInfo service :
+                    activityManager.getRunningServices(Integer.MAX_VALUE)) {
 
-                if(TrackerScanner.class.getName().equals(service.service.getClassName())){
-                    if(service.foreground){
+                if (TrackerScanner.class.getName().equals(service.service.getClassName())) {
+                    if (service.foreground) {
                         return true;
                     }
                 }
@@ -437,7 +419,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         }// end of if activityManger not null
         return false;
     }// end of isLocationServiceRunning
-
 
 
 //    private void startLocationService(){
@@ -451,13 +432,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 //    }// end of startLocationService
 
 
-    private void stopLocationService(){
-        if(isLocationServiceRunning()){
+    private void stopLocationService() {
+        if (isLocationServiceRunning()) {
             Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
             intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
             //stopService(intent);//?!
             getActivity().startService(intent);
-            Toast.makeText(getActivity(),"Location service stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
 

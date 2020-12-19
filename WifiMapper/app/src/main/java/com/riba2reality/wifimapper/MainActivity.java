@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
 
 
-
         //------------
 
         receiver = new BroadcastReceiver() {
@@ -83,11 +82,11 @@ public class MainActivity extends AppCompatActivity {
                 final ScrollView scroll = findViewById(R.id.logScroll);
 
 
-                if(logTextView!=null) {
+                if (logTextView != null) {
                     // append to the log text
                     logTextView.append(
                             "\n### " + currentTime + " ###"
-                            + "\n" + message
+                                    + "\n" + message
                     );
 
                     // count the number of lines to remove, i.e. the number of lines > the maximum
@@ -127,17 +126,17 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public  void onClick(View v){
+            public void onClick(View v) {
 
-                if(ContextCompat.checkSelfPermission(
+                if (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
-                )!= PackageManager.PERMISSION_GRANTED){
+                ) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(
                             MainActivity.this,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             REQUEST_CODE_LOCATION_PERMISSIONS
                     );
-                }else{
+                } else {
                     startLocationService();
 
                 }
@@ -149,14 +148,10 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.stop_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 stopLocationService();
             }
         });
-
-
-
-
 
 
         //------------
@@ -269,7 +264,6 @@ public class MainActivity extends AppCompatActivity {
  */
 
 
-
 //        // Get the SupportMapFragment and request notification
 //        // when the map is ready to be used.
 //        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -277,11 +271,7 @@ public class MainActivity extends AppCompatActivity {
 //        mapFragment.getMapAsync(this);
 
 
-
-
     }// end of onCreate method
-
-
 
 
 //    @Override
@@ -297,27 +287,27 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == REQUEST_CODE_LOCATION_PERMISSIONS && grantResults.length > 0){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == REQUEST_CODE_LOCATION_PERMISSIONS && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startLocationService();
-            }else{
+            } else {
                 Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
             }
         }
 
     }// end of onRequestPermissionsResult
 
-    private boolean isLocationServiceRunning(){
+    private boolean isLocationServiceRunning() {
 
         ActivityManager activityManager =
                 (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if(activityManager != null){
+        if (activityManager != null) {
 
-            for(ActivityManager.RunningServiceInfo service :
-                    activityManager.getRunningServices(Integer.MAX_VALUE)){
+            for (ActivityManager.RunningServiceInfo service :
+                    activityManager.getRunningServices(Integer.MAX_VALUE)) {
 
-                if(TrackerScanner.class.getName().equals(service.service.getClassName())){
-                    if(service.foreground){
+                if (TrackerScanner.class.getName().equals(service.service.getClassName())) {
+                    if (service.foreground) {
                         return true;
                     }
                 }
@@ -329,44 +319,43 @@ public class MainActivity extends AppCompatActivity {
     }// end of isLocationServiceRunning
 
 
-    private void startLocationService(){
-        if(!isLocationServiceRunning()){
+    private void startLocationService() {
+        if (!isLocationServiceRunning()) {
 
             String[] server_values = getResources().getStringArray(R.array.server_values);
 
 //            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
 //            String serverAddress = sharedPref.getString("ServerAddress","");
             SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            String serverAddress =SP.getString("ServerAddress", server_values[1]);
+            String serverAddress = SP.getString("ServerAddress", server_values[1]);
 
             //System.out.println("ServerAddress: "+serverAddress);
 
 
             //List<String> server_valuesList = Arrays.asList(server_values);
 
-            if(serverAddress.isEmpty() || serverAddress.equals(server_values[0])){
-                Toast.makeText(this,"Please set Server Address", Toast.LENGTH_SHORT).show();
+            if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
+                Toast.makeText(this, "Please set Server Address", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
             startService(intent);
-            Toast.makeText(this,"Location service started", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
 
 
-    private void stopLocationService(){
-        if(isLocationServiceRunning()){
+    private void stopLocationService() {
+        if (isLocationServiceRunning()) {
             Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
             intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
             //stopService(intent);//?!
             startService(intent);
-            Toast.makeText(this,"Location service stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
-
 
 
 }// end of class

@@ -91,15 +91,14 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Runnable periodicUpdate = new Runnable() {
         @Override
         public void run() {
-            if(running) {
+            if (running) {
 
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int postInterval = getResources().getInteger(R.integer.defaultVal_post);
-                int interval =SP.getInt("interval_posts", postInterval);
+                int interval = SP.getInt("interval_posts", postInterval);
 
                 handler.postDelayed(periodicUpdate, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
-            }
-            else
+            } else
                 return;
             //
 
@@ -172,12 +171,11 @@ public class TrackerScanner extends Service implements LocationListener {
         //locationManager.requestSingleUpdate(provider, this, Looper.getMainLooper());
 
 
-
     }//end of requestlocation
 
     public void sendResult(String message) {
         Intent intent = new Intent(TRACKERSCANNER_RESULT);
-        if(message != null)
+        if (message != null)
             intent.putExtra(TRACKERSCANNER_MESSAGE, message);
         broadcaster.sendBroadcast(intent);
     }
@@ -202,8 +200,6 @@ public class TrackerScanner extends Service implements LocationListener {
 //        wl.acquire();
 
 
-
-
         broadcaster = LocalBroadcastManager.getInstance(this);
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -211,10 +207,9 @@ public class TrackerScanner extends Service implements LocationListener {
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
-        if(wl.isHeld())
+        if (wl.isHeld())
             wl.release();
 
     }
@@ -222,7 +217,7 @@ public class TrackerScanner extends Service implements LocationListener {
     @Override
     public void onLocationChanged(@NonNull Location location) {
 
-        if(location==null)
+        if (location == null)
             return;
 //        LatLng myCords = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -276,12 +271,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }
 
-    private final LocationCallback locationCallback = new LocationCallback(){
+    private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
 
-            if(locationResult != null && locationResult.getLastLocation() != null){
+            if (locationResult != null && locationResult.getLastLocation() != null) {
                 // double latitude = locationResult.getLastLocation().getLatitude();
                 // double longitude = locationResult.getLastLocation().getLongitude();
 
@@ -346,9 +341,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
             CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
 
-            if(combinedScanResult != null &&
-                    combinedScanResultQueue.peek().dateTime == null){
-
+            if (combinedScanResult != null &&
+                    combinedScanResultQueue.peek().dateTime == null) {
 
 
                 combinedScanResult.dateTime = currentTime;
@@ -395,11 +389,11 @@ public class TrackerScanner extends Service implements LocationListener {
                 System.out.println("New periodicUpdate_wifi NOT started as already queued.");
             }
 
-            if(running && !wifi_scan_in_queue) {
+            if (running && !wifi_scan_in_queue) {
                 System.out.println("Started new periodicUpdate_wifi thread.");
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
-                int interval =SP.getInt("interval_wifi", wifiInterval);
+                int interval = SP.getInt("interval_wifi", wifiInterval);
 
                 handler.postDelayed(periodicUpdate_wifi, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
                 wifi_scan_in_queue = true;
@@ -433,7 +427,6 @@ public class TrackerScanner extends Service implements LocationListener {
         }*/
 
 
-
         //Toast.makeText(this, "Scanning WiFi ...", Toast.LENGTH_SHORT).show();
     }
 
@@ -448,22 +441,22 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String[] server_values = getResources().getStringArray(R.array.server_values);
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address =SP.getString("ServerAddress", server_values[1]);
+        String address = SP.getString("ServerAddress", server_values[1]);
 
-        String dataBase =SP.getString("database", "alpha");
+        String dataBase = SP.getString("database", "alpha");
         //
-        String deviceID =SP.getString("DeviceID", "");
+        String deviceID = SP.getString("DeviceID", "");
 
-        boolean useSSL = SP.getBoolean("SSL_switch",true);
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if(useSSL){
-            protocol+="s";
+        if (useSSL) {
+            protocol += "s";
         }
 
 
         // empty the resend queue forst
-        while(this.wifiScanResultResendQueue.size() > 0) {
+        while (this.wifiScanResultResendQueue.size() > 0) {
 
             PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
 
@@ -486,7 +479,7 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of looping queue
 
         // empty the queue
-        while(this.wifiScanResultQueue.size() > 0) {
+        while (this.wifiScanResultQueue.size() > 0) {
 
             PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
 
@@ -515,21 +508,21 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String[] server_values = getResources().getStringArray(R.array.server_values);
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address =SP.getString("ServerAddress", server_values[1]);
+        String address = SP.getString("ServerAddress", server_values[1]);
 
-        String dataBase =SP.getString("database", "alpha");
+        String dataBase = SP.getString("database", "alpha");
         //
-        String deviceID =SP.getString("DeviceID", "");
+        String deviceID = SP.getString("DeviceID", "");
 
-        boolean useSSL = SP.getBoolean("SSL_switch",true);
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if(useSSL){
-            protocol+="s";
+        if (useSSL) {
+            protocol += "s";
         }
 
         // empty the resend queue first
-        while(this.combinedScanResultResendQueue.size() > 0) {
+        while (this.combinedScanResultResendQueue.size() > 0) {
 
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
             PostCombinedResultToServer thisPost = new PostCombinedResultToServer(this);
@@ -553,7 +546,7 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of looping queue
 
         // empty the queue
-        while(this.combinedScanResultQueue.size() > 0) {
+        while (this.combinedScanResultQueue.size() > 0) {
 
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
             PostCombinedResultToServer thisPost = new PostCombinedResultToServer(this);
@@ -579,10 +572,7 @@ public class TrackerScanner extends Service implements LocationListener {
     }// end of postCombinedResult
 
 
-
-
-
-    private void postResult(){
+    private void postResult() {
         Map<String, String> parameters = new HashMap<>();
 
         List<String> macAddressList = new ArrayList<>();
@@ -595,14 +585,14 @@ public class TrackerScanner extends Service implements LocationListener {
         double altitude;
         double accuracy;
         String provider;
-        if(lastLocation!=null) {
+        if (lastLocation != null) {
             latitude = lastLocation.getLatitude();
             longitude = lastLocation.getLongitude();
             altitude = lastLocation.getAltitude();
             accuracy = lastLocation.getAccuracy();
 
             // provider = lastLocation.getProvider();
-        }else{
+        } else {
 
             this.sendResult("Error: GPS location missing.");
 
@@ -610,7 +600,7 @@ public class TrackerScanner extends Service implements LocationListener {
         }
 
 
-        if(arrayList == null){
+        if (arrayList == null) {
 
             this.sendResult("Error: WiFi scan results missing.");
 
@@ -639,11 +629,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------
 
 
-
-
         // results collected, switch scanning back on.
         boolean scanning = false;
-
 
 
         //------
@@ -651,11 +638,11 @@ public class TrackerScanner extends Service implements LocationListener {
         String[] server_values = getResources().getStringArray(R.array.server_values);
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address =SP.getString("ServerAddress", server_values[1]);
+        String address = SP.getString("ServerAddress", server_values[1]);
 
-        String dataBase =SP.getString("database", "alpha");
+        String dataBase = SP.getString("database", "alpha");
 
-        boolean useSSL = SP.getBoolean("SSL_switch",true);
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
 
         //------
@@ -665,24 +652,24 @@ public class TrackerScanner extends Service implements LocationListener {
 //                parameters.put("X","42");
 //                parameters.put("Y","7");
 
-        parameters.put("MAGIC_NUM",verificationCode);
+        parameters.put("MAGIC_NUM", verificationCode);
 
-        parameters.put("DATABASE",dataBase);
+        parameters.put("DATABASE", dataBase);
 
-        parameters.put("TIME",currentTime);
-        parameters.put("X",Double.toString(latitude));
-        parameters.put("Y",Double.toString(longitude));
+        parameters.put("TIME", currentTime);
+        parameters.put("X", Double.toString(latitude));
+        parameters.put("Y", Double.toString(longitude));
 
-        parameters.put("ALTITUDE",Double.toString(altitude));
-        parameters.put("ACC",Double.toString(accuracy));
+        parameters.put("ALTITUDE", Double.toString(altitude));
+        parameters.put("ACC", Double.toString(accuracy));
 
-        String macAddressJson = new Gson().toJson(macAddressList );
+        String macAddressJson = new Gson().toJson(macAddressList);
 
 
         //parameters.put("MacAddresses",macAddressList.toString());
-        parameters.put("MacAddressesJson",macAddressJson);
+        parameters.put("MacAddressesJson", macAddressJson);
 
-        parameters.put("signalStrengthsJson",new Gson().toJson(signalStrengths ));
+        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
 
         String message = new JSONObject(parameters).toString();
@@ -708,12 +695,12 @@ public class TrackerScanner extends Service implements LocationListener {
         //String uri = "http://"+address;
 
         String protocol = "http";
-        if(useSSL){
-            protocol+="s";
+        if (useSSL) {
+            protocol += "s";
         }
 
         //String uri = "https://"+address;
-        String uri = protocol+"://"+address;
+        String uri = protocol + "://" + address;
 
         //String uri = "http://example.com";
         //String uri = "https://postman-echo.com/get";
@@ -727,19 +714,16 @@ public class TrackerScanner extends Service implements LocationListener {
         post.is = getResources().openRawResource(R.raw.nginxselfsigned);
 
 
+        post.execute(uri, message, String.valueOf(useSSL), address);
 
 
-        post.execute(uri,message, String.valueOf(useSSL),address);
-
-
-
-        this.sendResult("Sending["+protocol+"]: "+message.length()+" bytes");
+        this.sendResult("Sending[" + protocol + "]: " + message.length() + " bytes");
 
 
     }// end of postResult
 
 
-    private void startLocationService(){
+    private void startLocationService() {
 
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -765,11 +749,11 @@ public class TrackerScanner extends Service implements LocationListener {
         builder.setAutoCancel(false);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            if(notificationManager != null &&
+            if (notificationManager != null &&
                     notificationManager.getNotificationChannel(channelId) == null
-            ){
+            ) {
                 NotificationChannel notificationChannel = new NotificationChannel(
                         channelId,
                         "Location Service",
@@ -810,13 +794,9 @@ public class TrackerScanner extends Service implements LocationListener {
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 
 
-
-
-
-
     }//end of startLocationService
 
-    private void stopLocationService(){
+    private void stopLocationService() {
 
 //        LocationServices.getFusedLocationProviderClient(this)
 //                .removeLocationUpdates(locationCallback);
@@ -825,7 +805,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
         try {
-            if(post!= null)
+            if (post != null)
                 post.get();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -833,10 +813,10 @@ public class TrackerScanner extends Service implements LocationListener {
             e.printStackTrace();
         }
 
-        // if service stopped when scaned wifi, the reciever already unregisted
+        // if service stopped when scanned wifi, the receiver already unregistered
         try {
             unregisterReceiver(wifiReceiver);
-        }catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
 
             e.printStackTrace();
         }
@@ -848,7 +828,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }// end of stopLocationService
 
-    private  void stopService(){
+    private void stopService() {
 
         handler.removeCallbacks(periodicUpdate);
 
@@ -856,7 +836,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         running = false;
 
-        System.out.println("Stop intiated...");
+        System.out.println("Stop initiated...");
 
         //
         wl.release();
@@ -864,11 +844,11 @@ public class TrackerScanner extends Service implements LocationListener {
     }// end of stop service
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
-        if(intent != null){
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
             String action = intent.getAction();
-            if(action != null){
-                if(action.equals(Constants.ACTION_START_LOCATION_SERVICE)){
+            if (action != null) {
+                if (action.equals(Constants.ACTION_START_LOCATION_SERVICE)) {
 
 
                     startLocationService();
@@ -894,8 +874,8 @@ public class TrackerScanner extends Service implements LocationListener {
                     this.sendResult("Started GPS and WiFi scanning.");
 
                     return START_STICKY;
-                }else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
-                    //System.out.println("Stop intiated...");
+                } else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
+                    //System.out.println("Stop initiated...");
                     this.sendResult("Stopping GPS and WiFi scanning... sending all remaining scans.");
 
                     // empty the queues before the lose them
@@ -908,12 +888,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
             }// end of if action not null
         }// end of if intent not null
-        return super.onStartCommand(intent,flags,startId);
+        return super.onStartCommand(intent, flags, startId);
     }// end of onStartCommand
-
-
-
-
 
 
 }// end of class

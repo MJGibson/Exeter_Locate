@@ -6,7 +6,6 @@
     tools:context=".ui.main.FirstTabFragment">
 
 
-
     <!--
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -19,38 +18,38 @@
         android:layout_height="match_parent">
         -->
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            tools:context="com.riba2reality.wifimapper.MainActivity" />
-
-<!--
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
-            android:id="@+id/start_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/start" />
+        tools:context="com.riba2reality.wifimapper.MainActivity" />
 
-        <Button
-            android:id="@+id/stop_button"
-            android:layout_width="wrap_content"
+    <!--
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/stop" />
-    </LinearLayout>
--->
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:id="@+id/start_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/start" />
+
+            <Button
+                android:id="@+id/stop_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/stop" />
+        </LinearLayout>
+    -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
