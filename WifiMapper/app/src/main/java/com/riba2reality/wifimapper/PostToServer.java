@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
@@ -25,13 +26,13 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostToServer extends AsyncTask<String, String, String> {
 
-    final TrackerScanner _trackerScanner;
+    private final WeakReference<TrackerScanner> trackerscannerContainer;
 
     public PostToServer(TrackerScanner trackerScanner){
         //set context variables if required
 //        broadcaster = LocalBroadcastManager.getInstance();
 
-        _trackerScanner = trackerScanner;
+        this.trackerscannerContainer = new WeakReference<>(trackerScanner);
     }
 
     public InputStream is;
@@ -59,8 +60,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
     protected  void onPostExecute(String result){
         super.onPostExecute(result);
 
-        if(_trackerScanner!=null){
-            _trackerScanner.sendResult(result);
+        if(this.trackerscannerContainer!=null){
+            this.trackerscannerContainer.get().sendResult(result);
         }
 
     }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
@@ -33,14 +34,15 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostCombinedResultToServer extends AsyncTask<String, String, String> {
 
-    final TrackerScanner _trackerScanner;
+    // final TrackerScanner _trackerScanner;
+    private final WeakReference<TrackerScanner> trackerscannerContainer;
 
     //WifiScanResult wifiScanResult;
     CombinedScanResult combinedScanResult;
 
-    public PostCombinedResultToServer(TrackerScanner trackerScanner){
+    public PostCombinedResultToServer(TrackerScanner trackerscanner){
 
-        _trackerScanner = trackerScanner;
+        this.trackerscannerContainer = new WeakReference<>(trackerscanner);
     }
 
     public InputStream is;
@@ -68,8 +70,8 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
     protected  void onPostExecute(String result){
         super.onPostExecute(result);
 
-        if(_trackerScanner!=null){
-            _trackerScanner.sendResult(result);
+        if(this.trackerscannerContainer!=null){
+            this.trackerscannerContainer.get().sendResult(result);
         }
 
     }
@@ -353,7 +355,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
             } catch (Exception e) {
 
                 // put it back in the queue
-                this._trackerScanner.combinedScanResultResendQueue.add(this.combinedScanResult);
+                this.trackerscannerContainer.get().combinedScanResultResendQueue.add(this.combinedScanResult);
 
 
                 e.printStackTrace();
@@ -378,7 +380,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
         } catch (Exception e) {
 
             // put it back in the queue
-            this._trackerScanner.combinedScanResultResendQueue.add(this.combinedScanResult);
+            this.trackerscannerContainer.get().combinedScanResultResendQueue.add(this.combinedScanResult);
 
 
             System.out.println(e.getMessage());

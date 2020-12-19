@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
@@ -30,13 +31,13 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
-    final TrackerScanner _trackerScanner;
+    private final WeakReference<TrackerScanner> trackerscannerContainer;
 
     WifiScanResult wifiScanResult;
 
     public PostWifiResultToServer(TrackerScanner trackerScanner){
 
-        _trackerScanner = trackerScanner;
+        this.trackerscannerContainer = new WeakReference<>(trackerScanner);
     }
 
     public InputStream is;
@@ -64,8 +65,8 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
     protected  void onPostExecute(String result){
         super.onPostExecute(result);
 
-        if(_trackerScanner!=null){
-            _trackerScanner.sendResult(result);
+        if(this.trackerscannerContainer!=null){
+            this.trackerscannerContainer.get().sendResult(result);
         }
 
     }
@@ -327,7 +328,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
 
 
                 // put it back in the queue
-                this._trackerScanner.wifiScanResultResendQueue.add(this.wifiScanResult);
+                this.trackerscannerContainer.get().wifiScanResultResendQueue.add(this.wifiScanResult);
 
 
                 e.printStackTrace();
@@ -352,7 +353,7 @@ public class PostWifiResultToServer extends AsyncTask<String, String, String> {
         } catch (Exception e) {
 
             // put it back in the queue
-            this._trackerScanner.wifiScanResultResendQueue.add(this.wifiScanResult);
+            this.trackerscannerContainer.get().wifiScanResultResendQueue.add(this.wifiScanResult);
 
             System.out.println(e.getMessage());
             return "Exception: "+e.getMessage();
