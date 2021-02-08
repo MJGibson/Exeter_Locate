@@ -112,9 +112,13 @@ def gps():
             )
 
         # select the collection and post the data if there is any
-        collection = db[combinedCollection]
         if len(records) > 0:
+            collection = db[combinedCollection]
             collection.insert_many(records)
+        else:
+            return print_and_jsonify(
+                "Server: No WiFi access points included in post."
+            )
 
         # ---- post data to the GPS table
         collection = db[gpsCollection]
@@ -180,9 +184,13 @@ def wifi():
             )
 
         # select the collection and post the data if there is any
-        collection = db[wifiCollection]
         if len(records) > 0:
+            collection = db[combinedCollection]
             collection.insert_many(records)
+        else:
+            return print_and_jsonify(
+                "Server: No WiFi access points included in post."
+            )
 
         return "Server: WiFi data stored successfully."
     return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
