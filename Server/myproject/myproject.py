@@ -12,6 +12,10 @@ wifiCollection = "wifi"
 combinedCollection = "combiColl"
 gpsCollection = "gpsColl"
 
+DEFAULT_GET_RESPONSE = (
+    "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
+)
+
 KEYS_REQUIRED_FOR_GPS = [
     "MAGIC_NUM",
     "UUID",
@@ -30,7 +34,10 @@ KEYS_REQUIRED_FOR_WIFI = [
     "signalStrengthsJson",
 ]
 
-KEYS_REQUIRED_FOR_COMBINED = KEYS_REQUIRED_FOR_GPS + KEYS_REQUIRED_FOR_WIFI
+KEYS_REQUIRED_FOR_COMBINED = list(
+    # get the unique elements across to two lists to avoid repetition
+    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI)
+)
 
 
 def parse_request(request):
@@ -41,12 +48,11 @@ def parse_request(request):
     if len(key_list) == 0:
         raise ValueError("Empty request")
 
-    # convert to json
-    jsonData = json.loads(key_list[0])
-
     # check we've not just been sent garbage
     try:
+        jsonData = json.loads(key_list[0])
         jsonData.keys()
+
     except AttributeError:
         raise ValueError("Bad request")
 
@@ -88,38 +94,6 @@ def gps():
         else:
             db = client[dataBase]
 
-        # ---- post data to the combined table
-
-        # extract the mac addresses and their signat strengths
-        MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
-        signalStregthsJSON = json.loads(jsonData["signalStrengthsJson"])
-
-        # combine each record into a list to update the db in one go
-        records = []
-        for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
-            records.append(
-                {
-                    "UUID": jsonData["UUID"],
-                    "Time": jsonData["TIME"],
-                    "Macs": mac,
-                    "level": int(strength),
-                    "GPSTIME": jsonData["GPSTIME"],
-                    "x": float(jsonData["X"]),
-                    "y": float(jsonData["Y"]),
-                    "z": float(jsonData["ALTITUDE"]),
-                    "acc": float(jsonData["ACC"]),
-                }
-            )
-
-        # select the collection and post the data if there is any
-        if len(records) > 0:
-            collection = db[combinedCollection]
-            collection.insert_many(records)
-        else:
-            return print_and_jsonify(
-                "Server: No WiFi access points included in post."
-            )
-
         # ---- post data to the GPS table
         collection = db[gpsCollection]
         collection.insert_one(
@@ -133,8 +107,40 @@ def gps():
             }
         )
 
-        return "Server: Combined GPS and WiFi data stored successfully."
-    return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
+        # ---- post data to the combined table
+
+        # extract the mac addresses and their signat strengths
+        MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
+        signalStregthsJSON = json.loads(jsonData["signalStrengthsJson"])
+
+        # check we've got some WiFi access points to post
+        if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
+            return "Server: GPS data stored but no WiFi access points included in post."
+
+        else:
+            # combine each record into a list to update the db in one go
+            records = []
+            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
+                records.append(
+                    {
+                        "UUID": jsonData["UUID"],
+                        "Time": jsonData["TIME"],
+                        "Macs": mac,
+                        "level": int(strength),
+                        "GPSTIME": jsonData["GPSTIME"],
+                        "x": float(jsonData["X"]),
+                        "y": float(jsonData["Y"]),
+                        "z": float(jsonData["ALTITUDE"]),
+                        "acc": float(jsonData["ACC"]),
+                    }
+                )
+
+            # select the collection and post the data
+            collection = db[combinedCollection]
+            collection.insert_many(records)
+            return "Server: Combined GPS and WiFi data stored successfully."
+
+    return DEFAULT_GET_RESPONSE
 
 
 @app.route("/wifi/", methods=["GET", "POST"])
@@ -171,29 +177,29 @@ def wifi():
         MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
         signalStregthsJSON = json.loads(jsonData["signalStrengthsJson"])
 
-        # combine each record into a list to update the db in one go
-        records = []
-        for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
-            records.append(
-                {
-                    "UUID": jsonData["UUID"],
-                    "Time": jsonData["TIME"],
-                    "Macs": mac,
-                    "level": int(strength),
-                }
-            )
+        # check we've got some WiFi access points to post
+        if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
+            return "Server: No WiFi access points included in post."
 
-        # select the collection and post the data if there is any
-        if len(records) > 0:
-            collection = db[combinedCollection]
-            collection.insert_many(records)
         else:
-            return print_and_jsonify(
-                "Server: No WiFi access points included in post."
-            )
+            # combine each record into a list to update the db in one go
+            records = []
+            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
+                records.append(
+                    {
+                        "UUID": jsonData["UUID"],
+                        "Time": jsonData["TIME"],
+                        "Macs": mac,
+                        "level": int(strength),
+                    }
+                )
 
-        return "Server: WiFi data stored successfully."
-    return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
+            # select the collection and post the data
+            collection = db[wifiCollection]
+            collection.insert_many(records)
+            return "Server: WiFi data stored successfully."
+
+    return DEFAULT_GET_RESPONSE
 
 
 if __name__ == "__main__":
