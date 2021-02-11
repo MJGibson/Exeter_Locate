@@ -9,6 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -31,6 +35,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
+import com.riba2reality.wifimapper.ui.main.MagSensorResult;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,12 +54,22 @@ public class TrackerScanner extends Service implements LocationListener {
     // make a user definable variable later
     //private final static String dataBase = "testTest";
 
+    //---------------------------------------------------------------------------------------------
+    // result/dispatch queues
+
     private final Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<>();
     public final Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
     private final Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<>();
     public final Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
+    private final Queue<MagSensorResult> magSensorResultQueue = new ConcurrentLinkedQueue<>();
+
+
+    //---------------------------------------------------------------------------------------------
+
+    private SensorManager sensorManager;
+    private Sensor sensorMag;
 
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = null;
@@ -210,6 +226,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         this.sendResult("GPS: Location updated.");
 
+        // TODO check this doesn't inflate the number of scan loops
         scanWifi();
 
     }// end of onLocationChanged
@@ -653,7 +670,7 @@ public class TrackerScanner extends Service implements LocationListener {
             }// end of if notificationManager not null
         }// end of if API 26 or greater
 
-        requestlocation();
+        //requestlocation();
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 
     }//end of startLocationService
@@ -663,7 +680,9 @@ public class TrackerScanner extends Service implements LocationListener {
 //        LocationServices.getFusedLocationProviderClient(this)
 //                .removeLocationUpdates(locationCallback);
 
-        locationManager.removeUpdates(this);
+
+        // NOTE re-enage later!
+        ////locationManager.removeUpdates(this);
 
 
         try {
@@ -703,6 +722,48 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }// end of stop service
 
+
+    private SensorEventListener magSensorListener;
+
+    private void startSensors(){
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        //sensorMag
+
+        magSensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+
+                String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+                MagSensorResult result = new MagSensorResult();
+                result.dateTime = currentTime;
+
+                result.X = event.values[0];
+                result.Y = event.values[1];
+                result.Z = event.values[2];
+
+                sendResult("Magnetic Scan updated"
+                +"x,y,z("+result.X+","+result.Y+","+result.Z+")"
+                );
+
+
+            }// end of onSensorChanged
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        };// end of magnetic sensor event listener
+
+        // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a second)
+        Log.d("MAGscan", "Initiated");
+        sensorManager.registerListener(magSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 1000000);
+
+
+
+
+    }// end of startSensor
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -712,6 +773,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
                     startLocationService();
+                    startSensors();
+
 
                     wifiManager = (WifiManager)
                             getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -728,10 +791,14 @@ public class TrackerScanner extends Service implements LocationListener {
                     running = true;
 
                     // fire off a new wifi and gps scan (these also start the timers post hoc)
-                    handler.post(periodicUpdate);
-                    handler.post(periodicUpdate_wifi);
+                    //handler.post(periodicUpdate);
+                    //handler.post(periodicUpdate_wifi);
+                    //this.sendResult("Started GPS and WiFi scanning.");
 
-                    this.sendResult("Started GPS and WiFi scanning.");
+
+
+
+
 
                     return START_STICKY;
                 } else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
@@ -739,11 +806,11 @@ public class TrackerScanner extends Service implements LocationListener {
                     this.sendResult("Stopping GPS and WiFi scanning... sending all remaining scans.");
 
                     // empty the queues before the lose them
-                    postCombinedResult();
-                    postWifiResult();
+                    ///postCombinedResult();
+                    ///postWifiResult();
 
                     stopLocationService();
-                    stopService();
+                    ///stopService();
                 }
 
             }// end of if action not null
