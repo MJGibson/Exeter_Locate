@@ -30,6 +30,15 @@ KEYS_REQUIRED_FOR_WIFI = [
     "signalStrengthsJson",
 ]
 
+KEYS_REQUIRED_FOR_MAG = [
+    "MAGIC_NUM",
+    "UUID",
+    "TIME",
+    "X",
+    "Y",
+    "Z"
+]
+
 KEYS_REQUIRED_FOR_COMBINED = KEYS_REQUIRED_FOR_GPS + KEYS_REQUIRED_FOR_WIFI
 
 
@@ -187,6 +196,53 @@ def wifi():
         return "Server: WiFi data stored successfully."
     return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
 
+@app.route("/mag/", methods=["GET", "POST"])
+def mag():
+    if request.method == "POST":
+        # ---- Error checking
+
+        # check we can parse the request
+        try:
+            jsonData = parse_request(request)
+        except Exception as e:
+            return print_and_jsonify(e)
+
+        # check all the required fields are there
+        for key in KEYS_REQUIRED_FOR_MAG:
+            if key not in jsonData.keys():
+                msg = f"Missing: {key:s}"
+                return print_and_jsonify(msg)
+
+        # check the magic number matches
+        if jsonData["MAGIC_NUM"] != magicNum:
+            return print_and_jsonify("magic number mismatch")
+
+        # ---- connect to the db
+        client = MongoClient("localhost", 27017)
+        if "DATABASE" in jsonData.keys():
+            db = client[jsonData["DATABASE"]]
+        else:
+            db = client[dataBase]
+
+        # ---- post data to the MAG table
+
+        # combine each record into a list to update the db in one go
+        record = {
+            "UUID": jsonData["UUID"],
+            "Time": jsonData["TIME"],
+            "x": float(jsonData["X"]),
+            "y": float(jsonData["Y"]),
+            "z": float(jsonData["Z"]),
+            }
+
+
+        # select the collection and post the data if there is any
+        collection = db[wifiCollection]
+        
+        collection.insert(record)
+
+        return "Server: Magnetic data stored successfully."
+    return "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

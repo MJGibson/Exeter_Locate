@@ -64,6 +64,7 @@ public class TrackerScanner extends Service implements LocationListener {
     public final Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
     private final Queue<MagSensorResult> magSensorResultQueue = new ConcurrentLinkedQueue<>();
+    public final Queue<MagSensorResult> magSensorResultResendQueue = new ConcurrentLinkedQueue<>();
 
 
     //---------------------------------------------------------------------------------------------
@@ -406,6 +407,72 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }// end of postWifiResult
 
+    private void postMagResult() {
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        String protocol = "http";
+        if (useSSL) {
+            protocol += "s";
+        }
+
+
+        // empty the resend queue first
+        while (this.magSensorResultResendQueue.size() > 0) {
+
+            PostMagResultToServer thisPost = new PostMagResultToServer(this);
+
+            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+
+            thisPost.magSensorResult = magSensorResultResendQueue.poll();
+
+            thisPost.execute(
+                    address,
+                    protocol,
+                    String.valueOf(useSSL),
+                    deviceID,
+                    dataBase
+            );
+
+            this.sendResult("Sending to server: Magnetic senor result (resend queue).");
+
+
+        }// end of looping queue
+
+        // empty the queue
+        while (this.magSensorResultQueue.size() > 0) {
+
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            PostMagResultToServer thisPost = new PostMagResultToServer(this);
+
+            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+
+            thisPost.magSensorResult = magSensorResultQueue.poll();
+
+
+            thisPost.execute(
+                    address,
+                    protocol,
+                    String.valueOf(useSSL),
+                    deviceID,
+                    dataBase
+            );
+
+            this.sendResult("Sending to server: Magenetic Sensor result.");
+
+
+        }// end of looping queue
+
+    }// end of postWifiResult
+
 
     private void postCombinedResult() {
 
@@ -725,6 +792,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private SensorEventListener magSensorListener;
 
+    //private SensorEvent lastEvent = null;
+    private long LastTimeStamp = Long.MAX_VALUE;
+
     private void startSensors(){
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         //sensorMag
@@ -741,9 +811,26 @@ public class TrackerScanner extends Service implements LocationListener {
                 result.Y = event.values[1];
                 result.Z = event.values[2];
 
-                sendResult("Magnetic Scan updated"
-                +"x,y,z("+result.X+","+result.Y+","+result.Z+")"
+
+                long timeDelay = Long.MAX_VALUE;
+                if(LastTimeStamp != Long.MAX_VALUE){
+
+                    timeDelay = event.timestamp - LastTimeStamp;
+                    //timeDelay = LastTimeStamp;
+                }
+
+
+                sendResult("Mag Scan updated"
+                +"("+result.X+","+result.Y+","+result.Z+")"
+                                +"\n["+timeDelay+"]"
+                                //+"\n["+LastTimeStamp+"]"
                 );
+
+                //magSensorResultQueue.add(result);
+
+
+                //lastEvent = event;
+                LastTimeStamp = event.timestamp;
 
 
             }// end of onSensorChanged
@@ -756,12 +843,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a second)
         Log.d("MAGscan", "Initiated");
-        sensorManager.registerListener(magSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 1000000);
+        sensorManager.registerListener(magSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 1000000*1000*10);
 
 
 
 
     }// end of startSensor
+
+    private void stopSensors(){
+
+        sensorManager.unregisterListener(magSensorListener);
+
+    }// end of stopSensors
 
 
     @Override
@@ -811,6 +904,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     stopLocationService();
                     ///stopService();
+
+                    stopSensors();
                 }
 
             }// end of if action not null
