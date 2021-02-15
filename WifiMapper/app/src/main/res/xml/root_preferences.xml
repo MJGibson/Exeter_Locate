@@ -77,6 +77,16 @@
             app:showSeekBarValue="true"
             app:title="Time interval between Wifi Scans (seconds)" />
 
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_mag"
+            app:isPreferenceVisible="true"
+            app:key="interval_mag"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between Magnetic Scans (seconds)" />
+
 
     </PreferenceCategory>
 

@@ -1,4 +1,4 @@
-package com.riba2reality.wifimapper.ui.main;
+package com.riba2reality.wifimapper;
 
 public class MagSensorResult {
 

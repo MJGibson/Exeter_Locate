@@ -2,9 +2,6 @@ package com.riba2reality.wifimapper;
 
 import android.os.AsyncTask;
 
-import com.google.gson.Gson;
-import com.riba2reality.wifimapper.ui.main.MagSensorResult;
-
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -19,9 +16,7 @@ import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;

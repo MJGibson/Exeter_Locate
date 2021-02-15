@@ -266,6 +266,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
         //----------------------------------------------------------------
+        //----------------------------------------------------------------
+
+        SeekBarPreference pref_interval_mag = getPreferenceManager().findPreference("interval_mag");
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+        int magInterval = SP.getInt("defaultVal_mag", -1);
+        if (magInterval == -1) {
+            magInterval = getContext().getResources().getInteger(R.integer.defaultVal_mag);
+        }
+        pref_interval_mag.setValue(magInterval);
+
+        // set lister for end results
+        pref_interval_wifi.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_mag", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
+
+        //----------------------------------------------------------------
 
         // set default
         EditTextPreference databasePref = getPreferenceManager().findPreference("database");
