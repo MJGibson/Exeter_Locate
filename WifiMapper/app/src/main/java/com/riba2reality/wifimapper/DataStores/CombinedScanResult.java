@@ -1,4 +1,4 @@
-package com.riba2reality.wifimapper;
+package com.riba2reality.wifimapper.DataStores;
 
 import android.location.Location;
 

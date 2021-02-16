@@ -30,7 +30,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.riba2reality.wifimapper.Constants;
+import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.R;
 import com.riba2reality.wifimapper.TrackerScanner;
 

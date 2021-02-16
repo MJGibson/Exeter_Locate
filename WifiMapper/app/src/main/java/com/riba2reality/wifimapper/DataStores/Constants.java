@@ -1,0 +1,16 @@
+package com.riba2reality.wifimapper.DataStores;
+
+public class Constants {
+
+    public static final int LOCATION_SERVICE_ID = 175;
+    public static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
+    public static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
+
+    public static final String database = "alpha";
+
+    public static final String verificationCode = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
+
+    public static final String port = "";
+
+
+}// end of class

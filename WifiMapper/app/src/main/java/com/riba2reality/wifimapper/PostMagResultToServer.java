@@ -2,6 +2,9 @@ package com.riba2reality.wifimapper;
 
 import android.os.AsyncTask;
 
+import com.riba2reality.wifimapper.DataStores.Constants;
+import com.riba2reality.wifimapper.DataStores.MagSensorResult;
+
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;

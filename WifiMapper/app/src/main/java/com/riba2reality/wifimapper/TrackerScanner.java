@@ -35,11 +35,23 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
+import com.google.gson.Gson;
+import com.riba2reality.wifimapper.DataStores.CombinedScanResult;
+import com.riba2reality.wifimapper.DataStores.Constants;
+import com.riba2reality.wifimapper.DataStores.MagSensorResult;
+import com.riba2reality.wifimapper.DataStores.ServerMessage;
+import com.riba2reality.wifimapper.DataStores.WifiResult;
+import com.riba2reality.wifimapper.DataStores.WifiScanResult;
+
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -59,9 +71,16 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Queue<MagSensorResult> magSensorResultQueue = new ConcurrentLinkedQueue<>();
     public final Queue<MagSensorResult> magSensorResultResendQueue = new ConcurrentLinkedQueue<>();
 
+    public final Queue<ServerMessage> resendQueue = new ConcurrentLinkedQueue<>();
+
 
     //----------------------------------------------------------------------------------------------
+    // class constants
 
+    static final public String TRACKERSCANNER_RESULT = "com.riba2reality.wifimapper.TrackerScanner.REQUEST_PROCESSED";
+    static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MSG";
+
+    //----------------------------------------------------------------------------------------------
     // class variables
 
     private SensorManager sensorManager;
@@ -70,13 +89,10 @@ public class TrackerScanner extends Service implements LocationListener {
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = null;
 
-    private PostToServer post;
+    ////private PostToServer post;
 
     LocalBroadcastManager broadcaster;
 
-    static final public String TRACKERSCANNER_RESULT = "com.riba2reality.wifimapper.TrackerScanner.REQUEST_PROCESSED";
-
-    static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MSG";
 
     PowerManager pm;
     PowerManager.WakeLock wl;
@@ -189,11 +205,10 @@ public class TrackerScanner extends Service implements LocationListener {
                 return;
             }
 
-            postCombinedResult();
-
-            postWifiResult();
-
-            postMagResult();
+            //postCombinedResult();
+            //postWifiResult();
+            //postMagResult();
+            postALL();
 
 
         }
@@ -408,7 +423,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             sendResult("Mag Scan updated"
                             +"("+result.X+","+result.Y+","+result.Z+")"
-                            +"\n["+timeDelay+"]"
+                            //+"\n["+timeDelay+"]"
                     //+"\n["+LastTimeStamp+"]"
             );
 
@@ -452,8 +467,11 @@ public class TrackerScanner extends Service implements LocationListener {
     //##############################################################################################
     // post result functions
 
+
     //==============================================================================================
-    private void postWifiResult() {
+    private ServerMessage encodeWifiResult(WifiScanResult wifiScanResult){
+
+        ServerMessage serverMessage = new ServerMessage();
 
         String[] server_values = getResources().getStringArray(R.array.server_values);
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -470,57 +488,85 @@ public class TrackerScanner extends Service implements LocationListener {
             protocol += "s";
         }
 
+        String port = Constants.port;
 
-        // empty the resend queue first
-        while (this.wifiScanResultResendQueue.size() > 0) {
+        String endpoint = "/wifi/";
 
-            PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+        String urlString = protocol + "://" + address + port + endpoint;
 
-            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+        //------------------------------------------------------------------
 
-            thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
+        List<String> macAddressList = new ArrayList<>();
+        List<String> signalStrengths = new ArrayList<>();
 
-            thisPost.execute(
-                    address,
-                    protocol,
-                    String.valueOf(useSSL),
-                    deviceID,
-                    dataBase
-            );
+        for (WifiResult wifiResult : wifiScanResult.wifiResult) {
 
-            this.sendResult("Sending to server: WiFi scan result (resend queue).");
+            macAddressList.add(wifiResult.macAddress);
+            signalStrengths.add(Integer.toString(wifiResult.signalStrength));
+        }
+
+        Map<String, String> parameters = new HashMap<>();
 
 
-        }// end of looping queue
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
+
+        parameters.put("UUID", deviceID);
+
+        parameters.put("DATABASE", dataBase);
+
+        parameters.put("TIME", wifiScanResult.dateTime);
+
+        String macAddressJson = new Gson().toJson(macAddressList);
+
+        parameters.put("MacAddressesJson", macAddressJson);
+
+        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
+
+
+        String message = new JSONObject(parameters).toString();
+
+        //------------------------------------------------------------------
+        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.useSSL = useSSL;
+        serverMessage.address = address;
+
+
+        return serverMessage;
+    }// end of encodeWifiResult
+    //==============================================================================================
+
+    //==============================================================================================
+    private void postWifiResult() {
 
         // empty the queue
         while (this.wifiScanResultQueue.size() > 0) {
 
-            PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            ServerMessage serverMessage = encodeWifiResult(wifiScanResultQueue.poll());
 
-            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            PostToServer thisPost = new PostToServer(this,
+                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    serverMessage
+                    );
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
-            thisPost.wifiScanResult = wifiScanResultQueue.poll();
-
-
-            thisPost.execute(
-                    address,
-                    protocol,
-                    String.valueOf(useSSL),
-                    deviceID,
-                    dataBase
-            );
+            thisPost.execute();
 
             this.sendResult("Sending to server: WiFi scan result.");
 
 
         }// end of looping queue
 
+
     }// end of postWifiResult
     //==============================================================================================
 
     //==============================================================================================
-    private void postMagResult() {
+    private ServerMessage encodeMagResult(MagSensorResult magSensorResult){
+
+        ServerMessage serverMessage = new ServerMessage();
 
         String[] server_values = getResources().getStringArray(R.array.server_values);
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -537,117 +583,192 @@ public class TrackerScanner extends Service implements LocationListener {
             protocol += "s";
         }
 
+        String port = Constants.port;
 
-        // empty the resend queue first
-        while (this.magSensorResultResendQueue.size() > 0) {
+        String endpoint = "/mag/";
 
-            PostMagResultToServer thisPost = new PostMagResultToServer(this);
+        String urlString = protocol + "://" + address + port + endpoint;
 
-            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+        //------------------------------------------------------------------
 
-            thisPost.magSensorResult = magSensorResultResendQueue.poll();
-
-            thisPost.execute(
-                    address,
-                    protocol,
-                    String.valueOf(useSSL),
-                    deviceID,
-                    dataBase
-            );
-
-            this.sendResult("Sending to server: Magnetic senor result (resend queue).");
+        Map<String, String> parameters = new HashMap<>();
 
 
-        }// end of looping queue
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
+
+        parameters.put("UUID", deviceID);
+
+        parameters.put("DATABASE", dataBase);
+
+        parameters.put("TIME", magSensorResult.dateTime);
+        //-----
+
+        parameters.put("X",Double.toString(magSensorResult.X));
+        parameters.put("Y",Double.toString(magSensorResult.Y));
+        parameters.put("Z",Double.toString(magSensorResult.Z));
+
+
+        //-----
+
+        String message = new JSONObject(parameters).toString();
+
+        //------------------------------------------------------------------
+        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.useSSL = useSSL;
+        serverMessage.address = address;
+
+
+        return serverMessage;
+    }// end of encodeWifiResult
+    //==============================================================================================
+
+    //==============================================================================================
+    private void postMagResult() {
+
 
         // empty the queue
         while (this.magSensorResultQueue.size() > 0) {
 
-            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            PostMagResultToServer thisPost = new PostMagResultToServer(this);
+            ServerMessage serverMessage = encodeMagResult(magSensorResultQueue.poll());
 
-            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
-
-            thisPost.magSensorResult = magSensorResultQueue.poll();
-
-
-            thisPost.execute(
-                    address,
-                    protocol,
-                    String.valueOf(useSSL),
-                    deviceID,
-                    dataBase
+            PostToServer thisPost = new PostToServer(this,
+                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    serverMessage
             );
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
-            this.sendResult("Sending to server: Magenetic Sensor result.");
+            thisPost.execute();
+
+            this.sendResult("Sending to server: Magnetic senor result.");
 
 
         }// end of looping queue
 
+
     }// end of postWifiResult
+    //==============================================================================================
+
+    //==============================================================================================
+    private ServerMessage encodeCombinedResult(CombinedScanResult combinedScanResult){
+
+        ServerMessage serverMessage = new ServerMessage();
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        String protocol = "http";
+        if (useSSL) {
+            protocol += "s";
+        }
+
+        String port = Constants.port;
+
+        String endpoint = "/";
+
+        String urlString = protocol + "://" + address + port + endpoint;
+
+        //------------------------------------------------------------------
+
+        double latitude = 0.0;
+        double longitude = 0.0;
+        double altitude = 0.0;
+        double accuracy = 0.0;
+        // String provider = "";
+        if (combinedScanResult.location != null) {
+            latitude = combinedScanResult.location.getLatitude();
+            longitude = combinedScanResult.location.getLongitude();
+            altitude = combinedScanResult.location.getAltitude();
+            accuracy = combinedScanResult.location.getAccuracy();
+
+            // provider = combinedScanResult.location.getProvider();
+        }
+
+
+        List<String> macAddressList = new ArrayList<>();
+        List<String> signalStrengths = new ArrayList<>();
+
+        for (WifiResult wifiResult : combinedScanResult.wifiResult) {
+
+            macAddressList.add(wifiResult.macAddress);
+            signalStrengths.add(Integer.toString(wifiResult.signalStrength));
+        }
+
+        String gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+                Locale.getDefault()).format(new Date(combinedScanResult.location.getTime()));
+
+
+        //------------------------------------------------------------------
+        // build message...
+
+        Map<String, String> parameters = new HashMap<>();
+
+
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
+
+        parameters.put("UUID", deviceID);
+
+        parameters.put("DATABASE", dataBase);
+
+        parameters.put("TIME", combinedScanResult.dateTime);
+
+
+        parameters.put("GPSTIME", gpsTime);
+
+        parameters.put("X", Double.toString(latitude));
+        parameters.put("Y", Double.toString(longitude));
+        parameters.put("ALTITUDE", Double.toString(altitude));
+        parameters.put("ACC", Double.toString(accuracy));
+
+        String macAddressJson = new Gson().toJson(macAddressList);
+
+
+        //parameters.put("MacAddresses",macAddressList.toString());
+        parameters.put("MacAddressesJson", macAddressJson);
+
+        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
+
+
+        String message = new JSONObject(parameters).toString();
+
+        //------------------------------------------------------------------
+        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.useSSL = useSSL;
+        serverMessage.address = address;
+
+
+        return serverMessage;
+    }// end of encodeCombinedResult
     //==============================================================================================
 
 
     //==============================================================================================
     private void postCombinedResult() {
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
 
-        String dataBase = SP.getString("database", "alpha");
-        //
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
-
-        String protocol = "http";
-        if (useSSL) {
-            protocol += "s";
-        }
-
-        // empty the resend queue first
-        while (this.combinedScanResultResendQueue.size() > 0) {
-
-            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            PostCombinedResultToServer thisPost = new PostCombinedResultToServer(this);
-
-            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
-
-            thisPost.combinedScanResult = combinedScanResultResendQueue.poll();
-
-
-            thisPost.execute(
-                    address,
-                    protocol,
-                    String.valueOf(useSSL),
-                    deviceID,
-                    dataBase
-            );
-
-            this.sendResult("Sending to server: GPS location and WiFi scan (resend queue).");
-
-
-        }// end of looping queue
 
         // empty the queue
         while (this.combinedScanResultQueue.size() > 0) {
 
-            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            PostCombinedResultToServer thisPost = new PostCombinedResultToServer(this);
+            ServerMessage serverMessage = encodeCombinedResult(combinedScanResultQueue.poll());
 
-            thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
-
-            thisPost.combinedScanResult = combinedScanResultQueue.poll();
-
-
-            thisPost.execute(
-                    address,
-                    protocol,
-                    String.valueOf(useSSL),
-                    deviceID,
-                    dataBase
+            PostToServer thisPost = new PostToServer(this,
+                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    serverMessage
             );
+
+            thisPost.execute();
+
 
             this.sendResult("Sending to server: GPS location and WiFi scan.");
 
@@ -657,8 +778,41 @@ public class TrackerScanner extends Service implements LocationListener {
     }// end of postCombinedResult
     //==============================================================================================
 
+    //==============================================================================================
+    private void postResends(){
+
+        // empty the queue
+        while (this.resendQueue.size() > 0) {
+
+            ServerMessage serverMessage = resendQueue.poll();
+
+            PostToServer thisPost = new PostToServer(this,
+                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    serverMessage
+            );
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
+
+            thisPost.execute();
+
+            this.sendResult("Sending to server: Resend!");
 
 
+        }// end of looping queue
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    private void postALL(){
+
+        postResends();
+
+        postCombinedResult();
+        postWifiResult();
+        postMagResult();
+    }
+    //==============================================================================================
 
 
     //##############################################################################################
@@ -720,14 +874,14 @@ public class TrackerScanner extends Service implements LocationListener {
 
         locationManager.removeUpdates(this);
 
-        try {
-            if (post != null)
-                post.get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (post != null)
+//                post.get();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         // if service stopped when scanned wifi, the receiver already unregistered
         try {
@@ -803,9 +957,10 @@ public class TrackerScanner extends Service implements LocationListener {
                     this.sendResult("Stopping scanning... sending all remaining scans.");
 
                     // empty the queues before the lose them
-                    postCombinedResult();
-                    postWifiResult();
-                    postMagResult();
+                    //postCombinedResult();
+                    //postWifiResult();
+                    //postMagResult();
+                    postALL();
 
 
                     stopLocationService();

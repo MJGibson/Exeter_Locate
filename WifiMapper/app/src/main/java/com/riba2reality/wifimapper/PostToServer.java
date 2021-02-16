@@ -2,6 +2,8 @@ package com.riba2reality.wifimapper;
 
 import android.os.AsyncTask;
 
+import com.riba2reality.wifimapper.DataStores.ServerMessage;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,36 +27,40 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostToServer extends AsyncTask<String, String, String> {
 
+    // class variables
+
     private final WeakReference<TrackerScanner> trackerscannerContainer;
 
-    public PostToServer(TrackerScanner trackerScanner) {
-        //set context variables if required
-//        broadcaster = LocalBroadcastManager.getInstance();
+    //public InputStream is;
+    private final WeakReference<InputStream> inputSteamContrainer;
+
+    private final WeakReference<ServerMessage> serverMessageContrainer;
+
+
+    //##############################################################################################
+    // functions
+
+    //==============================================================================================
+    public PostToServer(TrackerScanner trackerScanner,
+                        InputStream is,
+                        ServerMessage serverMessage
+                        ) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
+        this.inputSteamContrainer = new WeakReference<>(is);
+        this.serverMessageContrainer = new WeakReference<>(serverMessage);
+
     }
+    //==============================================================================================
 
-    public InputStream is;
-
-//    LocalBroadcastManager broadcaster;
-//
-//    static final public String POST_TO_SERVER_RESULT = "com.riba2reality.wifimapper.PostToServer.REQUEST_PROCESSED";
-//
-//    static final public String POST_TO_SERVER_MESSAGE = "com.riba2reality.wifimapper.PostToServer.POST_TO_SERVER_MSG";
-//
-//    public void sendResult(String message) {
-//        Intent intent = new Intent(POST_TO_SERVER_RESULT);
-//        if(message != null)
-//            intent.putExtra(POST_TO_SERVER_MESSAGE, message);
-//        broadcaster.sendBroadcast(intent);
-//    }
-
-
+    //==============================================================================================
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
     }
+    //==============================================================================================
 
+    //==============================================================================================
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
@@ -64,69 +70,52 @@ public class PostToServer extends AsyncTask<String, String, String> {
         }
 
     }
+    //==============================================================================================
 
+
+    //==============================================================================================
     @Override
     protected String doInBackground(String... params) {
-        String urlString = params[0]; // URL to call
-        String data = params[1]; //data to post
 
-        String useSSLString = params[2];
-        // OutputStream out = null;
+        //---------------------------------------------------------------------
+        int i = 0;
+        //final String address = params[i++];
+        //String protocol = params[i++];
 
-        final String address = params[3];
+        //String useSSLString = params[i++];
+        //boolean useSSL = Boolean.parseBoolean(useSSLString);
 
-        boolean useSSL = Boolean.parseBoolean(useSSLString);
+
+        //String port = "";
+
+
+        //String endpoint = "/";
+
+        //String urlString = protocol + "://" + address + port + endpoint;
+
+        //------------------------------------------------------------------
+        // check if Result null
+
+        String message = this.serverMessageContrainer.get().message;
+        String urlString = this.serverMessageContrainer.get().urlString;
+        boolean useSSL = this.serverMessageContrainer.get().useSSL;
+        final String address = this.serverMessageContrainer.get().address;
+
+
+        //serverMessage.urlString = urlString;
+        //serverMessage.message = message;
+        //------------------------------------------------------------------
+
+
+
+
+        //------------------------------------------------------------------
+
+        final String method = "POST";
 
         try {
 
             //------------------------------------------------------------------
-
-            //------------------------------------------------------------------
-            /*
-            URL url = new URL(urlString);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("POST");
-            out = new BufferedOutputStream(urlConnection.getOutputStream());
-
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
-            writer.write(data);
-            writer.flush();
-            writer.close();
-            out.close();
-
-            urlConnection.connect();
-
-             */
-
-
-
-            /*
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000);
-            conn.setConnectTimeout(15000);
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-
-            Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("firstParam", data);
-                    //.appendQueryParameter("secondParam", paramValue2)
-                    //.appendQueryParameter("thirdParam", paramValue3);
-            String query = builder.build().getEncodedQuery();
-
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(os, "UTF-8"));
-            writer.write(query);
-            writer.flush();
-            writer.close();
-            os.close();
-
-            conn.connect();
-*/
-
-            //---------------------------------
 
             //System.out.println(System.getProperty("user.dir"));
 
@@ -143,7 +132,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
 
             //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
-            InputStream caInput = new BufferedInputStream(this.is);
+            InputStream caInput = new BufferedInputStream(this.inputSteamContrainer.get());
 
 
             Certificate ca;
@@ -201,42 +190,15 @@ public class PostToServer extends AsyncTask<String, String, String> {
             //---------------------------------
             BufferedReader reader = null;
             String uri = urlString;
-            String method;
-            Map<String, String> parameters = new HashMap<>();
-
-            method = "POST";
-
-            //---------
-            /*
-            // dummy data
-
-            List<String> macAddressList = new ArrayList<>();
-
-            macAddressList.add("000.111.222.444");
-            macAddressList.add("777");
-            macAddressList.add("ABC");
-
-            parameters.put("TIME","12:01");
-            parameters.put("X","42");
-            parameters.put("Y","7");
-
-            String macAddressJson = new Gson().toJson(macAddressList );
-
-
-            //parameters.put("MacAddresses",macAddressList.toString());
-            parameters.put("MacAddressesJson",macAddressJson);
-
-
-*/
 
             //---------
 
 
-            if (method.equals("GET")) {
-                uri += "?" + this.getEncodedParams(parameters);
-                //As mentioned before, this only executes if the request method has been
-                //set to GET
-            }
+//            if (method.equals("GET")) {
+//                uri += "?" + this.getEncodedParams(parameters);
+//                //As mentioned before, this only executes if the request method has been
+//                //set to GET
+//            }
 
             try {
                 URL url = new URL(uri);
@@ -269,7 +231,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
                     //writer.write(this.getEncodedParams(parameters));
 
                     //writer.write(new JSONObject(parameters).toString());
-                    writer.write(data);
+                    writer.write(message);
 
                     writer.flush();
                 }
@@ -293,6 +255,13 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
             } catch (Exception e) {
 
+
+                // put it back in the queue
+                this.trackerscannerContainer.get().resendQueue.add(
+                        this.serverMessageContrainer.get()
+                );
+
+
                 e.printStackTrace();
                 //return null;
                 return "Exception: " + e.getMessage();
@@ -309,19 +278,23 @@ public class PostToServer extends AsyncTask<String, String, String> {
             }
 
 
-            //return "something";
+            //return "someting";
         } catch (Exception e) {
+
+            // put it back in the queue
+            this.trackerscannerContainer.get().resendQueue.add(this.serverMessageContrainer.get());
+
             System.out.println(e.getMessage());
             return "Exception: " + e.getMessage();
         }
     }// end of do in background method
+    //==============================================================================================
 
-
+    //==============================================================================================
     //The method below is only called if the request method has been set to GET
     //GET requests sends data in the url and it has to be encoded correctly in order
     //for the server to understand the request. This method encodes the data in the
     //params variable so that the server can understand the request
-
     public String getEncodedParams(Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
         for (String key : params.keySet()) {
@@ -340,6 +313,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
         }
         return sb.toString();
     }
+    //==============================================================================================
 
 
 }//end of Class

@@ -26,6 +26,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.ui.main.SectionsPagerAdapter;
 
 

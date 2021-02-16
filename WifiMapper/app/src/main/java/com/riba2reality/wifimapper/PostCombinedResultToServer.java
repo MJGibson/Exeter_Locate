@@ -3,6 +3,9 @@ package com.riba2reality.wifimapper;
 import android.os.AsyncTask;
 
 import com.google.gson.Gson;
+import com.riba2reality.wifimapper.DataStores.CombinedScanResult;
+import com.riba2reality.wifimapper.DataStores.Constants;
+import com.riba2reality.wifimapper.DataStores.WifiResult;
 
 import org.json.JSONObject;
 
