@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">WifiMapper</string>
     <string name="HomeScreen">Home</string>
+    <string name="ManualScan">Manual Scan</string>
+
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <!-- Preference Titles -->
@@ -11,5 +13,5 @@
     <!-- Sync Preferences -->
     <string name="Settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+
 </resources>

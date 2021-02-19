@@ -60,7 +60,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putCharSequence("textbox_contents", ((TextView) findViewById(R.id.log)).getText());
+        TextView log = findViewById(R.id.log);
+        if(log!=null) {
+            outState.putCharSequence("textbox_contents", (log).getText());
+        }
     }
 
     @Override
