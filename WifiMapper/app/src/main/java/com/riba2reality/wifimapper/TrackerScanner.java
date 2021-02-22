@@ -376,8 +376,11 @@ public class TrackerScanner extends Service implements LocationListener {
             CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
 
             if (combinedScanResult != null && combinedScanResultQueue.peek().dateTime == null) {
-                combinedScanResult.dateTime = currentTime;
-                combinedScanResult.wifiResult = result.wifiResult;
+                //?combinedScanResult.dateTime = currentTime;
+                //combinedScanResult.wifiResult = result.wifiResult;
+
+                combinedScanResult.wifiScanResult = result;
+                combinedScanResult.wifiScanResult.dateTime = currentTime;
             }
 
 
@@ -697,7 +700,7 @@ public class TrackerScanner extends Service implements LocationListener {
         List<String> macAddressList = new ArrayList<>();
         List<String> signalStrengths = new ArrayList<>();
 
-        for (WifiResult wifiResult : combinedScanResult.wifiResult) {
+        for (WifiResult wifiResult : combinedScanResult.wifiScanResult.wifiResult) {
 
             macAddressList.add(wifiResult.macAddress);
             signalStrengths.add(Integer.toString(wifiResult.signalStrength));

@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
+
                 // do something here.
 
                 //System.out.println("Message: "+message);

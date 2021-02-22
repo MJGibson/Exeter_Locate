@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.riba2reality.wifimapper.R;
+import com.riba2reality.wifimapper.TrackerScannerSingle;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +26,8 @@ public class ManualScanFragment extends Fragment {
 
     private int selectedLocation = -1;
 
+    private TrackerScannerSingle scans;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,28 +35,18 @@ public class ManualScanFragment extends Fragment {
 //    private static final String ARG_PARAM2 = "param2";
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+
+    //==============================================================================================
     public ManualScanFragment() {
         // Required empty public constructor
+
+
+
     }
+    //==============================================================================================
 
-//    /**
-//     * Use this factory method to create a new instance of
-//     * this fragment using the provided parameters.
-//     *
-//     * @param param1 Parameter 1.
-//     * @param param2 Parameter 2.
-//     * @return A new instance of fragment HomescreenFragment.
-//     */
-//    // TODO: Rename and change types and number of parameters
-//    public static ManualScanFragment newInstance(String param1, String param2) {
-//        ManualScanFragment fragment = new ManualScanFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
+    //==============================================================================================
     public static ManualScanFragment newInstance(int index) {
         ManualScanFragment fragment = new ManualScanFragment();
         Bundle bundle = new Bundle();
@@ -61,17 +54,22 @@ public class ManualScanFragment extends Fragment {
         fragment.setArguments(bundle);
         return fragment;
     }
+    //==============================================================================================
 
+    //==============================================================================================
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 //        if (getArguments() != null) {
 //            // TODO: Rename and change types of parameters
 //            String mParam1 = getArguments().getString(ARG_PARAM1);
 //            String mParam2 = getArguments().getString(ARG_PARAM2);
 //        }
     }
+    //==============================================================================================
 
+    //==============================================================================================
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -94,10 +92,26 @@ public class ManualScanFragment extends Fragment {
 
         dropdown.setOnItemSelectedListener(dropDownListerner);
 
+        //--------
+
+        rootView.findViewById(R.id.manualScanButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                manualScan();
+            }
+        });
+
+        //scans = new TrackerScannerSingle(getActivity());
+
+
 
         return rootView;
     }// end of on create view
+    //==============================================================================================
 
+
+
+    //==============================================================================================
     private AdapterView.OnItemSelectedListener dropDownListerner = new AdapterView.OnItemSelectedListener() {
 
 
@@ -137,9 +151,29 @@ public class ManualScanFragment extends Fragment {
         }
 
     };// end of dropDownListerner
+    //==============================================================================================
 
+    //==============================================================================================
     private String getCharForNumber(int i) {
         return i >= 0 && i < 27 ? String.valueOf((char)(i + 97)) : null;
     }
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void manualScan(){
+
+        Log.d("Trace", "ManualScan()");
+
+        if(scans==null) {
+            scans = new TrackerScannerSingle(getActivity());
+        }
+
+
+        scans.scanAll();
+
+    }// end of manual scan
+    //==============================================================================================
+
 
 }// end of class

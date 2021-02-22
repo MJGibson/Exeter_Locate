@@ -8,9 +8,12 @@ public class CombinedScanResult {
 
     public String dateTime;
 
-    public ArrayList<WifiResult> wifiResult = new ArrayList<>();
+    //public ArrayList<WifiResult> wifiResult = new ArrayList<>();
+    public WifiScanResult wifiScanResult;
 
     public Location location;
+
+    public MagSensorResult magSensorResult;
 
 
 }// end of class CombinedScanResult

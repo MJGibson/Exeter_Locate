@@ -124,7 +124,7 @@ public class PostCombinedResultToServer extends AsyncTask<String, String, String
         List<String> macAddressList = new ArrayList<>();
         List<String> signalStrengths = new ArrayList<>();
 
-        for (WifiResult wifiResult : combinedScanResult.wifiResult) {
+        for (WifiResult wifiResult : combinedScanResult.wifiScanResult.wifiResult) {
 
             macAddressList.add(wifiResult.macAddress);
             signalStrengths.add(Integer.toString(wifiResult.signalStrength));
