@@ -15,5 +15,7 @@ public class CombinedScanResult {
 
     public MagSensorResult magSensorResult;
 
+    public String message = "None";
+
 
 }// end of class CombinedScanResult

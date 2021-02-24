@@ -1,5 +1,10 @@
 package com.riba2reality.wifimapper.ui.main;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,14 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
+import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.R;
-import com.riba2reality.wifimapper.TrackerScannerSingle;
+import com.riba2reality.wifimapper.TrackerScanner;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,7 +35,9 @@ public class ManualScanFragment extends Fragment {
 
     private int selectedLocation = -1;
 
-    private TrackerScannerSingle scans;
+    //private TrackerScannerSingle scans;
+
+
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -35,6 +46,21 @@ public class ManualScanFragment extends Fragment {
 //    private static final String ARG_PARAM2 = "param2";
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
+        );
+    }
+
+    @Override
+    public void onStop() {
+        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(receiver);
+        super.onStop();
+    }
 
     //==============================================================================================
     public ManualScanFragment() {
@@ -102,11 +128,32 @@ public class ManualScanFragment extends Fragment {
         });
 
         //scans = new TrackerScannerSingle(getActivity());
+        //
 
+        rootView.findViewById(R.id.manualPostButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                postManualScans();
+            }
+        });
 
+        requestUpdate();
 
         return rootView;
     }// end of on create view
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void requestUpdate() {
+        Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+
+        intent.setAction(Constants.ACTION_REQUEST_UPDATE);
+
+        //intent.putExtra("message", imageName);
+
+        getActivity().startService(intent);
+    }
     //==============================================================================================
 
 
@@ -127,9 +174,9 @@ public class ManualScanFragment extends Fragment {
                 return;//bail
             }
 
-            if(imageName.compareTo("n")==0){
-                imageName="o"; // there is no "n"
-            }
+//            if(imageName.compareTo("n")==0){
+//                imageName="o"; // there is no "n"
+//            }
 
             //imageName += ".png";
 
@@ -155,7 +202,11 @@ public class ManualScanFragment extends Fragment {
 
     //==============================================================================================
     private String getCharForNumber(int i) {
-        return i >= 0 && i < 27 ? String.valueOf((char)(i + 97)) : null;
+        String returnVal = i >= 0 && i < 27 ? String.valueOf((char)(i + 97)) : null;
+        if(returnVal.compareTo("n")==0){
+            returnVal="o"; // there is no "n"
+        }
+        return returnVal;
     }
     //==============================================================================================
 
@@ -165,15 +216,126 @@ public class ManualScanFragment extends Fragment {
 
         Log.d("Trace", "ManualScan()");
 
-        if(scans==null) {
-            scans = new TrackerScannerSingle(getActivity());
+        getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
+        getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
+
+        String imageName = getCharForNumber(selectedLocation);
+
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String serverAddress = SP.getString("ServerAddress", server_values[1]);
+
+        //System.out.println("ServerAddress: "+serverAddress);
+
+        if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
+            Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
-        scans.scanAll();
+        intent.setAction(Constants.ACTION_SINGLE_SCAN);
+
+        intent.putExtra("message", imageName);
+
+        getActivity().startService(intent);
+
+
+
+        //Toast.makeText(getActivity(), "Started single scan set", Toast.LENGTH_SHORT).show();
+
+
+
+
+//
+//        if(scans==null) {
+//            scans = new TrackerScannerSingle(getActivity());
+//        }
+//
+//
+
+//        scans.scanAll(imageName);
 
     }// end of manual scan
     //==============================================================================================
 
+    //==============================================================================================
+    private void postManualScans(){
+
+        Log.d("Trace", "postManualScans()");
+//
+//        if(scans==null) {
+//            scans = new TrackerScannerSingle(getActivity());
+//        }else{
+//            scans.postQueuesToServer();
+//        }
+
+        getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
+        getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
+
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String serverAddress = SP.getString("ServerAddress", server_values[1]);
+
+        //System.out.println("ServerAddress: "+serverAddress);
+
+        if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
+            Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+
+        intent.setAction(Constants.ACTION_POST_ALL);
+
+        //intent.putExtra("message", imageName);
+
+        getActivity().startService(intent);
+
+
+
+    }// end of postManualScans
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("Trace", "ManualScanFragment.receiver.onReceive");
+
+            //String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
+
+            //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+
+            //TextView logTextView = findViewById(R.id.log);
+            //final ScrollView scroll = findViewById(R.id.logScroll);
+
+            //scanButton.setEnabled(true);
+            //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
+
+            getActivity().findViewById(R.id.manualScanButton).setEnabled(true);
+            getActivity().findViewById(R.id.manualPostButton).setEnabled(true);
+
+            int combinedQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT,-1);
+
+            int resendQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT,-1);
+
+            String postButtonTextUpdate = "Post Data - ("+String.valueOf(combinedQueueSize)+"),["
+                    +String.valueOf(resendQueueSize)+"]";
+
+            Button postButton = getActivity().findViewById(R.id.manualPostButton);
+            postButton.setText(postButtonTextUpdate);
+
+
+
+        }// end of onRecieve
+    };// end of new BroadcastReceiver
+    //==============================================================================================
 
 }// end of class

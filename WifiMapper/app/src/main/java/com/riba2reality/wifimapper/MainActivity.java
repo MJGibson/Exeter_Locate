@@ -179,133 +179,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //------------
-/*
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Map<String, String> parameters = new HashMap<>();
-
-                List<String> macAddressList = new ArrayList<>();
-
-                //------
-
-                FirstTabFragment mapTab = (FirstTabFragment)sectionsPagerAdapter.getItem(0);
-
-                LatLng myCords = new LatLng(mapTab.lat, mapTab.lon);
-
-                String time = mapTab.time;
-
-                //------
-
-                SecondTabFragment wifiTab = (SecondTabFragment) sectionsPagerAdapter.getItem(1);
-
-                ArrayList<String> wifiList = wifiTab.arrayList;
-
-
-                for(int i = 0; i <  wifiList.size(); ++i){
-
-                    String[] MacAndName = wifiList.get(i).split("-");
-
-                    String macAddress = MacAndName[MacAndName.length-1];
-
-                    macAddressList.add(macAddress);
-
-                }
-
-
-
-                //------
-
-
-
-
-
-//                parameters.put("TIME","12:01");
-//                parameters.put("X","42");
-//                parameters.put("Y","7");
-
-                parameters.put("TIME",time);
-                parameters.put("X",Double.toString(mapTab.lat));
-                parameters.put("Y",Double.toString(mapTab.lon));
-
-                String macAddressJson = new Gson().toJson(macAddressList );
-
-
-                //parameters.put("MacAddresses",macAddressList.toString());
-                parameters.put("MacAddressesJson",macAddressJson);
-
-
-                String message = new JSONObject(parameters).toString();
-
-                //------
-
-                //String address = "127.0.0.1";
-                //String address = "10.0.2.2"; // local for computer the emulator
-                //String address = "192.168.0.10";
-                //String port = "8000";
-                //String port = "27017";
-
-                //
-                String address = "82.46.100.70";
-
-                //String address = "httpbin.org/get";
-
-
-                //String uri = "http://"+address+":"+port;
-
-                //String uri = "http://"+address;
-                String uri = "https://"+address;
-
-                //String uri = "http://example.com";
-                //String uri = "https://postman-echo.com/get";
-
-                //String message = "hello_message";
-
-                PostToServer post = new PostToServer();
-
-
-                post.is = getResources().openRawResource(R.raw.cert);
-
-
-
-
-                post.execute(uri,message);
-
-
-
-
-
-
-
-
-                Snackbar.make(view, "Posted", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
- */
-
-
-//        // Get the SupportMapFragment and request notification
-//        // when the map is ready to be used.
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.mapView);
-//        mapFragment.getMapAsync(this);
 
 
     }// end of onCreate method
 
 
-//    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//        LatLng sydney = new LatLng(-33.852, 151.211);
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(sydney)
-//                .title("Marker in Sydney"));
-//    }
+
 
 
     @Override
@@ -349,15 +228,10 @@ public class MainActivity extends AppCompatActivity {
 
             String[] server_values = getResources().getStringArray(R.array.server_values);
 
-//            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-//            String serverAddress = sharedPref.getString("ServerAddress","");
             SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String serverAddress = SP.getString("ServerAddress", server_values[1]);
 
             //System.out.println("ServerAddress: "+serverAddress);
-
-
-            //List<String> server_valuesList = Arrays.asList(server_values);
 
             if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
                 Toast.makeText(this, "Please set Server Address", Toast.LENGTH_SHORT).show();

@@ -20,17 +20,18 @@ DEFAULT_GET_RESPONSE = (
 KEYS_REQUIRED_FOR_GPS = [
     "MAGIC_NUM",
     "UUID",
-    "GPSTIME",
+    "GPS_TIME",
     "X",
     "Y",
     "ALTITUDE",
     "ACC",
+    "MESSAGE"
 ]
 
 KEYS_REQUIRED_FOR_WIFI = [
     "MAGIC_NUM",
     "UUID",
-    "TIME",
+    "WIFI_TIME",
     "MacAddressesJson",
     "signalStrengthsJson",
 ]
@@ -38,15 +39,15 @@ KEYS_REQUIRED_FOR_WIFI = [
 KEYS_REQUIRED_FOR_MAG = [
     "MAGIC_NUM",
     "UUID",
-    "TIME",
-    "X",
-    "Y",
-    "Z",
+    "MAG_TIME",
+    "MAG_X",
+    "MAG_Y",
+    "MAG_Z",
 ]
 
 KEYS_REQUIRED_FOR_COMBINED = list(
     # get the unique elements across to two lists to avoid repetition
-    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI)
+    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI,KEYS_REQUIRED_FOR_MAG)
 )
 
 
@@ -109,7 +110,8 @@ def gps():
         collection.insert_one(
             {
                 "UUID": jsonData["UUID"],
-                "GPSTIME": jsonData["GPSTIME"],
+                "GPS_TIME": jsonData["GPS_TIME"],
+                #"MESSAGE": jsonData["MESSAGE"],
                 "x": float(jsonData["X"]),
                 "y": float(jsonData["Y"]),
                 "z": float(jsonData["ALTITUDE"]),
@@ -134,14 +136,19 @@ def gps():
                 records.append(
                     {
                         "UUID": jsonData["UUID"],
-                        "Time": jsonData["TIME"],
+                        "MESSAGE": jsonData["MESSAGE"],
+                        "WIFI_TIME": jsonData["WIFI_TIME"],
                         "Macs": mac,
                         "level": int(strength),
-                        "GPSTIME": jsonData["GPSTIME"],
+                        "GPS_TIME": jsonData["GPS_TIME"],
                         "x": float(jsonData["X"]),
                         "y": float(jsonData["Y"]),
                         "z": float(jsonData["ALTITUDE"]),
                         "acc": float(jsonData["ACC"]),
+                        "MAG_TIME": jsonData["MAG_TIME"],
+                        "MAG_x": float(jsonData["MAG_X"]),
+                        "MAG_y": float(jsonData["MAG_Y"]),
+                        "MAG_z": float(jsonData["MAG_Z"])
                     }
                 )
 
@@ -198,7 +205,7 @@ def wifi():
                 records.append(
                     {
                         "UUID": jsonData["UUID"],
-                        "Time": jsonData["TIME"],
+                        "WIFI_TIME": jsonData["WIFI_TIME"],
                         "Macs": mac,
                         "level": int(strength),
                     }
@@ -244,10 +251,10 @@ def mag():
         # combine each record into a list to update the db in one go
         record = {
             "UUID": jsonData["UUID"],
-            "Time": jsonData["TIME"],
-            "x": float(jsonData["X"]),
-            "y": float(jsonData["Y"]),
-            "z": float(jsonData["Z"]),
+            "MAG_TIME": jsonData["MAG_TIME"],
+            "MAG_x": float(jsonData["MAG_X"]),
+            "MAG_y": float(jsonData["MAG_Y"]),
+            "MAG_z": float(jsonData["MAG_Z"]),
             }
 
 
