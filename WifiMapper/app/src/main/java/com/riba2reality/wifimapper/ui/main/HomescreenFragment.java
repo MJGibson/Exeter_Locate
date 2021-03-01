@@ -4,11 +4,19 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
+import com.riba2reality.wifimapper.DataStores.ServerMessage;
 import com.riba2reality.wifimapper.R;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,10 +31,20 @@ public class HomescreenFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+    private ScrollView scroll;
+    private TextView logTextView;
+
+    private final Queue<String> messagesQueue = new ConcurrentLinkedQueue<>();
+
+
+    //==============================================================================================
     public HomescreenFragment() {
         // Required empty public constructor
     }
+    //==============================================================================================
 
+
+    //==============================================================================================
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -44,7 +62,9 @@ public class HomescreenFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    //==============================================================================================
 
+    //==============================================================================================
     public static HomescreenFragment newInstance(int index) {
         HomescreenFragment fragment = new HomescreenFragment();
         Bundle bundle = new Bundle();
@@ -52,7 +72,9 @@ public class HomescreenFragment extends Fragment {
         fragment.setArguments(bundle);
         return fragment;
     }
+    //==============================================================================================
 
+    //==============================================================================================
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +84,96 @@ public class HomescreenFragment extends Fragment {
             String mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+    //==============================================================================================
 
+    //==============================================================================================
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.d("Trace", "HomescreenFragment.onCreateView");
+
+        CharSequence txt = null;
+
+        if(logTextView!=null){
+
+            Log.d("Trace", "HomescreenFragment.onCreateView(logTextView!=null)");
+
+            txt = logTextView.getText();
+
+        }
+
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_homescreen, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_homescreen, container, false);
+
+        logTextView = rootView.findViewById(R.id.log);
+
+        scroll = rootView.findViewById(R.id.logScroll);
+
+        if(txt!=null){
+            logTextView.setText(txt);
+        }
+
+        if(messagesQueue.size() > 0){
+            while (this.messagesQueue.size() > 0) {
+                String message = messagesQueue.poll();
+                addMessage(message);
+            }
+
+        }
+
+
+
+        return rootView;
     }
-}
+    //==============================================================================================
+
+    //==============================================================================================
+    public void addMessage(String message){
+
+        if (logTextView != null) {
+
+            Log.d("Trace", "HomeScreenFragment.addMessage, logTextView != null");
+
+            // append to the log text
+            logTextView.append( message );
+
+            // count the number of lines to remove, i.e. the number of lines > the maximum
+            int linesToRemove = logTextView.getLineCount() - getActivity().getBaseContext().getResources().getInteger(R.integer.max_log_lines);
+
+            // if there some to remove
+            if (linesToRemove > 0) {
+                // get the text from the logger and declare some variables we'll need
+                Editable txt = logTextView.getEditableText();
+                int lineStart, lineEnd, i;
+
+                for (i = 0; i < linesToRemove; i++) {
+                    // get the start and end locations of the first line of the text
+                    lineStart = logTextView.getLayout().getLineStart(0);
+                    lineEnd = logTextView.getLayout().getLineEnd(0);
+
+                    // remove it
+                    txt.delete(lineStart, lineEnd);
+                }
+            }
+
+            scroll.post(new Runnable() {
+                @Override
+                public void run() {
+                    scroll.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            });
+
+        }else{
+            messagesQueue.add(message);
+        }
+
+
+
+
+    }// end of addMessage
+    //==============================================================================================
+
+
+}// end of class

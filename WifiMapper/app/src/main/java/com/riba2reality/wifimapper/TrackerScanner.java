@@ -112,7 +112,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     // private final boolean locationScanned = false;
     private boolean running = false;
-    private boolean wifi_scan_in_queue = false;
+    //private boolean wifi_scan_in_queue = false;
 
     //private SensorEvent lastEvent = null;
     private long LastTimeStamp = Long.MAX_VALUE;
@@ -120,6 +120,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     final Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean continueScanning = false;
 
     //----------------------------------------------------------------------------------------------
 
@@ -133,6 +135,8 @@ public class TrackerScanner extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Log.d("Trace", "TrackerScanner.onCreate()");
 
         broadcaster = LocalBroadcastManager.getInstance(this);
 
@@ -232,6 +236,29 @@ public class TrackerScanner extends Service implements LocationListener {
             //postWifiResult();
             //postMagResult();
             postALL();
+
+
+        }
+    };
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private final Runnable periodicUpdate_scan = new Runnable() {
+        @Override
+        public void run() {
+            if (running) {
+
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int postInterval = getResources().getInteger(R.integer.defaultVal_post);
+                int interval = SP.getInt("interval_scan", postInterval);
+
+                handler.postDelayed(periodicUpdate_scan, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+            } else {
+                return;
+            }
+
+            scanAll("None");
 
 
         }
@@ -350,28 +377,28 @@ public class TrackerScanner extends Service implements LocationListener {
         this.combinedScanResult.location = new Location(location);
 
         //-------------------------------------------------------------
-        if(running) {
-
-            CombinedScanResult combinedScanResult = new CombinedScanResult();
-            combinedScanResult.location = new Location(location);
-
-            combinedScanResultQueue.add(combinedScanResult);
-        }
+//        if(running) {
+//
+//            CombinedScanResult combinedScanResult = new CombinedScanResult();
+//            combinedScanResult.location = new Location(location);
+//
+//            combinedScanResultQueue.add(combinedScanResult);
+//        }
         //-------------------------------------------------------------
 
         this.sendResult("GPS: Location updated.");
 
         //-------------------------------------------------------------
         // EXTRA WIFI SCAN
-        if(running) {
-            scanWifi();
-            ScanMag();
-        }
+//        if(running) {
+//            scanWifi();
+//            ScanMag();
+//        }
         //-------------------------------------------------------------
 
-        if(!running){
+//        if(!running){
             checkAllScansCompleted();
-        }
+//        }
 
     }// end of onLocationChanged
     //==============================================================================================
@@ -426,27 +453,29 @@ public class TrackerScanner extends Service implements LocationListener {
 
             //-------------------------------------------------------------
 
-            if(running) {
+            wifiScanResultQueue.add(result);
 
-
-                wifiScanResultQueue.add(result);
-
-                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
-
-                if (combinedScanResult != null && combinedScanResultQueue.peek().dateTime == null) {
-                    //?combinedScanResult.dateTime = currentTime;
-                    //combinedScanResult.wifiResult = result.wifiResult;
-
-                    combinedScanResult.wifiScanResult = result;
-                    combinedScanResult.wifiScanResult.dateTime = currentTime;
-                }
-            }
+//            if(running) {
+//
+//
+//
+//
+//                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
+//
+//                if (combinedScanResult != null && combinedScanResultQueue.peek().dateTime == null) {
+//                    //?combinedScanResult.dateTime = currentTime;
+//                    //combinedScanResult.wifiResult = result.wifiResult;
+//
+//                    combinedScanResult.wifiScanResult = result;
+//                    combinedScanResult.wifiScanResult.dateTime = currentTime;
+//                }
+//            }
             //-------------------------------------------------------------
 
 
-            if(!running){
+//            if(!running){
                 checkAllScansCompleted();
-            }
+//            }
 
 
 
@@ -503,22 +532,24 @@ public class TrackerScanner extends Service implements LocationListener {
 
             //-------------------------------------------------------------
 
-            if(running) {
+            magSensorResultQueue.add(result);
 
-                magSensorResultQueue.add(result);
-
-                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
-
-                if (combinedScanResult != null && combinedScanResultQueue.peek().magSensorResult == null) {
-                    //?combinedScanResult.dateTime = currentTime;
-                    //combinedScanResult.wifiResult = result.wifiResult;
-
-                    combinedScanResult.magSensorResult = result;
-                    //combinedScanResult.wifiScanResult.dateTime = currentTime;
-                }
-
-
-            }
+//            if(running) {
+//
+//
+//
+//                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
+//
+//                if (combinedScanResult != null && combinedScanResultQueue.peek().magSensorResult == null) {
+//                    //?combinedScanResult.dateTime = currentTime;
+//                    //combinedScanResult.wifiResult = result.wifiResult;
+//
+//                    combinedScanResult.magSensorResult = result;
+//                    //combinedScanResult.wifiScanResult.dateTime = currentTime;
+//                }
+//
+//
+//            }
 
             LastTimeStamp = event.timestamp;
 
@@ -527,9 +558,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
             //-------------------------------------------------------------
 
-            if(!running) {
+//            if(!running) {
                 checkAllScansCompleted();
-            }
+//            }
 
         }// end of onSensorChanged
 
@@ -572,7 +603,15 @@ public class TrackerScanner extends Service implements LocationListener {
             //scanButton.setEnabled(true);
             //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
 
+
+
+
+
             this.sendSingleScanResult();
+
+            if(continueScanning){
+                startScanning();
+            }
 
 
 
@@ -1012,7 +1051,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
         // request on going locations
-        requestlocation(false);
+        //requestlocation(false);
 
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 
@@ -1054,9 +1093,10 @@ public class TrackerScanner extends Service implements LocationListener {
 
         handler.removeCallbacks(periodicUpdate);
 
-        handler.removeCallbacks(periodicUpdate_wifi);
+        //handler.removeCallbacks(periodicUpdate_wifi);
+        //handler.removeCallbacks(periodicUpdate_mag);
 
-        handler.removeCallbacks(periodicUpdate_mag);
+        handler.removeCallbacks(periodicUpdate_scan);
 
         running = false;
 
@@ -1095,6 +1135,60 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     //==============================================================================================
+    private void startScanning(){
+
+
+        //combinedScanResult = new CombinedScanResult();
+
+        continueScanning = false;
+
+        startLocationService();
+
+
+        //                    wifiManager = (WifiManager)
+        //                            getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (!wifiManager.isWifiEnabled()) {
+            Toast.makeText(this, "WiFi is disabled ... We need to enable it", Toast.LENGTH_LONG).show();
+            wifiManager.setWifiEnabled(true);
+        }
+
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wifiScanner:TrackerScanner");
+        wl.acquire();
+
+        running = true;
+
+        // fire off a new wifi and gps scan (these also start the timers post hoc)
+        handler.post(periodicUpdate);
+        //handler.post(periodicUpdate_wifi);
+        //handler.post(periodicUpdate_mag);
+
+        handler.post(periodicUpdate_scan);
+
+
+
+    }
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void stopScanning(){
+        // empty the queues before the lose them
+        //postCombinedResult();
+        //postWifiResult();
+        //postMagResult();
+        postALL();
+
+
+        stopLocationService();
+        stopService();
+    }
+    //==============================================================================================
+
+
+
+    //==============================================================================================
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -1107,31 +1201,7 @@ public class TrackerScanner extends Service implements LocationListener {
                 {
                     case Constants.ACTION_START_LOCATION_SERVICE:
 
-
-
-                        combinedScanResult = new CombinedScanResult();
-
-                        startLocationService();
-
-
-    //                    wifiManager = (WifiManager)
-    //                            getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-                        if (!wifiManager.isWifiEnabled()) {
-                            Toast.makeText(this, "WiFi is disabled ... We need to enable it", Toast.LENGTH_LONG).show();
-                            wifiManager.setWifiEnabled(true);
-                        }
-
-                        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-                        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wifiScanner:TrackerScanner");
-                        wl.acquire();
-
-                        running = true;
-
-                        // fire off a new wifi and gps scan (these also start the timers post hoc)
-                        handler.post(periodicUpdate);
-                        handler.post(periodicUpdate_wifi);
-                        handler.post(periodicUpdate_mag);
+                        startScanning();
 
                         this.sendResult("Started scanning.");
 
@@ -1142,21 +1212,20 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         this.sendResult("Stopping scanning... sending all remaining scans.");
 
-                        // empty the queues before the lose them
-                        //postCombinedResult();
-                        //postWifiResult();
-                        //postMagResult();
-                        postALL();
-
-
-                        stopLocationService();
-                        stopService();
+                        stopScanning();
 
                     break;
 
                     case Constants.ACTION_SINGLE_SCAN:
 
-                        stopService();
+
+                        if(running){
+                            continueScanning=true;
+                            stopService();
+                            //stopLocationService();
+                        }
+
+
 
                         String message = intent.getStringExtra("message");
 

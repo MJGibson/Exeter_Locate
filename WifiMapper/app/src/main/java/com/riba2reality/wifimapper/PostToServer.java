@@ -34,7 +34,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
     //public InputStream is;
     private final WeakReference<InputStream> inputSteamContrainer;
 
-    private final WeakReference<ServerMessage> serverMessageContrainer;
+    //private final WeakReference<ServerMessage> serverMessageContrainer;
+    private final ServerMessage serverMessage;
 
 
     //##############################################################################################
@@ -48,7 +49,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
         this.inputSteamContrainer = new WeakReference<>(is);
-        this.serverMessageContrainer = new WeakReference<>(serverMessage);
+        //this.serverMessageContrainer = new WeakReference<>(serverMessage);
+        this.serverMessage = serverMessage;
 
     }
     //==============================================================================================
@@ -69,6 +71,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             this.trackerscannerContainer.get().sendResult(result);
             this.trackerscannerContainer.get().sendSingleScanResult();
         }
+
 
     }
     //==============================================================================================
@@ -97,14 +100,17 @@ public class PostToServer extends AsyncTask<String, String, String> {
         //------------------------------------------------------------------
         // check if Result null
 
-        String message = this.serverMessageContrainer.get().message;
-        String urlString = this.serverMessageContrainer.get().urlString;
-        boolean useSSL = this.serverMessageContrainer.get().useSSL;
-        final String address = this.serverMessageContrainer.get().address;
+//        String message = this.serverMessageContrainer.get().message;
+//        String urlString = this.serverMessageContrainer.get().urlString;
+//        boolean useSSL = this.serverMessageContrainer.get().useSSL;
+//        final String address = this.serverMessageContrainer.get().address;
+        String message = this.serverMessage.message;
+        String urlString = this.serverMessage.urlString;
+        boolean useSSL = this.serverMessage.useSSL;
+        final String address = this.serverMessage.address;
 
 
-        //serverMessage.urlString = urlString;
-        //serverMessage.message = message;
+
         //------------------------------------------------------------------
 
 
@@ -258,9 +264,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
 
                 // put it back in the queue
-                this.trackerscannerContainer.get().resendQueue.add(
-                        this.serverMessageContrainer.get()
-                );
+//                this.trackerscannerContainer.get().resendQueue.add(
+//                        this.serverMessageContrainer.get()
+//                );
+                this.trackerscannerContainer.get().resendQueue.add( serverMessage );
 
 
                 e.printStackTrace();
@@ -283,7 +290,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
         } catch (Exception e) {
 
             // put it back in the queue
-            this.trackerscannerContainer.get().resendQueue.add(this.serverMessageContrainer.get());
+            //this.trackerscannerContainer.get().resendQueue.add(this.serverMessageContrainer.get());
+            this.trackerscannerContainer.get().resendQueue.add( serverMessage );
 
             System.out.println(e.getMessage());
             return "Exception: " + e.getMessage();
