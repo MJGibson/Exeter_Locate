@@ -21,12 +21,14 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.riba2reality.wifimapper.DataStores.Constants;
+import com.riba2reality.wifimapper.ui.main.HomescreenFragment;
 import com.riba2reality.wifimapper.ui.main.SectionsPagerAdapter;
 
 
@@ -40,17 +42,17 @@ public class MainActivity extends AppCompatActivity {
 
     BroadcastReceiver receiver;
 
+    HomescreenFragment homescreenFragment;
+
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
-                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
-        );
+
     }
 
     @Override
     protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+//        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onStop();
     }
 
@@ -80,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d("Trace", "MainActivity.onCreate");
+
         setContentView(R.layout.activity_main);
         final SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -87,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
+        homescreenFragment = (HomescreenFragment) sectionsPagerAdapter.getItem(0);
 
         //------------
 
@@ -102,48 +108,65 @@ public class MainActivity extends AppCompatActivity {
                 String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
                 //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
 
+                String outputMessage = "\n### " + currentTime + " ###" + "\n" + message;
+
                 TextView logTextView = findViewById(R.id.log);
 
                 final ScrollView scroll = findViewById(R.id.logScroll);
 
 
-                if (logTextView != null) {
-                    // append to the log text
-                    logTextView.append(
-                            "\n### " + currentTime + " ###"
-                                    + "\n" + message
-                    );
+                homescreenFragment.addMessage(outputMessage);
 
-                    // count the number of lines to remove, i.e. the number of lines > the maximum
-                    int linesToRemove = logTextView.getLineCount() - getBaseContext().getResources().getInteger(R.integer.max_log_lines);
 
-                    // if there some to remove
-                    if (linesToRemove > 0) {
-                        // get the text from the logger and declare some variables we'll need
-                        Editable txt = logTextView.getEditableText();
-                        int lineStart, lineEnd, i;
 
-                        for (i = 0; i < linesToRemove; i++) {
-                            // get the start and end locations of the first line of the text
-                            lineStart = logTextView.getLayout().getLineStart(0);
-                            lineEnd = logTextView.getLayout().getLineEnd(0);
 
-                            // remove it
-                            txt.delete(lineStart, lineEnd);
-                        }
-                    }
+//                if (logTextView != null) {
+//
+//                    Log.d("Trace", "MainActivity.receiver, logTextView != null");
+//
+//                    // append to the log text
+//                    logTextView.append(
+//                            "\n### " + currentTime + " ###"
+//                                    + "\n" + message
+//                    );
+//
+//                    // count the number of lines to remove, i.e. the number of lines > the maximum
+//                    int linesToRemove = logTextView.getLineCount() - getBaseContext().getResources().getInteger(R.integer.max_log_lines);
+//
+//                    // if there some to remove
+//                    if (linesToRemove > 0) {
+//                        // get the text from the logger and declare some variables we'll need
+//                        Editable txt = logTextView.getEditableText();
+//                        int lineStart, lineEnd, i;
+//
+//                        for (i = 0; i < linesToRemove; i++) {
+//                            // get the start and end locations of the first line of the text
+//                            lineStart = logTextView.getLayout().getLineStart(0);
+//                            lineEnd = logTextView.getLayout().getLineEnd(0);
+//
+//                            // remove it
+//                            txt.delete(lineStart, lineEnd);
+//                        }
+//                    }
+//
+//                    scroll.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            scroll.fullScroll(ScrollView.FOCUS_DOWN);
+//                        }
+//                    });
+//
+//                }else{
+//                    Log.d("Trace", "MainActivity.receiver, logTextView == null");
+//                }
 
-                    scroll.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            scroll.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
-
-                }
 
             }
         };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
+        );
 
         //FloatingActionButton fab = findViewById(R.id.fab);
 
