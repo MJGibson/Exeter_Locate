@@ -57,45 +57,45 @@
             app:showSeekBarValue="true"
             app:title="Time interval between posts (seconds)" />
 
+<!--        <SeekBarPreference-->
+<!--                    android:max="@integer/max"-->
+<!--                    app:adjustable="true"-->
+<!--                    app:defaultValue="@integer/defaultVal_gps"-->
+<!--                    app:isPreferenceVisible="true"-->
+<!--                    app:key="interval_scan"-->
+<!--                    app:min="@integer/min"-->
+<!--                    app:showSeekBarValue="true"-->
+<!--                    app:title="Time interval between scans (seconds)" />-->
+
         <SeekBarPreference
-                    android:max="@integer/max"
-                    app:adjustable="true"
-                    app:defaultValue="@integer/defaultVal_gps"
-                    app:isPreferenceVisible="true"
-                    app:key="interval_scan"
-                    app:min="@integer/min"
-                    app:showSeekBarValue="true"
-                    app:title="Time interval between scans (seconds)" />
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_gps"
+            app:isPreferenceVisible="true"
+            app:key="interval_gps"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between GPS scans (seconds)" />
 
-<!--        <SeekBarPreference-->
-<!--            android:max="@integer/max"-->
-<!--            app:adjustable="true"-->
-<!--            app:defaultValue="@integer/defaultVal_gps"-->
-<!--            app:isPreferenceVisible="true"-->
-<!--            app:key="interval_gps"-->
-<!--            app:min="@integer/min"-->
-<!--            app:showSeekBarValue="true"-->
-<!--            app:title="Time interval between GPS scans (seconds)" />-->
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_wifi"
+            app:isPreferenceVisible="true"
+            app:key="interval_wifi"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between Wifi Scans (seconds)" />
 
-<!--        <SeekBarPreference-->
-<!--            android:max="@integer/max"-->
-<!--            app:adjustable="true"-->
-<!--            app:defaultValue="@integer/defaultVal_wifi"-->
-<!--            app:isPreferenceVisible="true"-->
-<!--            app:key="interval_wifi"-->
-<!--            app:min="@integer/min"-->
-<!--            app:showSeekBarValue="true"-->
-<!--            app:title="Time interval between Wifi Scans (seconds)" />-->
-
-<!--        <SeekBarPreference-->
-<!--            android:max="@integer/max"-->
-<!--            app:adjustable="true"-->
-<!--            app:defaultValue="@integer/defaultVal_mag"-->
-<!--            app:isPreferenceVisible="true"-->
-<!--            app:key="interval_mag"-->
-<!--            app:min="@integer/min"-->
-<!--            app:showSeekBarValue="true"-->
-<!--            app:title="Time interval between Magnetic Scans (seconds)" />-->
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_mag"
+            app:isPreferenceVisible="true"
+            app:key="interval_mag"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between Magnetic Scans (seconds)" />
 
 
     </PreferenceCategory>

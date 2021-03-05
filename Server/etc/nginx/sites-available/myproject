@@ -8,6 +8,11 @@ server {
         include uwsgi_params;
         uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
+    
+    location /gps/ { 
+	include uwsgi_params;
+	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+    }
 
     location /wifi/ { 
 	include uwsgi_params;

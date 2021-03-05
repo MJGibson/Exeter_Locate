@@ -215,15 +215,40 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         //----------------------------------------------------------------
 
-        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_scan");
+//        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_scan");
+//
+//        //System.out.println("Post interval: "+Integer.toString(postInterval));
+//
+//        int scanInterval = SP.getInt("defaultVal_gps", -1);
+//        if (scanInterval == -1) {
+//            scanInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
+//        }
+//        pref_interval_gps.setValue(scanInterval);
+//
+//        // set lister for end results
+//        pref_interval_gps.setOnPreferenceChangeListener(
+//                new Preference.OnPreferenceChangeListener() {
+//                    @Override
+//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+//                        SPeditor.putInt("defaultVal_gps", (int) newValue);
+//                        SPeditor.apply();
+//                        stopLocationService();
+//                        return true;
+//                    }
+//                }
+//        );
+
+        //----------------------------------------------------------------
+
+        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_gps");
 
         //System.out.println("Post interval: "+Integer.toString(postInterval));
 
-        int scanInterval = SP.getInt("defaultVal_gps", -1);
-        if (scanInterval == -1) {
-            scanInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
+        int gpsInterval = SP.getInt("defaultVal_gps", -1);
+        if (gpsInterval == -1) {
+            gpsInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
         }
-        pref_interval_gps.setValue(scanInterval);
+        pref_interval_gps.setValue(gpsInterval);
 
         // set lister for end results
         pref_interval_gps.setOnPreferenceChangeListener(
@@ -240,82 +265,57 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         //----------------------------------------------------------------
 
-//        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_gps");
-//
-//        //System.out.println("Post interval: "+Integer.toString(postInterval));
-//
-//        int gpsInterval = SP.getInt("defaultVal_gps", -1);
-//        if (gpsInterval == -1) {
-//            gpsInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
-//        }
-//        pref_interval_gps.setValue(gpsInterval);
-//
-//        // set lister for end results
-//        pref_interval_gps.setOnPreferenceChangeListener(
-//                new Preference.OnPreferenceChangeListener() {
-//                    @Override
-//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                        SPeditor.putInt("defaultVal_gps", (int) newValue);
-//                        SPeditor.apply();
-//                        stopLocationService();
-//                        return true;
-//                    }
-//                }
-//        );
-//
-//        //----------------------------------------------------------------
-//
-//        SeekBarPreference pref_interval_wifi = getPreferenceManager().findPreference("interval_wifi");
-//
-//        //System.out.println("Post interval: "+Integer.toString(postInterval));
-//
-//        int wifiInterval = SP.getInt("defaultVal_wifi", -1);
-//        if (wifiInterval == -1) {
-//            wifiInterval = getContext().getResources().getInteger(R.integer.defaultVal_wifi);
-//        }
-//        pref_interval_wifi.setValue(wifiInterval);
-//
-//        // set lister for end results
-//        pref_interval_wifi.setOnPreferenceChangeListener(
-//                new Preference.OnPreferenceChangeListener() {
-//                    @Override
-//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                        SPeditor.putInt("defaultVal_wifi", (int) newValue);
-//                        SPeditor.apply();
-//                        stopLocationService();
-//                        return true;
-//                    }
-//                }
-//
-//        );
-//
-//
-//        //----------------------------------------------------------------
-//        //----------------------------------------------------------------
-//
-//        SeekBarPreference pref_interval_mag = getPreferenceManager().findPreference("interval_mag");
-//
-//        //System.out.println("Post interval: "+Integer.toString(postInterval));
-//
-//        int magInterval = SP.getInt("defaultVal_mag", -1);
-//        if (magInterval == -1) {
-//            magInterval = getContext().getResources().getInteger(R.integer.defaultVal_mag);
-//        }
-//        pref_interval_mag.setValue(magInterval);
-//
-//        // set lister for end results
-//        pref_interval_wifi.setOnPreferenceChangeListener(
-//                new Preference.OnPreferenceChangeListener() {
-//                    @Override
-//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                        SPeditor.putInt("defaultVal_mag", (int) newValue);
-//                        SPeditor.apply();
-//                        stopLocationService();
-//                        return true;
-//                    }
-//                }
-//
-//        );
+        SeekBarPreference pref_interval_wifi = getPreferenceManager().findPreference("interval_wifi");
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+        int wifiInterval = SP.getInt("defaultVal_wifi", -1);
+        if (wifiInterval == -1) {
+            wifiInterval = getContext().getResources().getInteger(R.integer.defaultVal_wifi);
+        }
+        pref_interval_wifi.setValue(wifiInterval);
+
+        // set lister for end results
+        pref_interval_wifi.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_wifi", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
+
+        //----------------------------------------------------------------
+        //----------------------------------------------------------------
+
+        SeekBarPreference pref_interval_mag = getPreferenceManager().findPreference("interval_mag");
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+        int magInterval = SP.getInt("defaultVal_mag", -1);
+        if (magInterval == -1) {
+            magInterval = getContext().getResources().getInteger(R.integer.defaultVal_mag);
+        }
+        pref_interval_mag.setValue(magInterval);
+
+        // set lister for end results
+        pref_interval_wifi.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_mag", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
 
 
         //----------------------------------------------------------------

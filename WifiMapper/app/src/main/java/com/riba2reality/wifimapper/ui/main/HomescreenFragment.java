@@ -1,8 +1,18 @@
 package com.riba2reality.wifimapper.ui.main;
 
+import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import android.text.Editable;
 import android.util.Log;
@@ -11,9 +21,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.DataStores.ServerMessage;
+import com.riba2reality.wifimapper.MainActivity;
 import com.riba2reality.wifimapper.R;
+import com.riba2reality.wifimapper.TrackerScanner;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,6 +38,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * create an instance of this fragment.
  */
 public class HomescreenFragment extends Fragment {
+
+
+    private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -105,7 +122,7 @@ public class HomescreenFragment extends Fragment {
 
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_homescreen, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_homescreen, container, false);
 
         logTextView = rootView.findViewById(R.id.log);
 
@@ -122,6 +139,36 @@ public class HomescreenFragment extends Fragment {
             }
 
         }
+        //----------------------------------------------------------------------
+
+        rootView.findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (ContextCompat.checkSelfPermission(
+                        getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                            getActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_CODE_LOCATION_PERMISSIONS
+                    );
+                } else {
+                    startLocationService();
+
+                }
+
+
+            }
+
+        });
+
+        rootView.findViewById(R.id.stop_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopLocationService();
+            }
+        });
 
 
 
@@ -174,6 +221,75 @@ public class HomescreenFragment extends Fragment {
 
     }// end of addMessage
     //==============================================================================================
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CODE_LOCATION_PERMISSIONS && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startLocationService();
+            } else {
+                Toast.makeText(getActivity(), "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }// end of onRequestPermissionsResult
+
+    private boolean isLocationServiceRunning() {
+
+        ActivityManager activityManager =
+                (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
+        if (activityManager != null) {
+
+            for (ActivityManager.RunningServiceInfo service :
+                    activityManager.getRunningServices(Integer.MAX_VALUE)) {
+
+                if (TrackerScanner.class.getName().equals(service.service.getClassName())) {
+                    if (service.foreground) {
+                        return true;
+                    }
+                }
+
+            }// end of looping
+            return false;
+        }// end of if activityManger not null
+        return false;
+    }// end of isLocationServiceRunning
+
+
+    private void startLocationService() {
+        if (!isLocationServiceRunning()) {
+
+            String[] server_values = getResources().getStringArray(R.array.server_values);
+
+            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+            String serverAddress = SP.getString("ServerAddress", server_values[1]);
+
+            //System.out.println("ServerAddress: "+serverAddress);
+
+            if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
+                Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+            getActivity().startService(intent);
+            Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
+        }
+    }// end of startLocationService
+
+
+    private void stopLocationService() {
+        if (isLocationServiceRunning()) {
+            Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+            intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+            //stopService(intent);//?!
+            getActivity().startService(intent);
+            Toast.makeText(getActivity(), "Location service stopped", Toast.LENGTH_SHORT).show();
+        }
+    }// end of startLocationService
 
 
 }// end of class

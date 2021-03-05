@@ -17,28 +17,59 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="0dp" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_margin="1dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
 
+
+    <LinearLayout
+        android:id="@+id/linearLayoutPics"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:orientation="vertical"
 
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner1"
-        app:srcCompat="@drawable/example_image" />
 
-<!--    <Button-->
-<!--        android:id="@+id/manualScanButton"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginBottom="30dp"-->
-<!--        android:text="Perform Scan"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        tools:layout_editor_absoluteX="0dp" />-->
+        >
 
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_margin="0dp"
+                android:layout_width="160pt"
+                android:layout_height="wrap_content"
+
+
+                android:layout_gravity="center"
+
+                app:layout_constraintBottom_toTopOf="@+id/imageViewPic"
+                app:layout_constraintEnd_toStartOf="@+id/imageViewPic"
+
+                app:layout_constraintStart_toEndOf="@+id/spinner1"
+                app:layout_constraintTop_toBottomOf="@+id/spinner1"
+                app:srcCompat="@drawable/example_image"
+                android:adjustViewBounds="true"
+                android:scaleType="center"
+            />
+
+
+            <ImageView
+                android:id="@+id/imageViewPic"
+                android:layout_margin="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                app:srcCompat="@drawable/a_pic"
+
+
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+
+                app:layout_constraintStart_toEndOf="@+id/imageViewPic"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewPic"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+            />
+
+    </LinearLayout>
 
 
 
@@ -60,14 +91,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Perform Scan" />
+            android:text="@string/perform_scan" />
 
-        <Button
-            android:id="@+id/manualPostButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Post Data - (0)" />
+<!--        <Button-->
+<!--            android:id="@+id/manualPostButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Post Data - (0)" />-->
     </LinearLayout>
 
 

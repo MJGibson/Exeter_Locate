@@ -47,18 +47,22 @@ public class ManualScanFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
 
 
+    boolean scanCompleted = true;
 
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
-                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
-        );
+//        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
+//                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
+//        );
+
+        Log.d("Trace", "ManualScanFragment.onStart()");
+
     }
 
     @Override
     public void onStop() {
-        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(receiver);
+//        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(receiver);
         super.onStop();
     }
 
@@ -99,6 +103,9 @@ public class ManualScanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.d("Trace", "ManualScanFragment.onCreateView()");
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_manual_scan, container, false);
 
@@ -120,24 +127,40 @@ public class ManualScanFragment extends Fragment {
 
         //--------
 
-        rootView.findViewById(R.id.manualScanButton).setOnClickListener(new View.OnClickListener() {
+        Button scanButton = rootView.findViewById(R.id.manualScanButton);
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 manualScan();
             }
         });
 
+        scanButton.setEnabled(scanCompleted);
+
         //scans = new TrackerScannerSingle(getActivity());
         //
 
-        rootView.findViewById(R.id.manualPostButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                postManualScans();
-            }
-        });
+//        rootView.findViewById(R.id.manualPostButton).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                postManualScans();
+//            }
+//        });
 
-        requestUpdate();
+        //requestUpdate();
+
+
+        //-------------------------
+
+
+
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
+        );
+
+
+
 
         return rootView;
     }// end of on create view
@@ -168,11 +191,14 @@ public class ManualScanFragment extends Fragment {
 
             ImageView mImageView= (ImageView) getActivity().findViewById(R.id.imageView);
 
+
             String imageName = getCharForNumber(position);
 
             if(imageName==null){
                 return;//bail
             }
+
+
 
 //            if(imageName.compareTo("n")==0){
 //                imageName="o"; // there is no "n"
@@ -185,10 +211,28 @@ public class ManualScanFragment extends Fragment {
 
             int image_id = getResources().getIdentifier(imageName, "drawable", getActivity().getPackageName());
 
+
+
+
             mImageView.setImageResource(image_id);
 
+            //-------------------------------------------------
+
+            Button scanButton = getActivity().findViewById(R.id.manualScanButton);
+            scanButton.setText(getString(R.string.perform_scan) + ": "+imageName);
+
+            //-------------------------------------------------
+
+            ImageView mImageViewPic= (ImageView) getActivity().findViewById(R.id.imageViewPic);
+            String pictureName = imageName + "_pic";
+            int picture_id = getResources().getIdentifier(pictureName, "drawable", getActivity().getPackageName());
+
+            mImageViewPic.setImageResource(picture_id);
 
 
+
+
+            //-------------------------------------------------
 
         }// end of onItenSelected
 
@@ -216,8 +260,10 @@ public class ManualScanFragment extends Fragment {
 
         Log.d("Trace", "ManualScan()");
 
+        scanCompleted = false;
+
         getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
-        getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
+        //getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
 
         String imageName = getCharForNumber(selectedLocation);
 
@@ -248,7 +294,6 @@ public class ManualScanFragment extends Fragment {
 
 
 
-
 //
 //        if(scans==null) {
 //            scans = new TrackerScannerSingle(getActivity());
@@ -272,8 +317,8 @@ public class ManualScanFragment extends Fragment {
 //            scans.postQueuesToServer();
 //        }
 
-        getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
-        getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
+        //getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
+        //getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
 
 
         String[] server_values = getResources().getStringArray(R.array.server_values);
@@ -308,6 +353,8 @@ public class ManualScanFragment extends Fragment {
 
             Log.d("Trace", "ManualScanFragment.receiver.onReceive");
 
+            scanCompleted = true;
+
             //String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
 
             //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
@@ -319,18 +366,25 @@ public class ManualScanFragment extends Fragment {
             //scanButton.setEnabled(true);
             //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
 
-            getActivity().findViewById(R.id.manualScanButton).setEnabled(true);
-            getActivity().findViewById(R.id.manualPostButton).setEnabled(true);
 
-            int combinedQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT,-1);
 
-            int resendQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT,-1);
+            Button scanButton = getActivity().findViewById(R.id.manualScanButton);
 
-            String postButtonTextUpdate = "Post Data - ("+String.valueOf(combinedQueueSize)+"),["
-                    +String.valueOf(resendQueueSize)+"]";
+            if(scanButton!=null){
+                scanButton.setEnabled(true);
+            }
 
-            Button postButton = getActivity().findViewById(R.id.manualPostButton);
-            postButton.setText(postButtonTextUpdate);
+            //getActivity().findViewById(R.id.manualPostButton).setEnabled(true);
+
+//            int combinedQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT,-1);
+//
+//            int resendQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT,-1);
+//
+//            String postButtonTextUpdate = "Post Data - ("+String.valueOf(combinedQueueSize)+"),["
+//                    +String.valueOf(resendQueueSize)+"]";
+//
+//            Button postButton = getActivity().findViewById(R.id.manualPostButton);
+//            postButton.setText(postButtonTextUpdate);
 
 
 

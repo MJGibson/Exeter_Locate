@@ -13,5 +13,7 @@
     <!-- Sync Preferences -->
     <string name="Settings">Settings</string>
 
+    <string name="perform_scan">Perform Scan</string>
+
 
 </resources>
