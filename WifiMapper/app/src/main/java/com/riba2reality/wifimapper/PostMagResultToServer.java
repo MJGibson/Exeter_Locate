@@ -3,7 +3,7 @@ package com.riba2reality.wifimapper;
 import android.os.AsyncTask;
 
 import com.riba2reality.wifimapper.DataStores.Constants;
-import com.riba2reality.wifimapper.DataStores.MagSensorResult;
+import com.riba2reality.wifimapper.DataStores.SensorResult;
 
 import org.json.JSONObject;
 
@@ -33,7 +33,7 @@ public class PostMagResultToServer extends AsyncTask<String, String, String> {
     private final WeakReference<TrackerScanner> trackerscannerContainer;
 
     //WifiScanResult wifiScanResult;
-    MagSensorResult magSensorResult;
+    SensorResult magSensorResult;
 
     public PostMagResultToServer(TrackerScanner trackerScanner) {
 

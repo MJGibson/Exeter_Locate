@@ -12,6 +12,7 @@ wifiCollection = "wifi"
 combinedCollection = "combiColl"
 gpsCollection = "gpsColl"
 magneticCollection = "mag"
+accelCollection = "accel"
 
 DEFAULT_GET_RESPONSE = (
     "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
@@ -44,12 +45,22 @@ KEYS_REQUIRED_FOR_MAG = [
     "MAG_Z",
 ]
 
+KEYS_REQUIRED_FOR_ACCEL = [
+    "MAGIC_NUM",
+    "UUID",
+    "MAG_TIME",
+    "MAG_X",
+    "MAG_Y",
+    "MAG_Z",
+]
+
 KEYS_REQUIRED_FOR_COMBINED = list(
     # get the unique elements across to two lists to avoid repetition
-    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI,KEYS_REQUIRED_FOR_MAG,["MESSAGE"])
+    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI,KEYS_REQUIRED_FOR_MAG,KEYS_REQUIRED_FOR_ACCEL,["MESSAGE"])
 )
 
 
+#-------------------------------------------------------------------------------------
 def parse_request(request):
     # get the data out of the immutable dict object
     key_list = list(request.form.to_dict().keys())
@@ -68,7 +79,7 @@ def parse_request(request):
 
     return jsonData
 
-
+#-------------------------------------------------------------------------------------
 def print_and_jsonify(msg):
     # converts msg to a string, print it and
     # return a flask request
@@ -76,6 +87,7 @@ def print_and_jsonify(msg):
     return jsonify({"ERROR": str(msg)})
 
 
+#-------------------------------------------------------------------------------------
 @app.route("/", methods=["GET", "POST"])
 def combined():
     if request.method == "POST":
@@ -105,35 +117,35 @@ def combined():
             db = client[dataBase]
 
         # ---- post data to the GPS table
-        collection = db[gpsCollection]
-        collection.insert_one(
-            {
-                "UUID": jsonData["UUID"],
-                "GPS_TIME": jsonData["GPS_TIME"],
-                #"MESSAGE": jsonData["MESSAGE"],
-                "x": float(jsonData["X"]),
-                "y": float(jsonData["Y"]),
-                "z": float(jsonData["ALTITUDE"]),
-                "acc": float(jsonData["ACC"]),
-            }
-        )
+        # collection = db[gpsCollection]
+        # collection.insert_one(
+            # {
+                # "UUID": jsonData["UUID"],
+                # "GPS_TIME": jsonData["GPS_TIME"],
+                # #"MESSAGE": jsonData["MESSAGE"],
+                # "x": float(jsonData["X"]),
+                # "y": float(jsonData["Y"]),
+                # "z": float(jsonData["ALTITUDE"]),
+                # "acc": float(jsonData["ACC"]),
+            # }
+        # )
         
-        # ---- post data to the MAG table
+        # # ---- post data to the MAG table
 
-        # combine each record into a list to update the db in one go
-        record = {
-            "UUID": jsonData["UUID"],
-            "MAG_TIME": jsonData["MAG_TIME"],
-            "MAG_x": float(jsonData["MAG_X"]),
-            "MAG_y": float(jsonData["MAG_Y"]),
-            "MAG_z": float(jsonData["MAG_Z"]),
-            }
+        # # combine each record into a list to update the db in one go
+        # record = {
+            # "UUID": jsonData["UUID"],
+            # "MAG_TIME": jsonData["MAG_TIME"],
+            # "MAG_x": float(jsonData["MAG_X"]),
+            # "MAG_y": float(jsonData["MAG_Y"]),
+            # "MAG_z": float(jsonData["MAG_Z"]),
+            # }
 
 
-        # select the collection and post the data if there is any
-        collection = db[magneticCollection]
+        # # select the collection and post the data if there is any
+        # collection = db[magneticCollection]
         
-        collection.insert(record)
+        # collection.insert(record)
 
         # ---- post data to the combined table
 
@@ -165,21 +177,25 @@ def combined():
                         "MAG_TIME": jsonData["MAG_TIME"],
                         "MAG_x": float(jsonData["MAG_X"]),
                         "MAG_y": float(jsonData["MAG_Y"]),
-                        "MAG_z": float(jsonData["MAG_Z"])
+                        "MAG_z": float(jsonData["MAG_Z"]),
+                        "ACCEL_TIME": jsonData["ACCEL_TIME"],
+                        "ACCEL_X": float(jsonData["ACCEL_X"]),
+                        "ACCEL_Y": float(jsonData["ACCEL_Y"]),
+                        "ACCEL_Z": float(jsonData["ACCEL_Z"]),
                     }
                 )
-                wifi_records.append(
-                    {
-                        "UUID": jsonData["UUID"],
-                        "WIFI_TIME": jsonData["WIFI_TIME"],
-                        "Macs": mac,
-                        "level": int(strength),
-                    }
-                )
+                # wifi_records.append(
+                    # {
+                        # "UUID": jsonData["UUID"],
+                        # "WIFI_TIME": jsonData["WIFI_TIME"],
+                        # "Macs": mac,
+                        # "level": int(strength),
+                    # }
+                # )
 
             # select the collection and post the data
-            collection = db[wifiCollection]
-            collection.insert_many(wifi_records)
+            # collection = db[wifiCollection]
+            # collection.insert_many(wifi_records)
 
             # select the collection and post the data
             collection = db[combinedCollection]
@@ -189,6 +205,7 @@ def combined():
 
     return DEFAULT_GET_RESPONSE
 
+#-------------------------------------------------------------------------------------
 
 @app.route("/gps/", methods=["GET", "POST"])
 def gps():
@@ -235,6 +252,7 @@ def gps():
 
     return DEFAULT_GET_RESPONSE
 
+#-------------------------------------------------------------------------------------
 
 @app.route("/wifi/", methods=["GET", "POST"])
 def wifi():
@@ -294,6 +312,7 @@ def wifi():
 
     return DEFAULT_GET_RESPONSE
 
+#-------------------------------------------------------------------------------------
 @app.route("/mag/", methods=["GET", "POST"])
 def mag():
     if request.method == "POST":
@@ -341,6 +360,61 @@ def mag():
 
         return "Server: Magnetic data stored successfully."
     return DEFAULT_GET_RESPONSE
+    
+    
+#-------------------------------------------------------------------------------------
+@app.route("/accel/", methods=["GET", "POST"])
+def accel():
+    if request.method == "POST":
+        # ---- Error checking
+
+        # check we can parse the request
+        try:
+            jsonData = parse_request(request)
+        except Exception as e:
+            return print_and_jsonify(e)
+
+        # check all the required fields are there
+        for key in KEYS_REQUIRED_FOR_ACCEL:
+            if key not in jsonData.keys():
+                msg = f"Missing: {key:s}"
+                return print_and_jsonify(msg)
+
+        # check the magic number matches
+        if jsonData["MAGIC_NUM"] != magicNum:
+            return print_and_jsonify("magic number mismatch")
+
+        # ---- connect to the db
+        client = MongoClient("localhost", 27017)
+        if "DATABASE" in jsonData.keys():
+            db = client[jsonData["DATABASE"]]
+        else:
+            db = client[dataBase]
+
+        # ---- post data to the MAG table
+
+        # combine each record into a list to update the db in one go
+        record = {
+            "UUID": jsonData["UUID"],
+            "ACCEL_TIME": jsonData["ACCEL_TIME"],
+            "ACCEL_X": float(jsonData["ACCEL_X"]),
+            "ACCEL_Y": float(jsonData["ACCEL_Y"]),
+            "ACCEL_Z": float(jsonData["ACCEL_Z"]),
+            }
+
+
+        # select the collection and post the data if there is any
+        collection = db[accelCollection]
+        
+        collection.insert(record)
+
+        return "Server: Magnetic data stored successfully."
+    return DEFAULT_GET_RESPONSE
+
+    
+
+#-------------------------------------------------------------------------------------
+######################################################################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

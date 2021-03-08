@@ -8,6 +8,7 @@
     <integer name="defaultVal_gps">10</integer>
     <integer name="defaultVal_wifi">10</integer>
     <integer name="defaultVal_mag">10</integer>
+    <integer name="defaultVal_accel">10</integer>
 
     <integer name="max_log_lines">200</integer>
 

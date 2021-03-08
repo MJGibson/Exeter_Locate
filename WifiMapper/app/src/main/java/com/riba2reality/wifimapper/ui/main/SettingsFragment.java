@@ -80,27 +80,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         final ListPreference serverAddressListPref = findPreference("ServerList");
         final EditTextPreference serverAddressPref = findPreference("ServerAddress");
         serverAddressListPref.setOnPreferenceChangeListener(new
-                                                                    Preference.OnPreferenceChangeListener() {
-                                                                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                                                                            final String val = newValue.toString();
-                                                                            int index = serverAddressListPref.findIndexOfValue(val);
-                                                                            if (index == 0) {
-                                                                                //if(val.equals(""))
+                Preference.OnPreferenceChangeListener() {
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        final String val = newValue.toString();
+                        int index = serverAddressListPref.findIndexOfValue(val);
+                        if (index == 0) {
+                            //if(val.equals(""))
 
-                                                                                // stop is as new IP can be put through checks
-                                                                                stopLocationService();
+                            // stop is as new IP can be put through checks
+                            stopLocationService();
 
 
-                                                                                serverAddressPref.setEnabled(true);
-                                                                                serverAddressPref.setText("");
+                            serverAddressPref.setEnabled(true);
+                            serverAddressPref.setText("");
 
-                                                                            } else {
-                                                                                serverAddressPref.setEnabled(false);
-                                                                                serverAddressPref.setText(val);
-                                                                            }
-                                                                            return true;
-                                                                        }
-                                                                    });
+                        } else {
+                            serverAddressPref.setEnabled(false);
+                            serverAddressPref.setText(val);
+                        }
+                        return true;
+                    }
+                });
 
         // set default value
         int ip_index = 1;
@@ -291,7 +291,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
         //----------------------------------------------------------------
-        //----------------------------------------------------------------
+
 
         SeekBarPreference pref_interval_mag = getPreferenceManager().findPreference("interval_mag");
 
@@ -319,6 +319,37 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
         //----------------------------------------------------------------
+
+
+        SeekBarPreference pref_interval_accel = getPreferenceManager().findPreference("interval_accel");
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+        int accelInterval = SP.getInt("defaultVal_accel", -1);
+        if (accelInterval == -1) {
+            accelInterval = getContext().getResources().getInteger(R.integer.defaultVal_accel);
+        }
+        pref_interval_accel.setValue(accelInterval);
+
+        // set lister for end results
+        pref_interval_accel.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_accel", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
+
+        //----------------------------------------------------------------
+
+
+
 
         // set default
         EditTextPreference databasePref = getPreferenceManager().findPreference("database");

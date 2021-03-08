@@ -2,8 +2,6 @@ package com.riba2reality.wifimapper.DataStores;
 
 import android.location.Location;
 
-import java.util.ArrayList;
-
 public class CombinedScanResult {
 
     public String dateTime;
@@ -13,7 +11,9 @@ public class CombinedScanResult {
 
     public Location location;
 
-    public MagSensorResult magSensorResult;
+    public SensorResult magSensorResult;
+
+    public SensorResult accelSensorResult;
 
     public String message = "None";
 

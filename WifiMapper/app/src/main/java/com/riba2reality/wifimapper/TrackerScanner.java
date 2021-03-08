@@ -39,7 +39,7 @@ import com.google.gson.Gson;
 import com.riba2reality.wifimapper.DataStores.CombinedScanResult;
 import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.DataStores.LocationResult;
-import com.riba2reality.wifimapper.DataStores.MagSensorResult;
+import com.riba2reality.wifimapper.DataStores.SensorResult;
 import com.riba2reality.wifimapper.DataStores.ServerMessage;
 import com.riba2reality.wifimapper.DataStores.WifiResult;
 import com.riba2reality.wifimapper.DataStores.WifiScanResult;
@@ -55,7 +55,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
 
 public class TrackerScanner extends Service implements LocationListener {
 
@@ -64,17 +63,20 @@ public class TrackerScanner extends Service implements LocationListener {
     // result/dispatch queues
 
     private final Queue<CombinedScanResult> combinedScanResultQueue = new ConcurrentLinkedQueue<>();
-    public final Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<>();
+    //public final Queue<CombinedScanResult> combinedScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
     private final Queue<LocationResult> locationResultQueue = new ConcurrentLinkedQueue<>();
 
     private final Queue<WifiScanResult> wifiScanResultQueue = new ConcurrentLinkedQueue<>();
-    public final Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<>();
+    //public final Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
 
 
-    private final Queue<MagSensorResult> magSensorResultQueue = new ConcurrentLinkedQueue<>();
-    public final Queue<MagSensorResult> magSensorResultResendQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<SensorResult> magSensorResultQueue = new ConcurrentLinkedQueue<>();
+    //public final Queue<SensorResult> magSensorResultResendQueue = new ConcurrentLinkedQueue<>();
+
+    private final Queue<SensorResult> accelSensorResultQueue = new ConcurrentLinkedQueue<>();
+
 
     public final Queue<ServerMessage> resendQueue = new ConcurrentLinkedQueue<>();
 
@@ -98,7 +100,7 @@ public class TrackerScanner extends Service implements LocationListener {
     // class variables
 
     private SensorManager sensorManager;
-    private Sensor sensorMag;
+    //private Sensor sensorMag;
 
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = null;
@@ -326,7 +328,29 @@ public class TrackerScanner extends Service implements LocationListener {
     };
     //==============================================================================================
 
+    //==============================================================================================
+    private final Runnable periodicUpdate_accel = new Runnable() {
+        @Override
+        public void run() {
 
+            if (running) {
+
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int accelInterval = getResources().getInteger(R.integer.defaultVal_accel);
+                int interval = SP.getInt("interval_accel", accelInterval);
+
+                handler.postDelayed(periodicUpdate_accel, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+            } else {
+                return;
+            }
+
+            ScanAccel();
+
+
+
+        }
+    };
+    //==============================================================================================
 
 
     //##############################################################################################
@@ -523,7 +547,7 @@ public class TrackerScanner extends Service implements LocationListener {
             Log.d("Trace", "TrackerScanner.magSensorListener.event()");
 
             String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
-            MagSensorResult result = new MagSensorResult();
+            SensorResult result = new SensorResult();
             result.dateTime = currentTime;
 
             result.X = event.values[0];
@@ -600,6 +624,100 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
+    //##############################################################################################
+    // accelerometer sensor function
+
+
+    //==============================================================================================
+    private SensorEventListener accelSensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+            // only perform a single scan
+            sensorManager.unregisterListener(accelSensorListener);
+
+            Log.d("Trace", "TrackerScanner.accelSensorListener.event()");
+
+            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+            SensorResult result = new SensorResult();
+            result.dateTime = currentTime;
+
+            result.X = event.values[0];
+            result.Y = event.values[1];
+            result.Z = event.values[2];
+
+
+            long timeDelay = Long.MAX_VALUE;
+            if(LastTimeStamp != Long.MAX_VALUE){
+
+                timeDelay = event.timestamp - LastTimeStamp;
+                //timeDelay = LastTimeStamp;
+            }
+
+
+            sendResult("Accel Scan updated"
+                            +" ("+result.X+","+result.Y+","+result.Z+")"
+                    //+"\n["+timeDelay+"]"
+                    //+"\n["+LastTimeStamp+"]"
+            );
+
+            //-------------------------------------------------------------
+
+            accelSensorResultQueue.add(result);
+
+//            if(running) {
+//
+//
+//
+//                CombinedScanResult combinedScanResult = combinedScanResultQueue.peek();
+//
+//                if (combinedScanResult != null && combinedScanResultQueue.peek().magSensorResult == null) {
+//                    //?combinedScanResult.dateTime = currentTime;
+//                    //combinedScanResult.wifiResult = result.wifiResult;
+//
+//                    combinedScanResult.magSensorResult = result;
+//                    //combinedScanResult.wifiScanResult.dateTime = currentTime;
+//                }
+//
+//
+//            }
+
+            LastTimeStamp = event.timestamp;
+
+            //-------------------------------------------------------------
+
+            if(!running) {
+                combinedScanResult.accelSensorResult = result;
+
+                checkAllScansCompleted();
+            }
+
+        }// end of onSensorChanged
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };// end of magnetic sensor event listener;
+    //==============================================================================================
+
+
+
+    //==============================================================================================
+    private void ScanAccel(){
+
+        //sensorMag
+
+        // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a second)
+        Log.d("ACCELscan", "Initiated");
+        sensorManager.registerListener(accelSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
+
+    }// end of startSensor
+    //==============================================================================================
+
+    //##############################################################################################
+    // Scan sync for single scan
+
     //==============================================================================================
     private void checkAllScansCompleted(){
 
@@ -607,8 +725,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if(
                 combinedScanResult.wifiScanResult != null &&
-                        combinedScanResult.magSensorResult != null &&
-                        combinedScanResult.location != null
+                combinedScanResult.magSensorResult != null &&
+                combinedScanResult.location != null &&
+                        combinedScanResult.accelSensorResult != null
         ){
             Log.d("Trace", "TrackerScanner.checkAllScansCompleted() - ALL SCANS COMPLETED!");
 
@@ -849,7 +968,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    private ServerMessage encodeMagResult(MagSensorResult magSensorResult){
+    private ServerMessage encodeMagResult(SensorResult magSensorResult){
 
         ServerMessage serverMessage = new ServerMessage();
 
@@ -935,6 +1054,97 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }// end of postWifiResult
     //==============================================================================================
+
+
+    //==============================================================================================
+    private ServerMessage encodeAccelResult(SensorResult sensorResult){
+
+        ServerMessage serverMessage = new ServerMessage();
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        String protocol = "http";
+        if (useSSL) {
+            protocol += "s";
+        }
+
+        String port = Constants.port;
+
+        String endpoint = "/accel/";
+
+        String urlString = protocol + "://" + address + port + endpoint;
+
+        //------------------------------------------------------------------
+
+        Map<String, String> parameters = new HashMap<>();
+
+
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
+
+        parameters.put("UUID", deviceID);
+
+        parameters.put("DATABASE", dataBase);
+
+        parameters.put("ACCEL_TIME", sensorResult.dateTime);
+        //-----
+
+        parameters.put("ACCEL_X",Double.toString(sensorResult.X));
+        parameters.put("ACCEL_Y",Double.toString(sensorResult.Y));
+        parameters.put("ACCEL_Z",Double.toString(sensorResult.Z));
+
+
+        //-----
+
+        String message = new JSONObject(parameters).toString();
+
+        //------------------------------------------------------------------
+        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.useSSL = useSSL;
+        serverMessage.address = address;
+
+
+        return serverMessage;
+    }// end of encodeAccelResult
+    //==============================================================================================
+
+    //==============================================================================================
+    private void postAccelResult() {
+
+
+        // empty the queue
+        while (this.accelSensorResultQueue.size() > 0) {
+
+            ServerMessage serverMessage = encodeAccelResult(accelSensorResultQueue.poll());
+
+            PostToServer thisPost = new PostToServer(this,
+                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    serverMessage
+            );
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
+
+            thisPost.execute();
+
+            this.sendResult("Sending to server: Accelerometer senor result.");
+
+
+        }// end of looping queue
+
+
+    }// end of postAccelResult
+    //==============================================================================================
+
+
 
     //==============================================================================================
     private ServerMessage encodeCombinedResult(CombinedScanResult combinedScanResult){
@@ -1027,17 +1237,27 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //------------
         // magnetic
-        if(combinedScanResult.magSensorResult!=null) {
+        //if(combinedScanResult.magSensorResult!=null) {
             parameters.put("MAG_TIME", combinedScanResult.magSensorResult.dateTime);
             parameters.put("MAG_X", String.valueOf(combinedScanResult.magSensorResult.X));
             parameters.put("MAG_Y", String.valueOf(combinedScanResult.magSensorResult.Y));
             parameters.put("MAG_Z", String.valueOf(combinedScanResult.magSensorResult.Z));
-        }
+        //}
+
+        //------------
+        // accelerometer
+
+        parameters.put("ACCEL_TIME", combinedScanResult.accelSensorResult.dateTime);
+        parameters.put("ACCEL_X", String.valueOf(combinedScanResult.accelSensorResult.X));
+        parameters.put("ACCEL_Y", String.valueOf(combinedScanResult.accelSensorResult.Y));
+        parameters.put("ACCEL_Z", String.valueOf(combinedScanResult.accelSensorResult.Z));
+
+
 
         //------------
         // wifi
 
-        parameters.put("WIFI_TIME", combinedScanResult.dateTime);
+        parameters.put("WIFI_TIME", combinedScanResult.wifiScanResult.dateTime);
         String macAddressJson = new Gson().toJson(macAddressList);
 
 
@@ -1120,6 +1340,7 @@ public class TrackerScanner extends Service implements LocationListener {
         postCombinedResult();
         postWifiResult();
         postMagResult();
+        postAccelResult();
         postLocationResult();
 
         this.sendSingleScanResult();

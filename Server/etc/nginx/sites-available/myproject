@@ -24,6 +24,10 @@ server {
 	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
 
+    location /accel/ { 
+	include uwsgi_params;
+	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+    }
 
 }
 
