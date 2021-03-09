@@ -4,11 +4,14 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -34,6 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+    //==============================================================================================
     public static SettingsFragment newInstance(int index) {
         SettingsFragment fragment = new SettingsFragment();
         Bundle bundle = new Bundle();
@@ -41,9 +45,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         fragment.setArguments(bundle);
         return fragment;
     }
+    //==============================================================================================
 
+
+    //==============================================================================================
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
+        Log.d("Trace", "SettingsFragment.onCreatePreferences()");
+
+
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final SharedPreferences.Editor SPeditor = SP.edit();
@@ -174,20 +185,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         });
 
         //----------------------------------------------------------------
-
-        // make interval at least have a number input dialog
-        /*
-        EditTextPreference pref_interval = getPreferenceManager().findPreference("interval");
-        pref_interval.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
-            @Override
-            public void onBindEditText(@NonNull EditText editText) {
-                editText.setInputType(InputType.TYPE_CLASS_PHONE);
-            }
-        });
-
-        // set default value from constants
-        pref_interval.setText(Constants.interval);
-         */
+        // posting
 
         SeekBarPreference pref_interval_post = getPreferenceManager().findPreference("interval_posts");
 
@@ -214,6 +212,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         );
 
         //----------------------------------------------------------------
+        // combined scanning (deprecated - on continious scanning)
 
 //        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_scan");
 //
@@ -264,6 +263,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         );
 
         //----------------------------------------------------------------
+        // wifi
 
         SeekBarPreference pref_interval_wifi = getPreferenceManager().findPreference("interval_wifi");
 
@@ -291,7 +291,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
         //----------------------------------------------------------------
+        // magnetometer
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 
         SeekBarPreference pref_interval_mag = getPreferenceManager().findPreference("interval_mag");
 
@@ -302,6 +304,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             magInterval = getContext().getResources().getInteger(R.integer.defaultVal_mag);
         }
         pref_interval_mag.setValue(magInterval);
+
+        // check if sensor is present
+
+
+        SensorManager sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null)
+
+        {
+            // Success! There's a magnetometer.
+            prefs.edit().putBoolean("magAvailable", true).apply();
+        } else {
+            // Failure! No magnetometer.
+            pref_interval_mag.setEnabled(false);
+            prefs.edit().putBoolean("magAvailable", false).apply();
+
+        }
+
 
         // set lister for end results
         pref_interval_wifi.setOnPreferenceChangeListener(
@@ -330,6 +349,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             accelInterval = getContext().getResources().getInteger(R.integer.defaultVal_accel);
         }
         pref_interval_accel.setValue(accelInterval);
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+        {
+            // Success! There's a magnetometer.
+            prefs.edit().putBoolean("accelAvailable", true).apply();
+        } else {
+            // Failure! No magnetometer.
+            pref_interval_accel.setEnabled(false);
+            prefs.edit().putBoolean("accelAvailable", false).apply();
+
+        }
 
         // set lister for end results
         pref_interval_accel.setOnPreferenceChangeListener(
@@ -442,8 +472,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
     }// end of onCreatePreferences
-    //############################################################################################
+    //==============================================================================================
 
+
+    //==============================================================================================
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         if (!(preference instanceof EditTextPreference)) {
@@ -480,9 +512,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         return false;
     }
+    //==============================================================================================
 
 
-    //############################################################################################
+    //==============================================================================================
     private boolean isLocationServiceRunning() {
 
         ActivityManager activityManager =
@@ -503,8 +536,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         }// end of if activityManger not null
         return false;
     }// end of isLocationServiceRunning
+    //==============================================================================================
 
 
+    //==============================================================================================
 //    private void startLocationService(){
 //        if(!isLocationServiceRunning()){
 //            Intent intent = new Intent(getActivity().
@@ -514,8 +549,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 //            Toast.makeText(getActivity(),"Location service started", Toast.LENGTH_SHORT).show();
 //        }
 //    }// end of startLocationService
+    //==============================================================================================
 
 
+    //==============================================================================================
     private void stopLocationService() {
         if (isLocationServiceRunning()) {
             Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
@@ -525,5 +562,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             Toast.makeText(getActivity(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
+    //==============================================================================================
+
 
 }// end of class

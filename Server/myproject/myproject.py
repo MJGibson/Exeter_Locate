@@ -48,15 +48,17 @@ KEYS_REQUIRED_FOR_MAG = [
 KEYS_REQUIRED_FOR_ACCEL = [
     "MAGIC_NUM",
     "UUID",
-    "MAG_TIME",
-    "MAG_X",
-    "MAG_Y",
-    "MAG_Z",
+    "ACCEL_TIME",
+    "ACCEL_X",
+    "ACCEL_Y",
+    "ACCEL_Z",
 ]
 
 KEYS_REQUIRED_FOR_COMBINED = list(
     # get the unique elements across to two lists to avoid repetition
-    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI,KEYS_REQUIRED_FOR_MAG,KEYS_REQUIRED_FOR_ACCEL,["MESSAGE"])
+    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI,KEYS_REQUIRED_FOR_MAG,KEYS_REQUIRED_FOR_ACCEL,
+    ["MESSAGE", "matrix_R", "matrix_I"]
+    )
 )
 
 
@@ -182,6 +184,8 @@ def combined():
                         "ACCEL_X": float(jsonData["ACCEL_X"]),
                         "ACCEL_Y": float(jsonData["ACCEL_Y"]),
                         "ACCEL_Z": float(jsonData["ACCEL_Z"]),
+                        "matrix_R": jsonData["matrix_R"],
+                        "matrix_I": jsonData["matrix_I"],
                     }
                 )
                 # wifi_records.append(
@@ -408,7 +412,7 @@ def accel():
         
         collection.insert(record)
 
-        return "Server: Magnetic data stored successfully."
+        return "Server: Accelerometer data stored successfully."
     return DEFAULT_GET_RESPONSE
 
     

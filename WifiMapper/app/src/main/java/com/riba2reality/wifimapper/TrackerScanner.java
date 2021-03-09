@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SeekBarPreference;
 
 import com.google.gson.Gson;
 import com.riba2reality.wifimapper.DataStores.CombinedScanResult;
@@ -48,6 +49,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -132,8 +134,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //----------------------------------------------------------------------------------------------
 
+    private boolean magAvailable = false;
+    private boolean accelAvailable = false;
 
 
+
+    //----------------------------------------------------------------------------------------------
 
     //##############################################################################################
     // class functions
@@ -152,6 +158,15 @@ public class TrackerScanner extends Service implements LocationListener {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        //----------------------------------
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        // check has sensors
+        magAvailable = SP.getBoolean("magAvailable", false);
+
+        accelAvailable = SP.getBoolean("accelAvailable", false);
 
 
     }// end of onCreate
@@ -724,17 +739,62 @@ public class TrackerScanner extends Service implements LocationListener {
         Log.d("Trace", "TrackerScanner.checkAllScansCompleted()");
 
         if(
-                combinedScanResult.wifiScanResult != null &&
-                combinedScanResult.magSensorResult != null &&
-                combinedScanResult.location != null &&
-                        combinedScanResult.accelSensorResult != null
+
+                combinedScanResult.wifiScanResult != null
+                        &&
+
+                (combinedScanResult.magSensorResult != null == magAvailable)
+                        &&
+
+                (combinedScanResult.location != null)
+                        &&
+
+                (combinedScanResult.accelSensorResult != null== accelAvailable)
         ){
             Log.d("Trace", "TrackerScanner.checkAllScansCompleted() - ALL SCANS COMPLETED!");
+
+
+            if(!magAvailable){
+                combinedScanResult.magSensorResult = new SensorResult();
+            }
+
+            if(!accelAvailable){
+                combinedScanResult.accelSensorResult = new SensorResult();
+            }
+
+
+            float gravity[] = {combinedScanResult.accelSensorResult.X,
+                                combinedScanResult.accelSensorResult.Y,
+                                combinedScanResult.accelSensorResult.Z};
+
+            float geomagnetic[] = {combinedScanResult.magSensorResult.X,
+                    combinedScanResult.magSensorResult.Y,
+                    combinedScanResult.magSensorResult.Z};
+
+            float identifyMatrix_R[] = new float[9];
+            float rotationMatrix_I[] = new float[9];
+
+            if(magAvailable && accelAvailable) {
+
+                boolean success = sensorManager.getRotationMatrix(identifyMatrix_R, rotationMatrix_I,
+                        gravity, geomagnetic
+                );
+
+                Log.d("getRotationMatrix", "identifyMatrix_R: " + Arrays.toString(identifyMatrix_R));
+                Log.d("getRotationMatrix", "rotationMatrix_I: " + Arrays.toString(rotationMatrix_I));
+
+                combinedScanResult.matrix_R = identifyMatrix_R;
+                combinedScanResult.matrix_I = rotationMatrix_I;
+
+            }
+
+            //--------------
 
             combinedScanResultQueue.add(combinedScanResult);
 
             //scanButton.setEnabled(true);
             //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
+
 
 
 
@@ -1266,6 +1326,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
+        parameters.put("matrix_R", new Gson().toJson(combinedScanResult.matrix_R));
+        parameters.put("matrix_I", new Gson().toJson(combinedScanResult.matrix_I));
+
 
         String message = new JSONObject(parameters).toString();
 
@@ -1339,8 +1402,10 @@ public class TrackerScanner extends Service implements LocationListener {
 
         postCombinedResult();
         postWifiResult();
-        postMagResult();
-        postAccelResult();
+        if(magAvailable)
+            postMagResult();
+        if(accelAvailable)
+            postAccelResult();
         postLocationResult();
 
         this.sendSingleScanResult();
@@ -1440,8 +1505,12 @@ public class TrackerScanner extends Service implements LocationListener {
         handler.removeCallbacks(periodicUpdate);
 
         handler.removeCallbacks(periodicUpdate_wifi);
-        handler.removeCallbacks(periodicUpdate_mag);
 
+        if(magAvailable)
+            handler.removeCallbacks(periodicUpdate_mag);
+
+        if(accelAvailable)
+            handler.removeCallbacks(periodicUpdate_accel);
 
         //handler.removeCallbacks(periodicUpdate_scan);
 
@@ -1474,7 +1543,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
         scanWifi();
 
-        ScanMag();
+        if(magAvailable)
+            ScanMag();
+
+        if(accelAvailable)
+            ScanAccel();
 
 
     }// end of scan all
@@ -1510,7 +1583,12 @@ public class TrackerScanner extends Service implements LocationListener {
         // fire off a new wifi and gps scan (these also start the timers post hoc)
         handler.post(periodicUpdate);
         handler.post(periodicUpdate_wifi);
-        handler.post(periodicUpdate_mag);
+
+        if(magAvailable)
+            handler.post(periodicUpdate_mag);
+
+        if(accelAvailable)
+            handler.post(periodicUpdate_accel);
 
         requestlocation(false);
 

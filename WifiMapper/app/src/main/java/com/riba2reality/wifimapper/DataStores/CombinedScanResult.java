@@ -17,5 +17,8 @@ public class CombinedScanResult {
 
     public String message = "None";
 
+    public float[] matrix_R;
+    public float[] matrix_I;
+
 
 }// end of class CombinedScanResult
