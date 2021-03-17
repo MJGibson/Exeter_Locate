@@ -32,7 +32,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
     private final WeakReference<TrackerScanner> trackerscannerContainer;
 
     //public InputStream is;
-    private final WeakReference<InputStream> inputSteamContrainer;
+    //private final WeakReference<InputStream> inputSteamContrainer;
+    private InputStream is;
 
     //private final WeakReference<ServerMessage> serverMessageContrainer;
     private final ServerMessage serverMessage;
@@ -48,7 +49,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
                         ) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
-        this.inputSteamContrainer = new WeakReference<>(is);
+        //this.inputSteamContrainer = new WeakReference<>(is);
+        this.is = is;
+
+
         //this.serverMessageContrainer = new WeakReference<>(serverMessage);
         this.serverMessage = serverMessage;
 
@@ -139,7 +143,9 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
 
             //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
-            InputStream caInput = new BufferedInputStream(this.inputSteamContrainer.get());
+
+            //InputStream caInput = new BufferedInputStream(this.inputSteamContrainer.get());
+            InputStream caInput = new BufferedInputStream(this.is);
 
 
             Certificate ca;

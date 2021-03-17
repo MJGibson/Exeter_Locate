@@ -157,6 +157,36 @@ def combined():
 
         # check we've got some WiFi access points to post
         if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
+        
+            record = {
+                        "UUID": jsonData["UUID"],
+                        "MESSAGE": jsonData["MESSAGE"],
+                        "WIFI_TIME": None,
+                        "Macs": None,
+                        "level": None,
+                        "GPS_TIME": jsonData["GPS_TIME"],
+                        "x": float(jsonData["X"]),
+                        "y": float(jsonData["Y"]),
+                        "z": float(jsonData["ALTITUDE"]),
+                        "acc": float(jsonData["ACC"]),
+                        "MAG_TIME": jsonData["MAG_TIME"],
+                        "MAG_x": float(jsonData["MAG_X"]),
+                        "MAG_y": float(jsonData["MAG_Y"]),
+                        "MAG_z": float(jsonData["MAG_Z"]),
+                        "ACCEL_TIME": jsonData["ACCEL_TIME"],
+                        "ACCEL_X": float(jsonData["ACCEL_X"]),
+                        "ACCEL_Y": float(jsonData["ACCEL_Y"]),
+                        "ACCEL_Z": float(jsonData["ACCEL_Z"]),
+                        "matrix_R": jsonData["matrix_R"],
+                        "matrix_I": jsonData["matrix_I"],
+                    }
+            
+            
+            # select the collection and post the data
+            collection = db[combinedCollection]
+            collection.insert(record)
+        
+        
             return "Server: GPS data stored but no WiFi access points included in post."
 
         else:

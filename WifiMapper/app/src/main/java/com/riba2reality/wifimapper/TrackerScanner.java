@@ -98,6 +98,9 @@ public class TrackerScanner extends Service implements LocationListener {
     static final public String TRACKERSCANNER_COMBINED_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT";
     static final public String TRACKERSCANNER_RESEND_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT";
 
+
+    final public String MANUAL_SCAN_MESSAGE = "Manual Scan: ";
+
     //----------------------------------------------------------------------------------------------
     // class variables
 
@@ -439,7 +442,7 @@ public class TrackerScanner extends Service implements LocationListener {
 //        }
         //-------------------------------------------------------------
 
-        this.sendResult("GPS: Location updated.");
+
 
         //-------------------------------------------------------------
         // EXTRA WIFI SCAN
@@ -454,6 +457,12 @@ public class TrackerScanner extends Service implements LocationListener {
             this.combinedScanResult.location = new Location(location);
 
             checkAllScansCompleted();
+
+            this.sendResult(MANUAL_SCAN_MESSAGE +
+                    "GPS: Location updated." + "Location: " + this.combinedScanResult.message
+            );
+        }else{
+            this.sendResult("GPS: Location updated.");
         }
 
     }// end of onLocationChanged
@@ -497,7 +506,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             }
 
-            sendResult("WiFi: Scan complete.");
+
 
             Log.d("WIFI_UPDATE: ", String.valueOf(arrayList.size()));
 
@@ -529,6 +538,13 @@ public class TrackerScanner extends Service implements LocationListener {
                 combinedScanResult.wifiScanResult = result;
 
                 checkAllScansCompleted();
+
+                sendResult(MANUAL_SCAN_MESSAGE +
+                        "WiFi: Scan complete."+ "Location: " + combinedScanResult.message
+                );
+
+            }else{
+                sendResult("WiFi: Scan complete.");
             }
 
 
@@ -578,11 +594,7 @@ public class TrackerScanner extends Service implements LocationListener {
             }
 
 
-            sendResult("Mag Scan updated"
-                            +" ("+result.X+","+result.Y+","+result.Z+")"
-                            //+"\n["+timeDelay+"]"
-                    //+"\n["+LastTimeStamp+"]"
-            );
+
 
             //-------------------------------------------------------------
 
@@ -613,6 +625,22 @@ public class TrackerScanner extends Service implements LocationListener {
                 combinedScanResult.magSensorResult = result;
 
                 checkAllScansCompleted();
+
+                sendResult(MANUAL_SCAN_MESSAGE+"Mag Scan updated."
+                                + "Location: " + combinedScanResult.message
+                                //+" ("+result.X+","+result.Y+","+result.Z+")"
+                        //+"\n["+timeDelay+"]"
+                        //+"\n["+LastTimeStamp+"]"
+                );
+
+            }else{
+
+                sendResult("Mag Scan updated."
+                                //+" ("+result.X+","+result.Y+","+result.Z+")"
+                        //+"\n["+timeDelay+"]"
+                        //+"\n["+LastTimeStamp+"]"
+                );
+
             }
 
         }// end of onSensorChanged
@@ -670,11 +698,7 @@ public class TrackerScanner extends Service implements LocationListener {
             }
 
 
-            sendResult("Accel Scan updated"
-                            +" ("+result.X+","+result.Y+","+result.Z+")"
-                    //+"\n["+timeDelay+"]"
-                    //+"\n["+LastTimeStamp+"]"
-            );
+
 
             //-------------------------------------------------------------
 
@@ -705,6 +729,21 @@ public class TrackerScanner extends Service implements LocationListener {
                 combinedScanResult.accelSensorResult = result;
 
                 checkAllScansCompleted();
+
+                sendResult(MANUAL_SCAN_MESSAGE+"Accel Scan updated."
+                                + "Location: " + combinedScanResult.message
+                                //+" ("+result.X+","+result.Y+","+result.Z+")"
+                        //+"\n["+timeDelay+"]"
+                        //+"\n["+LastTimeStamp+"]"
+                );
+
+            }else{
+
+                sendResult("Accel Scan updated."
+                                //+" ("+result.X+","+result.Y+","+result.Z+")"
+                        //+"\n["+timeDelay+"]"
+                        //+"\n["+LastTimeStamp+"]"
+                );
             }
 
         }// end of onSensorChanged
@@ -1106,7 +1145,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             thisPost.execute();
 
-            this.sendResult("Sending to server: Magnetic senor result.");
+            this.sendResult("Sending to server: Magnetic sensor result.");
 
 
         }// end of looping queue
@@ -1195,7 +1234,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             thisPost.execute();
 
-            this.sendResult("Sending to server: Accelerometer senor result.");
+            this.sendResult("Sending to server: Accelerometer sensor result.");
 
 
         }// end of looping queue
@@ -1402,6 +1441,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         postCombinedResult();
         postWifiResult();
+
         if(magAvailable)
             postMagResult();
         if(accelAvailable)
