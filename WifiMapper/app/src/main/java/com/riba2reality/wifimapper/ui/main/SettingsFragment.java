@@ -212,6 +212,33 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         );
 
         //----------------------------------------------------------------
+        // manual scan
+
+        SeekBarPreference pref_manual_scan_duration = getPreferenceManager().findPreference("duration_manual_scan");
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+        int manual_scan_duration = SP.getInt("defaultVal_manual_scan", -1);
+        if (manual_scan_duration == -1) {
+            manual_scan_duration = getContext().getResources().getInteger(R.integer.defaultVal_manual_scan);
+        }
+        pref_manual_scan_duration.setValue(manual_scan_duration);
+
+        // set lister for end results
+        pref_manual_scan_duration.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_manual_scan", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
+        //----------------------------------------------------------------
         // combined scanning (deprecated - on continious scanning)
 
 //        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_scan");

@@ -50,6 +50,16 @@
         <SeekBarPreference
             android:max="@integer/max"
             app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_manual_scan"
+            app:isPreferenceVisible="true"
+            app:key="duration_manual_scan"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Duration of manual scan (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
             app:defaultValue="@integer/defaultVal_post"
             app:isPreferenceVisible="true"
             app:key="interval_posts"

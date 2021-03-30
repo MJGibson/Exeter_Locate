@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,8 @@ import com.riba2reality.wifimapper.MainActivity;
 import com.riba2reality.wifimapper.R;
 import com.riba2reality.wifimapper.TrackerScanner;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -52,6 +55,8 @@ public class HomescreenFragment extends Fragment {
     private TextView logTextView;
 
     private final Queue<String> messagesQueue = new ConcurrentLinkedQueue<>();
+
+    private Date lastScrollTime;
 
 
     //==============================================================================================
@@ -109,6 +114,10 @@ public class HomescreenFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         Log.d("Trace", "HomescreenFragment.onCreateView");
+
+
+        lastScrollTime = Calendar.getInstance().getTime();
+
 
         CharSequence txt = null;
 
@@ -177,6 +186,18 @@ public class HomescreenFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    private ViewTreeObserver.OnScrollChangedListener scrollChangedListener = new ViewTreeObserver.OnScrollChangedListener(){
+
+        @Override
+        public void onScrollChanged() {
+            //Date currentTime = Calendar.getInstance().getTime();
+            lastScrollTime = Calendar.getInstance().getTime();
+
+        }
+    };
+    //==============================================================================================
+
+    //==============================================================================================
     public void addMessage(String message){
 
         if (logTextView != null) {
@@ -205,12 +226,22 @@ public class HomescreenFragment extends Fragment {
                 }
             }
 
-            scroll.post(new Runnable() {
-                @Override
-                public void run() {
-                    scroll.fullScroll(ScrollView.FOCUS_DOWN);
-                }
-            });
+
+            // check if enough time has passed, otherwise the user is using the scroll
+            Date nextScrollTime = lastScrollTime;
+            nextScrollTime.setSeconds(lastScrollTime.getSeconds() + 30);
+            Date currentTime = Calendar.getInstance().getTime();
+
+            if(currentTime.compareTo(nextScrollTime) > 0) {
+
+
+                scroll.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        scroll.fullScroll(ScrollView.FOCUS_DOWN);
+                    }
+                });
+            }
 
         }else{
             messagesQueue.add(message);
@@ -222,6 +253,8 @@ public class HomescreenFragment extends Fragment {
     }// end of addMessage
     //==============================================================================================
 
+
+    //==============================================================================================
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -235,7 +268,9 @@ public class HomescreenFragment extends Fragment {
         }
 
     }// end of onRequestPermissionsResult
+    //==============================================================================================
 
+    //==============================================================================================
     private boolean isLocationServiceRunning() {
 
         ActivityManager activityManager =
@@ -256,8 +291,10 @@ public class HomescreenFragment extends Fragment {
         }// end of if activityManger not null
         return false;
     }// end of isLocationServiceRunning
+    //==============================================================================================
 
 
+    //==============================================================================================
     private void startLocationService() {
         if (!isLocationServiceRunning()) {
 
@@ -279,8 +316,10 @@ public class HomescreenFragment extends Fragment {
             Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
+    //==============================================================================================
 
 
+    //==============================================================================================
     private void stopLocationService() {
         if (isLocationServiceRunning()) {
             Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
@@ -290,6 +329,7 @@ public class HomescreenFragment extends Fragment {
             Toast.makeText(getActivity(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }// end of startLocationService
+    //==============================================================================================
 
 
 }// end of class

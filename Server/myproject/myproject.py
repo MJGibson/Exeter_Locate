@@ -25,7 +25,8 @@ KEYS_REQUIRED_FOR_GPS = [
     "X",
     "Y",
     "ALTITUDE",
-    "ACC"
+    "ACC",
+    "MESSAGE",
 ]
 
 KEYS_REQUIRED_FOR_WIFI = [
@@ -34,6 +35,7 @@ KEYS_REQUIRED_FOR_WIFI = [
     "WIFI_TIME",
     "MacAddressesJson",
     "signalStrengthsJson",
+    "MESSAGE",
 ]
 
 KEYS_REQUIRED_FOR_MAG = [
@@ -43,6 +45,7 @@ KEYS_REQUIRED_FOR_MAG = [
     "MAG_X",
     "MAG_Y",
     "MAG_Z",
+    "MESSAGE",
 ]
 
 KEYS_REQUIRED_FOR_ACCEL = [
@@ -52,6 +55,7 @@ KEYS_REQUIRED_FOR_ACCEL = [
     "ACCEL_X",
     "ACCEL_Y",
     "ACCEL_Z",
+    "MESSAGE",
 ]
 
 KEYS_REQUIRED_FOR_COMBINED = list(
@@ -280,6 +284,7 @@ def gps():
                 "y": float(jsonData["Y"]),
                 "z": float(jsonData["ALTITUDE"]),
                 "acc": float(jsonData["ACC"]),
+                "message": jsonData["MESSAGE"],
             }
         )
         return "Server: GPS data stored successfully."
@@ -336,6 +341,7 @@ def wifi():
                         "WIFI_TIME": jsonData["WIFI_TIME"],
                         "Macs": mac,
                         "level": int(strength),
+                        "message": jsonData["MESSAGE"],
                     }
                 )
 
@@ -384,6 +390,7 @@ def mag():
             "MAG_x": float(jsonData["MAG_X"]),
             "MAG_y": float(jsonData["MAG_Y"]),
             "MAG_z": float(jsonData["MAG_Z"]),
+            "message": jsonData["MESSAGE"],
             }
 
 
@@ -434,6 +441,7 @@ def accel():
             "ACCEL_X": float(jsonData["ACCEL_X"]),
             "ACCEL_Y": float(jsonData["ACCEL_Y"]),
             "ACCEL_Z": float(jsonData["ACCEL_Z"]),
+            "message": jsonData["MESSAGE"],
             }
 
 

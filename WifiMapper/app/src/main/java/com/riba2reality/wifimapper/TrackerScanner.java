@@ -90,13 +90,29 @@ public class TrackerScanner extends Service implements LocationListener {
     // class constants
 
     static final public String TRACKERSCANNER_RESULT = "com.riba2reality.wifimapper.TrackerScanner.REQUEST_PROCESSED";
-    static final public String TRACKERSCANNER_SINGLE_SCAN_RESULT = "com.riba2reality.wifimapper.TrackerScanner.SINGLE_SCAN_REQUEST_PROCESSED";
+
+
+    static final public String TRACKERSCANNER_MANUAL_SCAN_RESULT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_RESULT";
+    static final public String TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE";
 
     // tags
     static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MSG";
 
     static final public String TRACKERSCANNER_COMBINED_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT";
     static final public String TRACKERSCANNER_RESEND_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT";
+
+    static final public String TRACKERSCANNER_LOCATION_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_LOCATION_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_WIFI_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_MAG_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_ACCEL_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT";
+
+    static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
+
+    private int manualScanCount_loction = 0;
+    private int manualScanCount_wifi = 0;
+    private int manualScanCount_mag = 0;
+    private int manualScanCount_accel = 0;
+
 
 
     final public String MANUAL_SCAN_MESSAGE = "Manual Scan: ";
@@ -133,7 +149,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
     final Handler handler = new Handler(Looper.getMainLooper());
 
-    private boolean continueScanning = false;
+    //private boolean continueScanning = false;
+    private boolean stopScanning = false;
+
+    private long stopManualScanTime;
+
+    private String manualScanMessage = "None";
 
     //----------------------------------------------------------------------------------------------
 
@@ -198,11 +219,32 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    public void sendSingleScanResult() {
-        Intent intent = new Intent(TRACKERSCANNER_SINGLE_SCAN_RESULT);
+    public void sendManualScanResult() {
+        Intent intent = new Intent(TRACKERSCANNER_MANUAL_SCAN_RESULT);
 
-        intent.putExtra(TRACKERSCANNER_COMBINED_QUEUE_COUNT, this.combinedScanResultQueue.size());
-        intent.putExtra(TRACKERSCANNER_RESEND_QUEUE_COUNT, this.resendQueue.size());
+        //intent.putExtra(TRACKERSCANNER_COMBINED_QUEUE_COUNT, this.combinedScanResultQueue.size());
+        //intent.putExtra(TRACKERSCANNER_RESEND_QUEUE_COUNT, this.resendQueue.size());
+
+        broadcaster.sendBroadcast(intent);
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    public void sendManualScanUpdate() {
+        Intent intent = new Intent(this.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE);
+
+        //intent.putExtra(TRACKERSCANNER_COMBINED_QUEUE_COUNT, this.combinedScanResultQueue.size());
+        //intent.putExtra(TRACKERSCANNER_RESEND_QUEUE_COUNT, this.resendQueue.size());
+
+        long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+        intent.putExtra(TRACKERSCANNER_MANUAL_SCAN_REMAINING, durationRemaining);
+
+        intent.putExtra(TRACKERSCANNER_LOCATION_QUEUE_COUNT, this.manualScanCount_loction);
+        intent.putExtra(TRACKERSCANNER_WIFI_QUEUE_COUNT, this.manualScanCount_wifi);
+        intent.putExtra(TRACKERSCANNER_MAG_QUEUE_COUNT, this.manualScanCount_mag);
+        intent.putExtra(TRACKERSCANNER_ACCEL_QUEUE_COUNT, this.manualScanCount_accel);
+
+
 
         broadcaster.sendBroadcast(intent);
     }
@@ -243,6 +285,53 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //##############################################################################################
     // runnable periodic updates
+
+    //==============================================================================================
+    private final Runnable updateManualScanCounts = new Runnable() {
+        @Override
+        public void run() {
+            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+            if(durationRemaining > 0){
+                //if(!running){
+
+
+                sendManualScanUpdate();
+
+
+                handler.postDelayed(updateManualScanCounts,  1000 );
+            } else {
+                return;
+            }
+
+
+
+        }
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    private final Runnable finaliseManualScan = new Runnable() {
+        @Override
+        public void run() {
+            if (running) {
+
+                manualScanMessage = "None";
+
+                sendManualScanResult();
+
+                if(stopScanning){
+                    stopScanning();
+                }
+
+            } else {
+                return;
+            }
+
+        }
+    };
+    //==============================================================================================
+
 
     //==============================================================================================
     private final Runnable periodicUpdate = new Runnable() {
@@ -427,6 +516,8 @@ public class TrackerScanner extends Service implements LocationListener {
         result.dateTime = currentTime;
         result.location = location;
 
+        result.message = this.MANUAL_SCAN_MESSAGE;
+
 
         //-------------------------------------------------------------
 
@@ -452,18 +543,30 @@ public class TrackerScanner extends Service implements LocationListener {
 //        }
         //-------------------------------------------------------------
 
-        if(!running){
+        manualScanCount_loction += 1;
 
-            this.combinedScanResult.location = new Location(location);
 
-            checkAllScansCompleted();
+        long durationRemaining = this.stopManualScanTime - SystemClock.elapsedRealtime();
+
+        if(durationRemaining > 0){
+            //if(!running){
+
+            //this.combinedScanResult.location = new Location(location);
+            //checkAllScansCompleted();
 
             this.sendResult(MANUAL_SCAN_MESSAGE +
-                    "GPS: Location updated." + "Location: " + this.combinedScanResult.message
+                    "GPS: Location updated." + "Location: " + this.manualScanMessage
             );
-        }else{
+
+
+
+
+        }// end of within manual scan period
+        else{
             this.sendResult("GPS: Location updated.");
         }
+
+
 
     }// end of onLocationChanged
     //==============================================================================================
@@ -486,7 +589,7 @@ public class TrackerScanner extends Service implements LocationListener {
             WifiScanResult result = new WifiScanResult();
             result.dateTime = currentTime;
 
-
+            result.message = MANUAL_SCAN_MESSAGE;
 
 
             arrayList = new ArrayList<>();
@@ -532,15 +635,18 @@ public class TrackerScanner extends Service implements LocationListener {
 //            }
             //-------------------------------------------------------------
 
+            manualScanCount_wifi += 1;
 
-            if(!running){
+            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
 
-                combinedScanResult.wifiScanResult = result;
+            //if(!running){
+            if(durationRemaining > 0){
 
-                checkAllScansCompleted();
+                //combinedScanResult.wifiScanResult = result;
+                //checkAllScansCompleted();
 
                 sendResult(MANUAL_SCAN_MESSAGE +
-                        "WiFi: Scan complete."+ "Location: " + combinedScanResult.message
+                        "WiFi: Scan complete."+ "Location: " + manualScanMessage
                 );
 
             }else{
@@ -585,6 +691,8 @@ public class TrackerScanner extends Service implements LocationListener {
             result.Y = event.values[1];
             result.Z = event.values[2];
 
+            result.message = manualScanMessage;
+
 
             long timeDelay = Long.MAX_VALUE;
             if(LastTimeStamp != Long.MAX_VALUE){
@@ -621,13 +729,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
             //-------------------------------------------------------------
 
-            if(!running) {
-                combinedScanResult.magSensorResult = result;
+            manualScanCount_mag += 1;
 
-                checkAllScansCompleted();
+            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+            //if(!running){
+            if(durationRemaining > 0){
+
+                //combinedScanResult.magSensorResult = result;
+                //checkAllScansCompleted();
 
                 sendResult(MANUAL_SCAN_MESSAGE+"Mag Scan updated."
-                                + "Location: " + combinedScanResult.message
+                                + "Location: " + manualScanMessage
                                 //+" ("+result.X+","+result.Y+","+result.Z+")"
                         //+"\n["+timeDelay+"]"
                         //+"\n["+LastTimeStamp+"]"
@@ -689,6 +802,8 @@ public class TrackerScanner extends Service implements LocationListener {
             result.Y = event.values[1];
             result.Z = event.values[2];
 
+            result.message = manualScanMessage;
+
 
             long timeDelay = Long.MAX_VALUE;
             if(LastTimeStamp != Long.MAX_VALUE){
@@ -725,13 +840,17 @@ public class TrackerScanner extends Service implements LocationListener {
 
             //-------------------------------------------------------------
 
-            if(!running) {
-                combinedScanResult.accelSensorResult = result;
+            manualScanCount_accel += 1;
 
-                checkAllScansCompleted();
+            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+            //if(!running){
+            if(durationRemaining > 0){
+                //combinedScanResult.accelSensorResult = result;
+                //checkAllScansCompleted();
 
                 sendResult(MANUAL_SCAN_MESSAGE+"Accel Scan updated."
-                                + "Location: " + combinedScanResult.message
+                                + "Location: " + manualScanMessage
                                 //+" ("+result.X+","+result.Y+","+result.Z+")"
                         //+"\n["+timeDelay+"]"
                         //+"\n["+LastTimeStamp+"]"
@@ -772,89 +891,89 @@ public class TrackerScanner extends Service implements LocationListener {
     //##############################################################################################
     // Scan sync for single scan
 
-    //==============================================================================================
-    private void checkAllScansCompleted(){
-
-        Log.d("Trace", "TrackerScanner.checkAllScansCompleted()");
-
-        if(
-
-                combinedScanResult.wifiScanResult != null
-                        &&
-
-                (combinedScanResult.magSensorResult != null == magAvailable)
-                        &&
-
-                (combinedScanResult.location != null)
-                        &&
-
-                (combinedScanResult.accelSensorResult != null== accelAvailable)
-        ){
-            Log.d("Trace", "TrackerScanner.checkAllScansCompleted() - ALL SCANS COMPLETED!");
-
-
-            if(!magAvailable){
-                combinedScanResult.magSensorResult = new SensorResult();
-            }
-
-            if(!accelAvailable){
-                combinedScanResult.accelSensorResult = new SensorResult();
-            }
-
-
-            float gravity[] = {combinedScanResult.accelSensorResult.X,
-                                combinedScanResult.accelSensorResult.Y,
-                                combinedScanResult.accelSensorResult.Z};
-
-            float geomagnetic[] = {combinedScanResult.magSensorResult.X,
-                    combinedScanResult.magSensorResult.Y,
-                    combinedScanResult.magSensorResult.Z};
-
-            float identifyMatrix_R[] = new float[9];
-            float rotationMatrix_I[] = new float[9];
-
-            if(magAvailable && accelAvailable) {
-
-                boolean success = sensorManager.getRotationMatrix(identifyMatrix_R, rotationMatrix_I,
-                        gravity, geomagnetic
-                );
-
-                Log.d("getRotationMatrix", "identifyMatrix_R: " + Arrays.toString(identifyMatrix_R));
-                Log.d("getRotationMatrix", "rotationMatrix_I: " + Arrays.toString(rotationMatrix_I));
-
-                combinedScanResult.matrix_R = identifyMatrix_R;
-                combinedScanResult.matrix_I = rotationMatrix_I;
-
-            }
-
-            //--------------
-
-            combinedScanResultQueue.add(combinedScanResult);
-
-            //scanButton.setEnabled(true);
-            //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
-
-
-
-
-
-
-            this.sendSingleScanResult();
-
-            if(continueScanning){
-                startScanning();
-            }
-
-
-            postALL();
-
-
-
-
-        }// end of if scans completed
-
-    }// end of checkAllScansCompleted
-    //==============================================================================================
+//    //==============================================================================================
+//    private void checkAllScansCompleted(){
+//
+//        Log.d("Trace", "TrackerScanner.checkAllScansCompleted()");
+//
+//        if(
+//
+//                combinedScanResult.wifiScanResult != null
+//                        &&
+//
+//                (combinedScanResult.magSensorResult != null == magAvailable)
+//                        &&
+//
+//                (combinedScanResult.location != null)
+//                        &&
+//
+//                (combinedScanResult.accelSensorResult != null== accelAvailable)
+//        ){
+//            Log.d("Trace", "TrackerScanner.checkAllScansCompleted() - ALL SCANS COMPLETED!");
+//
+//
+//            if(!magAvailable){
+//                combinedScanResult.magSensorResult = new SensorResult();
+//            }
+//
+//            if(!accelAvailable){
+//                combinedScanResult.accelSensorResult = new SensorResult();
+//            }
+//
+//
+//            float gravity[] = {combinedScanResult.accelSensorResult.X,
+//                                combinedScanResult.accelSensorResult.Y,
+//                                combinedScanResult.accelSensorResult.Z};
+//
+//            float geomagnetic[] = {combinedScanResult.magSensorResult.X,
+//                    combinedScanResult.magSensorResult.Y,
+//                    combinedScanResult.magSensorResult.Z};
+//
+//            float identifyMatrix_R[] = new float[9];
+//            float rotationMatrix_I[] = new float[9];
+//
+//            if(magAvailable && accelAvailable) {
+//
+//                boolean success = sensorManager.getRotationMatrix(identifyMatrix_R, rotationMatrix_I,
+//                        gravity, geomagnetic
+//                );
+//
+//                Log.d("getRotationMatrix", "identifyMatrix_R: " + Arrays.toString(identifyMatrix_R));
+//                Log.d("getRotationMatrix", "rotationMatrix_I: " + Arrays.toString(rotationMatrix_I));
+//
+//                combinedScanResult.matrix_R = identifyMatrix_R;
+//                combinedScanResult.matrix_I = rotationMatrix_I;
+//
+//            }
+//
+//            //--------------
+//
+//            combinedScanResultQueue.add(combinedScanResult);
+//
+//            //scanButton.setEnabled(true);
+//            //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
+//
+//
+//
+//
+//
+//
+//            this.sendSingleScanResult();
+//
+//            if(continueScanning){
+//                startScanning();
+//            }
+//
+//
+//            postALL();
+//
+//
+//
+//
+//        }// end of if scans completed
+//
+//    }// end of checkAllScansCompleted
+//    //==============================================================================================
 
 
 
@@ -921,6 +1040,8 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("UUID", deviceID);
 
         parameters.put("DATABASE", dataBase);
+
+        parameters.put("MESSAGE", this.manualScanMessage);
 
         //------------
         // GPS
@@ -1017,6 +1138,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("DATABASE", dataBase);
 
+        parameters.put("MESSAGE", this.manualScanMessage);
+
         parameters.put("WIFI_TIME", wifiScanResult.dateTime);
 
         String macAddressJson = new Gson().toJson(macAddressList);
@@ -1102,6 +1225,8 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("UUID", deviceID);
 
         parameters.put("DATABASE", dataBase);
+
+        parameters.put("MESSAGE", this.manualScanMessage);
 
         parameters.put("MAG_TIME", magSensorResult.dateTime);
         //-----
@@ -1191,6 +1316,8 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("UUID", deviceID);
 
         parameters.put("DATABASE", dataBase);
+
+        parameters.put("MESSAGE", this.manualScanMessage);
 
         parameters.put("ACCEL_TIME", sensorResult.dateTime);
         //-----
@@ -1437,6 +1564,8 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     private void postALL(){
 
+
+
         postResends();
 
         postCombinedResult();
@@ -1448,7 +1577,9 @@ public class TrackerScanner extends Service implements LocationListener {
             postAccelResult();
         postLocationResult();
 
-        this.sendSingleScanResult();
+
+
+        //this.sendSingleScanResult();
 
     }
     //==============================================================================================
@@ -1600,7 +1731,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //combinedScanResult = new CombinedScanResult();
 
-        continueScanning = false;
+        //continueScanning = false;
 
         startLocationService();
 
@@ -1673,6 +1804,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         this.sendResult("Started scanning.");
 
+                        stopScanning = false;
+
                     return START_STICKY;
 
                     //} else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
@@ -1687,17 +1820,39 @@ public class TrackerScanner extends Service implements LocationListener {
                     case Constants.ACTION_SINGLE_SCAN:
 
 
-                        if(running){
-                            continueScanning=true;
-                            stopService();
-                            //stopLocationService();
+                        if(!running){
+                            //continueScanning=true;
+                            //stopService();
+
+                            startScanning();
+
+                            this.sendResult("Started scanning.");
+
+                            stopScanning = true;
+
+                        }else{
+                            stopScanning = false;
                         }
 
 
+                        manualScanCount_loction = 0;
+                        manualScanCount_wifi = 0;
+                        manualScanCount_mag = 0;
+                        manualScanCount_accel = 0;
 
                         String message = intent.getStringExtra("message");
 
-                        this.scanAll(message);
+                        int manualScanDuration = intent.getIntExtra("duration",-1);
+
+                        this.manualScanMessage = message;
+
+                        this.stopManualScanTime = SystemClock.elapsedRealtime() + (manualScanDuration * 1000);
+
+                        //this.scanAll(message);
+
+                        handler.postDelayed(finaliseManualScan, manualScanDuration * 1000 );
+
+                        handler.postDelayed(updateManualScanCounts, 1000 );
 
 
                     break;
@@ -1714,7 +1869,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     case Constants.ACTION_REQUEST_UPDATE:
 
-                        this.sendSingleScanResult();
+                        //this.sendSingleScanResult();
 
                     break;
                 }// end of switch case for action type

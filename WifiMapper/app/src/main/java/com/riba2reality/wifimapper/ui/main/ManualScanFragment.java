@@ -156,9 +156,12 @@ public class ManualScanFragment extends Fragment {
 
 
         LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
-                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_RESULT)
         );
 
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((updateReceiver),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE)
+        );
 
 
 
@@ -286,6 +289,18 @@ public class ManualScanFragment extends Fragment {
 
         intent.putExtra("message", imageName);
 
+        //----------------------------------------------------------
+
+
+        int manualScanDuration = getResources().getInteger(R.integer.defaultVal_manual_scan);
+        manualScanDuration = SP.getInt("duration_manual_scan", manualScanDuration);
+
+        intent.putExtra("duration", manualScanDuration);
+
+
+        //----------------------------------------------------------
+
+
         getActivity().startService(intent);
 
 
@@ -391,5 +406,49 @@ public class ManualScanFragment extends Fragment {
         }// end of onRecieve
     };// end of new BroadcastReceiver
     //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("Trace", "ManualScanFragment.updateReceiver.onReceive");
+
+            //
+
+            String buttonStandardText = getResources().getString(R.string.perform_scan);
+
+            double remainingDuration = ((double)intent.getLongExtra(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING,-1))/1000.0;
+
+            int locationQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_LOCATION_QUEUE_COUNT,-1);
+            int wifiQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT,-1);
+            int magQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT,-1);
+            int accelQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT,-1);
+
+            String buttonMessage = buttonStandardText
+                    + " L["+locationQueueSize+ "]"
+                    + " W["+wifiQueueSize+ "]"
+                    + " M["+magQueueSize+ "]"
+                    + " A["+accelQueueSize+ "]"
+                    + " Time remaining["+remainingDuration+ "]";
+
+
+
+            Button scanButton = getActivity().findViewById(R.id.manualScanButton);
+
+            if(scanButton!=null){
+                //scanButton.setEnabled(true);
+
+                scanButton.setText(buttonMessage);
+
+            }
+
+
+
+
+        }// end of onRecieve
+    };// end of new BroadcastReceiver
+    //==============================================================================================
+
 
 }// end of class

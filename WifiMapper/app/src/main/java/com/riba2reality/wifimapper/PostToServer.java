@@ -73,7 +73,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         if (this.trackerscannerContainer != null) {
             this.trackerscannerContainer.get().sendResult(result);
-            this.trackerscannerContainer.get().sendSingleScanResult();
+            //this.trackerscannerContainer.get().sendSingleScanResult();
         }
 
 

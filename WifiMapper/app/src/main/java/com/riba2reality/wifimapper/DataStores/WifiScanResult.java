@@ -9,6 +9,8 @@ public class WifiScanResult {
 
     public final ArrayList<WifiResult> wifiResult = new ArrayList<>();
 
+    public String message;
+
 
 }// end of WifiScanResult class
 

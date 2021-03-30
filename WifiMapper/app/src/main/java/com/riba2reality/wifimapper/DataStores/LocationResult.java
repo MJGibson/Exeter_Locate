@@ -8,6 +8,8 @@ public class LocationResult {
 
     public Location location;
 
+    public String message;
+
 
 
 

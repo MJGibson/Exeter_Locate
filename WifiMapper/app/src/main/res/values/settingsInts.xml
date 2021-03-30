@@ -4,6 +4,8 @@
     <integer name="max">60</integer>
     <integer name="min">5</integer>
 
+    <integer name="defaultVal_manual_scan">20</integer>
+
     <integer name="defaultVal_post">10</integer>
     <integer name="defaultVal_gps">10</integer>
     <integer name="defaultVal_wifi">10</integer>

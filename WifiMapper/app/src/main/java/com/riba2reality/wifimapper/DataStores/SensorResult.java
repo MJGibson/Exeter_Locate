@@ -8,4 +8,6 @@ public class SensorResult {
     public float Y;
     public float Z;
 
+    public String message;
+
 }// end of class
