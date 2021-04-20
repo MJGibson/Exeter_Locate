@@ -350,7 +350,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
         // set lister for end results
-        pref_interval_wifi.setOnPreferenceChangeListener(
+        pref_interval_mag.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {

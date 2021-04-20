@@ -2,7 +2,7 @@
 <resources>
 
     <integer name="max">60</integer>
-    <integer name="min">5</integer>
+    <integer name="min">1</integer>
 
     <integer name="defaultVal_manual_scan">20</integer>
 
