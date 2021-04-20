@@ -154,10 +154,19 @@ public class HomescreenFragment extends Fragment {
         }
         //----------------------------------------------------------------------
 
-        rootView.findViewById(R.id.start_button).setOnClickListener(startButtonPressed);
+        startButton = rootView.findViewById(R.id.start_button);
+        startButton.setOnClickListener(startButtonPressed);
 
-        rootView.findViewById(R.id.stop_button).setOnClickListener(stopButtonPressed);
+        stopButton = rootView.findViewById(R.id.stop_button);
+        stopButton.setOnClickListener(stopButtonPressed);
 
+        if (!isLocationServiceRunning()) {
+            stopButton.setEnabled(false);
+            startButton.setEnabled(true);
+        }else{
+            stopButton.setEnabled(true);
+            startButton.setEnabled(false);
+        }
 
 
         return rootView;
