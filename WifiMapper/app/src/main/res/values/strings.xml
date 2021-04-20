@@ -2,6 +2,7 @@
     <string name="app_name">WifiMapper</string>
     <string name="HomeScreen">Home</string>
     <string name="ManualScan">Manual Scan</string>
+    <string name="QRscan">QR Scanner</string>
 
     <string name="start">Start</string>
     <string name="stop">Stop</string>
@@ -14,6 +15,12 @@
     <string name="Settings">Settings</string>
 
     <string name="perform_scan">Perform Scan</string>
+
+
+    <string name="qr_code_found_scan">QR Code Found - Scan</string>
+    <string name="qr_code_found_none_riba">QR Code Found - None RIBA</string>
+
+    <string name="qr_check_message">RIBA2Reality:</string>
 
 
 </resources>

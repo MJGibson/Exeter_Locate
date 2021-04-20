@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     //private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1;
 
-    BroadcastReceiver receiver;
+    //BroadcastReceiver receiver;
 
     HomescreenFragment homescreenFragment;
 
@@ -96,26 +96,71 @@ public class MainActivity extends AppCompatActivity {
 
         //------------
 
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
-
-                // do something here.
-
-                //System.out.println("Message: "+message);
-
-                String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-                //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
-
-                String outputMessage = "\n### " + currentTime + " ###" + "\n" + message;
-
-                TextView logTextView = findViewById(R.id.log);
-
-                final ScrollView scroll = findViewById(R.id.logScroll);
 
 
-                homescreenFragment.addMessage(outputMessage);
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
+        );
+
+        //FloatingActionButton fab = findViewById(R.id.fab);
+
+        //------------
+
+//        findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                if (ContextCompat.checkSelfPermission(
+//                        getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(
+//                            MainActivity.this,
+//                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                            REQUEST_CODE_LOCATION_PERMISSIONS
+//                    );
+//                } else {
+//                    startLocationService();
+//
+//                }
+//
+//
+//            }
+//
+//        });
+//
+//        findViewById(R.id.stop_button).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                stopLocationService();
+//            }
+//        });
+
+
+
+
+    }// end of onCreate method
+
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
+
+            // do something here.
+
+            //System.out.println("Message: "+message);
+
+            String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+            //String message = "Time:" + currentTime + "\nLat:" + latitude + "\nLong:" + longitude;
+
+            String outputMessage = "\n### " + currentTime + " ###" + "\n" + message;
+
+            TextView logTextView = findViewById(R.id.log);
+
+            final ScrollView scroll = findViewById(R.id.logScroll);
+
+
+            homescreenFragment.addMessage(outputMessage);
 
 
 
@@ -161,123 +206,11 @@ public class MainActivity extends AppCompatActivity {
 //                }
 
 
-            }
-        };
-
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
-                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
-        );
-
-        //FloatingActionButton fab = findViewById(R.id.fab);
-
-        //------------
-
-//        findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if (ContextCompat.checkSelfPermission(
-//                        getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
-//                ) != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(
-//                            MainActivity.this,
-//                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                            REQUEST_CODE_LOCATION_PERMISSIONS
-//                    );
-//                } else {
-//                    startLocationService();
-//
-//                }
-//
-//
-//            }
-//
-//        });
-//
-//        findViewById(R.id.stop_button).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                stopLocationService();
-//            }
-//        });
+        }
+    };
 
 
 
-
-    }// end of onCreate method
-
-
-
-
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//
-//        if (requestCode == REQUEST_CODE_LOCATION_PERMISSIONS && grantResults.length > 0) {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                startLocationService();
-//            } else {
-//                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//
-//    }// end of onRequestPermissionsResult
-//
-//    private boolean isLocationServiceRunning() {
-//
-//        ActivityManager activityManager =
-//                (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-//        if (activityManager != null) {
-//
-//            for (ActivityManager.RunningServiceInfo service :
-//                    activityManager.getRunningServices(Integer.MAX_VALUE)) {
-//
-//                if (TrackerScanner.class.getName().equals(service.service.getClassName())) {
-//                    if (service.foreground) {
-//                        return true;
-//                    }
-//                }
-//
-//            }// end of looping
-//            return false;
-//        }// end of if activityManger not null
-//        return false;
-//    }// end of isLocationServiceRunning
-//
-//
-//    private void startLocationService() {
-//        if (!isLocationServiceRunning()) {
-//
-//            String[] server_values = getResources().getStringArray(R.array.server_values);
-//
-//            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//            String serverAddress = SP.getString("ServerAddress", server_values[1]);
-//
-//            //System.out.println("ServerAddress: "+serverAddress);
-//
-//            if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
-//                Toast.makeText(this, "Please set Server Address", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//
-//            Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
-//            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-//            startService(intent);
-//            Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
-//        }
-//    }// end of startLocationService
-//
-//
-//    private void stopLocationService() {
-//        if (isLocationServiceRunning()) {
-//            Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
-//            intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-//            //stopService(intent);//?!
-//            startService(intent);
-//            Toast.makeText(this, "Location service stopped", Toast.LENGTH_SHORT).show();
-//        }
-//    }// end of startLocationService
 
 
 }// end of class

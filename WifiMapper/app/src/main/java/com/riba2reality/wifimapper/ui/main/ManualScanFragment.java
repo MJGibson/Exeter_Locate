@@ -325,28 +325,20 @@ public class ManualScanFragment extends Fragment {
     private void postManualScans(){
 
         Log.d("Trace", "postManualScans()");
+
+
+
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
 //
-//        if(scans==null) {
-//            scans = new TrackerScannerSingle(getActivity());
-//        }else{
-//            scans.postQueuesToServer();
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+//        String serverAddress = SP.getString("ServerAddress", server_values[1]);
+//
+//        //System.out.println("ServerAddress: "+serverAddress);
+//
+//        if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
+//            Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
+//            return;
 //        }
-
-        //getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
-        //getActivity().findViewById(R.id.manualPostButton).setEnabled(false);
-
-
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        String serverAddress = SP.getString("ServerAddress", server_values[1]);
-
-        //System.out.println("ServerAddress: "+serverAddress);
-
-        if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
-            Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 

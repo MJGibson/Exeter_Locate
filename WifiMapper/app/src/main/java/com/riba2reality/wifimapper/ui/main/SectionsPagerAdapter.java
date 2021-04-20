@@ -21,7 +21,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @StringRes
     private static final int[] TAB_TITLES =
             //new int[]{R.string.HomeScreen,R.string.tab_text_1, R.string.tab_text_2, R.string.Settings};
-            new int[]{R.string.HomeScreen, R.string.Settings, R.string.ManualScan};
+            new int[]{R.string.HomeScreen, R.string.Settings, R.string.ManualScan, R.string.QRscan};
     private final Context mContext;
 
     //private Fragment mapTab;
@@ -30,6 +30,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private final Fragment homeScreen;
 
     private final Fragment manualScan;
+
+    private final Fragment qrScan;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -45,6 +47,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         settings = SettingsFragment.newInstance(++i);
 
         manualScan = ManualScanFragment.newInstance(++i);
+
+        qrScan = QRScannerFragment.newInstance(++i);
 
     }
 
@@ -73,6 +77,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return manualScan;
 
 
+            case 3:
+                return qrScan;
+
             // Other fragments
         }
 
@@ -90,6 +97,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 2 total pages.
-        return 3;
+        return 4;
     }
 }

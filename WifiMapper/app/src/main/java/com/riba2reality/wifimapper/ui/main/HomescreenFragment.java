@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,9 @@ public class HomescreenFragment extends Fragment {
     private final Queue<String> messagesQueue = new ConcurrentLinkedQueue<>();
 
     private Date lastScrollTime;
+
+    private Button startButton;
+    private Button stopButton;
 
 
     //==============================================================================================
@@ -150,40 +154,55 @@ public class HomescreenFragment extends Fragment {
         }
         //----------------------------------------------------------------------
 
-        rootView.findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        rootView.findViewById(R.id.start_button).setOnClickListener(startButtonPressed);
 
-                if (ContextCompat.checkSelfPermission(
-                        getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
-                            getActivity(),
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            REQUEST_CODE_LOCATION_PERMISSIONS
-                    );
-                } else {
-                    startLocationService();
-
-                }
-
-
-            }
-
-        });
-
-        rootView.findViewById(R.id.stop_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopLocationService();
-            }
-        });
+        rootView.findViewById(R.id.stop_button).setOnClickListener(stopButtonPressed);
 
 
 
         return rootView;
     }
     //==============================================================================================
+
+    //==============================================================================================
+    View.OnClickListener startButtonPressed = new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+
+            startButton.setEnabled(false);
+            stopButton.setEnabled(true);
+
+            if (ContextCompat.checkSelfPermission(
+                    getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_CODE_LOCATION_PERMISSIONS
+                );
+            } else {
+                startLocationService();
+
+            }
+
+
+        }
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    View.OnClickListener stopButtonPressed = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            startButton.setEnabled(true);
+            stopButton.setEnabled(false);
+
+            stopLocationService();
+        }
+    };
+    //==============================================================================================
+
 
     //==============================================================================================
     private ViewTreeObserver.OnScrollChangedListener scrollChangedListener = new ViewTreeObserver.OnScrollChangedListener(){
