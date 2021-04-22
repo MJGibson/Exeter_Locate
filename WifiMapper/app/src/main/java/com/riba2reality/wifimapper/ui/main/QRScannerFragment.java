@@ -99,9 +99,12 @@ public class QRScannerFragment extends Fragment {
 
 
         qrCodeFoundButton = rootView.findViewById(R.id.activity_main_qrCodeFoundButton);
-        qrCodeFoundButton.setVisibility(View.INVISIBLE);
+        //qrCodeFoundButton.setVisibility(View.INVISIBLE);
         qrCodeFoundButton.setOnClickListener(codeFoundButtonListerner);
-        qrCodeFoundButton.setEnabled(scanCompleted);
+        //qrCodeFoundButton.setEnabled(scanCompleted);
+
+        qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_not_found));
+        qrCodeFoundButton.setEnabled(false);
 
         qrCodeLabel = rootView.findViewById(R.id.qrScannerFragmet_textView);
         qrCodeLabel.setVisibility(View.INVISIBLE);
@@ -270,7 +273,14 @@ public class QRScannerFragment extends Fragment {
 
             String qrCheckMessage = getString(R.string.qr_check_message);
 
+
+
+
             if(_qrCode.startsWith(qrCheckMessage)) {
+
+                if(scanCompleted){
+                    qrCodeFoundButton.setEnabled(true);
+                }
 
                 qrCode = _qrCode;
 
@@ -281,12 +291,14 @@ public class QRScannerFragment extends Fragment {
                 qrCodeFoundButton.setOnClickListener(codeFoundButtonListerner);
             }else{
 
+                qrCodeFoundButton.setEnabled(false);
+
                 qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_found_none_riba));
                 qrCodeLabel.setTextColor(Color.RED);
                 qrCodeFoundButton.setOnClickListener(null);
             }
 
-            qrCodeFoundButton.setVisibility(View.VISIBLE);
+            //qrCodeFoundButton.setVisibility(View.VISIBLE);
             qrCodeLabel.setText(_qrCode);
             qrCodeLabel.setVisibility(View.VISIBLE);
 
@@ -295,7 +307,10 @@ public class QRScannerFragment extends Fragment {
         @Override
         public void qrCodeNotFound() {
 
-            qrCodeFoundButton.setVisibility(View.INVISIBLE);
+            //qrCodeFoundButton.setVisibility(View.INVISIBLE);
+            qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_not_found));
+            qrCodeFoundButton.setEnabled(false);
+
 
             qrCodeLabel.setVisibility(View.INVISIBLE);
         }
@@ -307,7 +322,7 @@ public class QRScannerFragment extends Fragment {
 
         Log.d("Trace", "QRScannerFragment.ManualScan()");
 
-        //scanCompleted = false;
+        scanCompleted = false;
 
         //getActivity().findViewById(R.id.manualScanButton).setEnabled(false);
         qrCodeFoundButton.setEnabled(false);
@@ -367,9 +382,9 @@ public class QRScannerFragment extends Fragment {
             //Button scanButton = getActivity().findViewById(R.id.manualScanButton);
             //qrCodeFoundButton
 
-            if(qrCodeFoundButton!=null){
-                qrCodeFoundButton.setEnabled(true);
-            }
+//            if(qrCodeFoundButton!=null){
+//                qrCodeFoundButton.setEnabled(true);
+//            }
 
             requestCamera(true);
 

@@ -19,6 +19,7 @@
 
     <string name="qr_code_found_scan">QR Code Found - Scan</string>
     <string name="qr_code_found_none_riba">QR Code Found - None RIBA</string>
+    <string name="qr_code_not_found">No QR Code Found</string>
 
     <string name="qr_check_message">RIBA2Reality:</string>
 
