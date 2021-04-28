@@ -21,7 +21,7 @@
     <string name="qr_code_found_none_riba">QR Code Found - None RIBA</string>
     <string name="qr_code_not_found">No QR Code Found</string>
 
-    <string name="qr_check_message">RIBA2Reality:</string>
+    <string name="qr_check_message">https://www.datacentricengineering.co.uk/from-riba-to-reality.html?qr=</string>
 
 
 </resources>

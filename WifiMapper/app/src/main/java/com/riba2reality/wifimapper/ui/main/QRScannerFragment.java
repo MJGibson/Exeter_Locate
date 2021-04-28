@@ -38,6 +38,15 @@ import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.R;
 import com.riba2reality.wifimapper.TrackerScanner;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -265,11 +274,131 @@ public class QRScannerFragment extends Fragment {
 
 
     //==============================================================================================
+    public int checkdigit(String idWithoutCheckdigit) {
+
+// allowable characters within identifier
+        String validChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVYWXZ_";
+
+// remove leading or trailing whitespace, convert to uppercase
+        idWithoutCheckdigit = idWithoutCheckdigit.trim().toUpperCase();
+
+// this will be a running total
+        int sum = 0;
+
+// loop through digits from right to left
+        for (int i = 0; i < idWithoutCheckdigit.length(); i++) {
+
+//set ch to "current" character to be processed
+            char ch = idWithoutCheckdigit
+                    .charAt(idWithoutCheckdigit.length() - i - 1);
+
+// throw exception for invalid characters
+            if (validChars.indexOf(ch) == -1) {
+                //throw new InvalidIdentifierException(
+                //        "\"" + ch + "\" is an invalid character");
+                return -1;
+            }
+
+// our "digit" is calculated using ASCII value - 48
+            int digit = (int)ch - 48;
+
+// weight will be the current digit's contribution to
+// the running total
+            int weight;
+            if (i % 2 == 0) {
+
+                // for alternating digits starting with the rightmost, we
+                // use our formula this is the same as multiplying x 2 and
+                // adding digits together for values 0 to 9.  Using the
+                // following formula allows us to gracefully calculate a
+                // weight for non-numeric "digits" as well (from their
+                // ASCII value - 48).
+                weight = (2 * digit) - (int) (digit / 5) * 9;
+
+            } else {
+
+                // even-positioned digits just contribute their ascii
+                // value minus 48
+                weight = digit;
+
+            }
+
+// keep a running total of weights
+            sum += weight;
+
+        }
+
+// avoid sum less than 10 (if characters below "0" allowed,
+// this could happen)
+        sum = Math.abs(sum) + 10;
+
+// check digit is amount needed to reach next number
+// divisible by ten
+        return (10 - (sum % 10)) % 10;
+
+    }
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void validQRCodeFound(String _qrCode){
+        if(scanCompleted){
+            qrCodeFoundButton.setEnabled(true);
+        }
+
+        qrCode = _qrCode;
+
+
+        qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_found_scan));
+
+        qrCodeLabel.setTextColor(Color.GREEN);
+        qrCodeFoundButton.setOnClickListener(codeFoundButtonListerner);
+    }
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void invalidQRCodeFound(){
+        qrCodeFoundButton.setEnabled(false);
+
+        qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_found_none_riba));
+        qrCodeLabel.setTextColor(Color.RED);
+        qrCodeFoundButton.setOnClickListener(null);
+    }
+    //==============================================================================================
+
+
+
+    //==============================================================================================
+    public static Map<String, List<String>> splitQuery(URL url) throws UnsupportedEncodingException {
+        final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
+        final String[] pairs = url.getQuery().split("&");
+        for (String pair : pairs) {
+            final int idx = pair.indexOf("=");
+            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+            if (!query_pairs.containsKey(key)) {
+                query_pairs.put(key, new LinkedList<String>());
+            }
+            final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
+            query_pairs.get(key).add(value);
+        }
+        return query_pairs;
+    }
+    //==============================================================================================
+
+
+    //==============================================================================================
     QRCodeImageAnalyzer imageAnalyzer = new QRCodeImageAnalyzer(new QRCodeFoundListener() {
         @Override
         public void onQRCodeFound(String _qrCode) {
 
             Log.d("Trace", "QRScannerFragment.onQRCodeFound()");
+
+
+            //qrCodeFoundButton.setVisibility(View.VISIBLE);
+            qrCodeLabel.setText(_qrCode);
+            qrCodeLabel.setVisibility(View.VISIBLE);
+
 
             String qrCheckMessage = getString(R.string.qr_check_message);
 
@@ -278,29 +407,59 @@ public class QRScannerFragment extends Fragment {
 
             if(_qrCode.startsWith(qrCheckMessage)) {
 
-                if(scanCompleted){
-                    qrCodeFoundButton.setEnabled(true);
+                // check the check digit:
+
+
+                boolean success = false;
+                Map<String, List<String>> stringListMap = null;
+                try {
+                    stringListMap = splitQuery(new URL(_qrCode));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    success = false;
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    success = false;
                 }
 
-                qrCode = _qrCode;
+                List<String> qr_id_list = stringListMap.get("qr");
+
+                String id = qr_id_list.get(0);
+
+                String checkDigit = String.valueOf(id.charAt(id.length()-1));
+
+                String plainID = id.substring(0,id.length()-2);
+
+                //----------------------------
+
+                int outputCheckDigit = checkdigit(plainID);
 
 
-                qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_found_scan));
+                //----------------------------
 
-                qrCodeLabel.setTextColor(Color.GREEN);
-                qrCodeFoundButton.setOnClickListener(codeFoundButtonListerner);
+                Log.d("Trace-qr", "checkDigit:"+checkDigit);
+                Log.d("Trace-qr", "plainID:"+plainID);
+                Log.d("Trace-qr", "outputCheckDigit:"+String.valueOf(outputCheckDigit));
+
+                if(checkDigit.equals(String.valueOf(outputCheckDigit))){
+                    success = true;
+                }
+
+                if(success) {
+                    validQRCodeFound(_qrCode);
+                }else {
+
+                    Log.d("Trace-qr", "FAIL!");
+
+                    invalidQRCodeFound();
+                }
+
             }else{
 
-                qrCodeFoundButton.setEnabled(false);
-
-                qrCodeFoundButton.setText(getResources().getString(R.string.qr_code_found_none_riba));
-                qrCodeLabel.setTextColor(Color.RED);
-                qrCodeFoundButton.setOnClickListener(null);
+                invalidQRCodeFound();
             }
 
-            //qrCodeFoundButton.setVisibility(View.VISIBLE);
-            qrCodeLabel.setText(_qrCode);
-            qrCodeLabel.setVisibility(View.VISIBLE);
+
 
         }
 
