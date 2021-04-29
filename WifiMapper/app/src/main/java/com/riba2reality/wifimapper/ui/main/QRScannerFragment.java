@@ -42,6 +42,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -58,6 +62,11 @@ public class QRScannerFragment extends Fragment {
 
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+    private static final Charset UTF_8 = StandardCharsets.UTF_8;
+    private static final String OUTPUT_FORMAT = "%-20s:%s";
+
+    private static final String HASH_ALGORITHM = "SHA-224";
 
     private static final int PERMISSION_REQUEST_CAMERA = 0;
 
@@ -274,67 +283,35 @@ public class QRScannerFragment extends Fragment {
 
 
     //==============================================================================================
-    public int checkdigit(String idWithoutCheckdigit) {
-
-// allowable characters within identifier
-        String validChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVYWXZ_";
-
-// remove leading or trailing whitespace, convert to uppercase
-        idWithoutCheckdigit = idWithoutCheckdigit.trim().toUpperCase();
-
-// this will be a running total
-        int sum = 0;
-
-// loop through digits from right to left
-        for (int i = 0; i < idWithoutCheckdigit.length(); i++) {
-
-//set ch to "current" character to be processed
-            char ch = idWithoutCheckdigit
-                    .charAt(idWithoutCheckdigit.length() - i - 1);
-
-// throw exception for invalid characters
-            if (validChars.indexOf(ch) == -1) {
-                //throw new InvalidIdentifierException(
-                //        "\"" + ch + "\" is an invalid character");
-                return -1;
-            }
-
-// our "digit" is calculated using ASCII value - 48
-            int digit = (int)ch - 48;
-
-// weight will be the current digit's contribution to
-// the running total
-            int weight;
-            if (i % 2 == 0) {
-
-                // for alternating digits starting with the rightmost, we
-                // use our formula this is the same as multiplying x 2 and
-                // adding digits together for values 0 to 9.  Using the
-                // following formula allows us to gracefully calculate a
-                // weight for non-numeric "digits" as well (from their
-                // ASCII value - 48).
-                weight = (2 * digit) - (int) (digit / 5) * 9;
-
-            } else {
-
-                // even-positioned digits just contribute their ascii
-                // value minus 48
-                weight = digit;
-
-            }
-
-// keep a running total of weights
-            sum += weight;
-
+    public static byte[] digest(byte[] input, String algorithm) {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
         }
+        byte[] result = md.digest(input);
+        return result;
+    }
+    //==============================================================================================
 
-// avoid sum less than 10 (if characters below "0" allowed,
-// this could happen)
-        sum = Math.abs(sum) + 10;
+    //==============================================================================================
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+    //==============================================================================================
 
-// check digit is amount needed to reach next number
-// divisible by ten
-        return (10 - (sum % 10)) % 10;
+
+    //==============================================================================================
+    public String checkdigit(String idWithoutCheckdigit) {
+
+
+        String outputHash = bytesToHex(digest(idWithoutCheckdigit.getBytes(UTF_8),HASH_ALGORITHM));
+        return outputHash.substring(outputHash.length()-3);
 
     }
     //==============================================================================================
@@ -426,22 +403,44 @@ public class QRScannerFragment extends Fragment {
 
                 String id = qr_id_list.get(0);
 
-                String checkDigit = String.valueOf(id.charAt(id.length()-1));
+                String checkDigit = "";
+                if (id.length() < 3) {
+                    //throw new IllegalArgumentException("id less than 3 check digits required");
+                    success = false;
+                } else {
+                    //
+                    checkDigit = id.substring(id.length() - 3);
+                }
 
-                String plainID = id.substring(0,id.length()-2);
+                //String checkDigit = String.valueOf(id.charAt(id.length()-1));
+
+                //String plainID = id.substring(0,id.length()-2);
+
+                String plainID;
+
+                // remove check digits
+                plainID = id.substring(0,id.length() - 3);
+                // remove building id (everything after the -)
+                String[] idSubArray = plainID.split("-");
+                if(idSubArray.length < 2){
+                    //throw new IllegalArgumentException("id less than 3 check digits required");
+                    success = false;
+                }else {
+                    plainID = idSubArray[1];
+                }
 
                 //----------------------------
 
-                int outputCheckDigit = checkdigit(plainID);
+                String outputCheckDigit = checkdigit(plainID);
 
 
                 //----------------------------
 
                 Log.d("Trace-qr", "checkDigit:"+checkDigit);
                 Log.d("Trace-qr", "plainID:"+plainID);
-                Log.d("Trace-qr", "outputCheckDigit:"+String.valueOf(outputCheckDigit));
+                Log.d("Trace-qr", "outputCheckDigit:"+outputCheckDigit);
 
-                if(checkDigit.equals(String.valueOf(outputCheckDigit))){
+                if(checkDigit.equals(outputCheckDigit)){
                     success = true;
                 }
 
