@@ -21,7 +21,7 @@ DEFAULT_GET_RESPONSE = (
 KEYS_REQUIRED_FOR_GPS = [
     "MAGIC_NUM",
     "UUID",
-    "GPS_TIME",
+    "GPSTIME",
     "X",
     "Y",
     "ALTITUDE",
@@ -127,7 +127,7 @@ def combined():
         # collection.insert_one(
             # {
                 # "UUID": jsonData["UUID"],
-                # "GPS_TIME": jsonData["GPS_TIME"],
+                # "GPSTIME": jsonData["GPSTIME"],
                 # #"MESSAGE": jsonData["MESSAGE"],
                 # "x": float(jsonData["X"]),
                 # "y": float(jsonData["Y"]),
@@ -168,7 +168,7 @@ def combined():
                         "WIFI_TIME": None,
                         "Macs": None,
                         "level": None,
-                        "GPS_TIME": jsonData["GPS_TIME"],
+                        "GPSTIME": jsonData["GPSTIME"],
                         "x": float(jsonData["X"]),
                         "y": float(jsonData["Y"]),
                         "z": float(jsonData["ALTITUDE"]),
@@ -205,7 +205,7 @@ def combined():
                         "WIFI_TIME": jsonData["WIFI_TIME"],
                         "Macs": mac,
                         "level": int(strength),
-                        "GPS_TIME": jsonData["GPS_TIME"],
+                        "GPSTIME": jsonData["GPSTIME"],
                         "x": float(jsonData["X"]),
                         "y": float(jsonData["Y"]),
                         "z": float(jsonData["ALTITUDE"]),
@@ -279,7 +279,7 @@ def gps():
         collection.insert_one(
             {
                 "UUID": jsonData["UUID"],
-                "GPS_TIME": jsonData["GPS_TIME"],
+                "GPSTIME": jsonData["GPSTIME"],
                 "x": float(jsonData["X"]),
                 "y": float(jsonData["Y"]),
                 "z": float(jsonData["ALTITUDE"]),
