@@ -3,6 +3,7 @@
     <string name="HomeScreen">Home</string>
     <string name="ManualScan">Manual Scan</string>
     <string name="QRscan">QR Scanner</string>
+    <string name="BLEScanner">BLE Scanner</string>
 
     <string name="start">Start</string>
     <string name="stop">Stop</string>
