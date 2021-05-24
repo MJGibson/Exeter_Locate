@@ -405,6 +405,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         //----------------------------------------------------------------
 
+        // bluetooth
+
+
+
+
+
+
+
+
+
+
+
+        //----------------------------------------------------------------
+
 
 
 

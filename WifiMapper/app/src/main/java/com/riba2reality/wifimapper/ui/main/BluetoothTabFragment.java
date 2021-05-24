@@ -111,11 +111,6 @@ public class BluetoothTabFragment extends Fragment {
             // Device doesn't support Bluetooth
         }
 
-
-
-
-
-
         // ble stuff
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
@@ -192,6 +187,30 @@ public class BluetoothTabFragment extends Fragment {
 
     //==============================================================================================
     private ScanCallback leScanCallback = new ScanCallback() {
+
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            super.onBatchScanResults(results);
+
+            Log.d("mgdev", "BluetoothTabFragment.onBatchScanResults");
+
+            for (ScanResult result : results) {
+
+                String message;
+                String device = result.getDevice().getAddress();
+
+                String name = result.getDevice().getName();
+
+                message = "" + device + "---"+ name;
+
+                if(!arrayList.contains(message))
+                    arrayList.add(message);
+            }
+            adapter.notifyDataSetChanged();
+        }
+
+
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);

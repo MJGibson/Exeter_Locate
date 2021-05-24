@@ -2,6 +2,8 @@ package com.riba2reality.wifimapper.ui.main;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,6 +38,8 @@ import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomescreenFragment#newInstance} factory method to
@@ -51,6 +55,12 @@ public class HomescreenFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+    private BluetoothLeScanner bluetoothLeScanner;
+    private BluetoothAdapter bluetoothAdapter;
+
+
+    public static final int REQUEST_ENABLE_BT = 11;
 
     private ScrollView scroll;
     private TextView logTextView;
@@ -167,6 +177,15 @@ public class HomescreenFragment extends Fragment {
             stopButton.setEnabled(true);
             startButton.setEnabled(false);
         }
+
+        // check if bluetooth is available and fetch it
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+        }
+
+        // ble stuff
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
 
         return rootView;
@@ -338,12 +357,51 @@ public class HomescreenFragment extends Fragment {
                 return;
             }
 
-            Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
-            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-            getActivity().startService(intent);
-            Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
+            if(bluetoothAdapter == null){
+                // then no bluetooth capabilties
+            }else{
+                if(bluetoothLeScanner == null){
+                    // probably no BLE
+                }else{
+                    // request bluetooth activation
+                    if (!bluetoothAdapter.isEnabled()) {
+                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                    }else{
+                        startService();
+                    }
+
+                }
+            }
+
         }
     }// end of startLocationService
+    //==============================================================================================
+
+    //==============================================================================================
+    private void startService(){
+
+        Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
+        intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+        getActivity().startService(intent);
+        Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
+
+    }// end of startService
+    //==============================================================================================
+
+    //==============================================================================================
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode,  data);
+
+        if( resultCode == RESULT_OK){
+            startService();
+            Log.d("mgdev", "HomescreenFragment.onActivityResult.RESULT_OK");
+        }else{
+            Log.d("mgdev", "HomescreenFragment.onActivityResult. ELSE");
+        }
+
+    }
     //==============================================================================================
 
 

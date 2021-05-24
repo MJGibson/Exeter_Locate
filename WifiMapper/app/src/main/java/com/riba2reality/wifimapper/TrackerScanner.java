@@ -1,9 +1,13 @@
 package com.riba2reality.wifimapper;
 
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -57,6 +61,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static android.app.Activity.RESULT_OK;
 
 public class TrackerScanner extends Service implements LocationListener {
 
@@ -126,6 +132,12 @@ public class TrackerScanner extends Service implements LocationListener {
     private WifiManager wifiManager;
     public ArrayList<String> arrayList = null;
 
+    private BluetoothLeScanner bluetoothLeScanner;
+    private BluetoothAdapter bluetoothAdapter;
+
+
+    public static final int REQUEST_ENABLE_BT = 11;
+
     ////private PostToServer post;
 
     LocalBroadcastManager broadcaster;
@@ -191,6 +203,18 @@ public class TrackerScanner extends Service implements LocationListener {
         magAvailable = SP.getBoolean("magAvailable", false);
 
         accelAvailable = SP.getBoolean("accelAvailable", false);
+
+        //---------------------------------
+        //initiate the bluetooth
+
+        // check if bluetooth is available and fetch it
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+        }
+
+        // ble stuff
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
 
     }// end of onCreate
@@ -1765,9 +1789,55 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //handler.post(periodicUpdate_scan);
 
+        if (!bluetoothAdapter.isEnabled()) {
+            // not alot we can do at this point,
+        }else{
+            startBLEScan();
+        }
 
 
     }
+    //==============================================================================================
+
+
+
+    //==============================================================================================
+    private void startBLEScan(){
+
+        Log.d("mgdev", "startBLEScan");
+        bluetoothLeScanner.startScan(leScanCallback);
+
+    }// end of startBLEScan
+    //==============================================================================================
+
+    //==============================================================================================
+    private ScanCallback leScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, android.bluetooth.le.ScanResult result) {
+            super.onScanResult(callbackType, result);
+
+            //bluetoothLeScanner.stopScan(leScanCallback);
+
+
+            Log.d("mgdev", "BluetoothTabFragment.onScanResult");
+
+
+
+            String message;
+            String device = result.getDevice().getAddress();
+
+            String name = result.getDevice().getName();
+
+            message = "" + device + "---"+ name;
+
+            //if(!arrayList.contains(message))
+                //arrayList.add(message);
+
+
+            //adapter.notifyDataSetChanged();
+        }
+
+    };
     //==============================================================================================
 
 
@@ -1817,7 +1887,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     break;
 
-                    case Constants.ACTION_SINGLE_SCAN:
+                    case Constants.ACTION_SINGLE_SCAN: // shouldn't need single scan any more deprecated...
 
 
                         if(!running){
