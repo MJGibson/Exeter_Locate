@@ -116,6 +116,7 @@ public class TrackerScanner extends Service implements LocationListener {
     static final public String TRACKERSCANNER_WIFI_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT";
     static final public String TRACKERSCANNER_MAG_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT";
     static final public String TRACKERSCANNER_ACCEL_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_BLE_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT";
 
     static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
 
@@ -137,6 +138,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private int manualScanCount_wifi = 0;
     private int manualScanCount_mag = 0;
     private int manualScanCount_accel = 0;
+    private int manualScanCount_ble = 0;
 
     private SensorManager sensorManager;
     //private Sensor sensorMag;
@@ -279,6 +281,7 @@ public class TrackerScanner extends Service implements LocationListener {
         intent.putExtra(TRACKERSCANNER_WIFI_QUEUE_COUNT, this.manualScanCount_wifi);
         intent.putExtra(TRACKERSCANNER_MAG_QUEUE_COUNT, this.manualScanCount_mag);
         intent.putExtra(TRACKERSCANNER_ACCEL_QUEUE_COUNT, this.manualScanCount_accel);
+        intent.putExtra(TRACKERSCANNER_BLE_QUEUE_COUNT, this.manualScanCount_ble);
 
 
 
@@ -1034,6 +1037,8 @@ public class TrackerScanner extends Service implements LocationListener {
             bluetoothLEScanResultQueue.add(currentResult);
 
             long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+            manualScanCount_ble += 1;
 
             //if(!running){
             if(durationRemaining > 0){
@@ -2128,6 +2133,7 @@ public class TrackerScanner extends Service implements LocationListener {
                         manualScanCount_wifi = 0;
                         manualScanCount_mag = 0;
                         manualScanCount_accel = 0;
+                        manualScanCount_ble = 0;
 
                         String message = intent.getStringExtra("message");
 

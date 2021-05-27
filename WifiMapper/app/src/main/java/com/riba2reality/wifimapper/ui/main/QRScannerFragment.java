@@ -9,6 +9,14 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Size;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.Camera;
@@ -24,15 +32,6 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
-import android.util.Log;
-import android.util.Size;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.R;
@@ -46,7 +45,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -572,12 +570,14 @@ public class QRScannerFragment extends Fragment {
             int wifiQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT,-1);
             int magQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT,-1);
             int accelQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT,-1);
+            int bleQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT,-1);
 
             String buttonMessage = buttonStandardText
                     + " L["+locationQueueSize+ "]"
                     + " W["+wifiQueueSize+ "]"
                     + " M["+magQueueSize+ "]"
                     + " A["+accelQueueSize+ "]"
+                    + " b["+bleQueueSize+ "]"
                     + " Time remaining["+remainingDuration+ "]";
 
 
