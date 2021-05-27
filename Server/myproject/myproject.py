@@ -13,6 +13,7 @@ combinedCollection = "combiColl"
 gpsCollection = "gpsColl"
 magneticCollection = "mag"
 accelCollection = "accel"
+bleCollection = "ble"
 
 DEFAULT_GET_RESPONSE = (
     "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
@@ -33,6 +34,15 @@ KEYS_REQUIRED_FOR_WIFI = [
     "MAGIC_NUM",
     "UUID",
     "WIFI_TIME",
+    "MacAddressesJson",
+    "signalStrengthsJson",
+    "MESSAGE",
+]
+
+KEYS_REQUIRED_FOR_BLE = [
+    "MAGIC_NUM",
+    "UUID",
+    "BLE_TIME",
     "MacAddressesJson",
     "signalStrengthsJson",
     "MESSAGE",
@@ -60,8 +70,12 @@ KEYS_REQUIRED_FOR_ACCEL = [
 
 KEYS_REQUIRED_FOR_COMBINED = list(
     # get the unique elements across to two lists to avoid repetition
-    set(KEYS_REQUIRED_FOR_GPS).union(KEYS_REQUIRED_FOR_WIFI,KEYS_REQUIRED_FOR_MAG,KEYS_REQUIRED_FOR_ACCEL,
-    ["MESSAGE", "matrix_R", "matrix_I"]
+    set(KEYS_REQUIRED_FOR_GPS).union(
+        KEYS_REQUIRED_FOR_WIFI,
+        KEYS_REQUIRED_FOR_MAG,
+        KEYS_REQUIRED_FOR_ACCEL,
+        #KEYS_REQUIRED_FOR_BLE,
+        ["MESSAGE", "matrix_R", "matrix_I"]
     )
 )
 
@@ -349,6 +363,66 @@ def wifi():
             collection = db[wifiCollection]
             collection.insert_many(records)
             return "Server: WiFi data stored successfully."
+
+    return DEFAULT_GET_RESPONSE
+
+#-------------------------------------------------------------------------------------
+@app.route("/ble/", methods=["GET", "POST"])
+def ble():
+    if request.method == "POST":
+        # ---- Error checking
+
+        # check we can parse the request
+        try:
+            jsonData = parse_request(request)
+        except Exception as e:
+            return print_and_jsonify(e)
+
+        # check all the required fields are there
+        for key in KEYS_REQUIRED_FOR_BLE:
+            if key not in jsonData.keys():
+                msg = f"Missing: {key:s}"
+                return print_and_jsonify(msg)
+
+        # check the magic number matches
+        if jsonData["MAGIC_NUM"] != magicNum:
+            return print_and_jsonify("magic number mismatch")
+
+        # ---- connect to the db
+        client = MongoClient("localhost", 27017)
+        if "DATABASE" in jsonData.keys():
+            db = client[jsonData["DATABASE"]]
+        else:
+            db = client[dataBase]
+
+        # ---- post data to the WIFI table
+
+        # extract the mac addresses and their signal strengths
+        MacAddressesJSON = json.loads(jsonData["MacAddressesJson"])
+        signalStregthsJSON = json.loads(jsonData["signalStrengthsJson"])
+
+        # check we've got some WiFi access points to post
+        if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
+            return "Server: No WiFi access points included in post."
+
+        else:
+            # combine each record into a list to update the db in one go
+            records = []
+            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
+                records.append(
+                    {
+                        "UUID": jsonData["UUID"],
+                        "BLE_TIME": jsonData["BLE_TIME"],
+                        "Macs": mac,
+                        "level": int(strength),
+                        "message": jsonData["MESSAGE"],
+                    }
+                )
+
+            # select the collection and post the data
+            collection = db[bleCollection]
+            collection.insert_many(records)
+            return "Server: BLE data stored successfully."
 
     return DEFAULT_GET_RESPONSE
 

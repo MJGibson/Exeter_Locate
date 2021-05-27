@@ -28,6 +28,11 @@ server {
 	include uwsgi_params;
 	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
+	
+	location /ble/ { 
+	include uwsgi_params;
+	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+    }
 
 }
 

@@ -1354,6 +1354,105 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
+    private ServerMessage encodeBLEResult(BluetoothLEScanResult bleScanResult){
+
+        ServerMessage serverMessage = new ServerMessage();
+
+        String[] server_values = getResources().getStringArray(R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        String protocol = "http";
+        if (useSSL) {
+            protocol += "s";
+        }
+
+        String port = Constants.port;
+
+        String endpoint = "/ble/";
+
+        String urlString = protocol + "://" + address + port + endpoint;
+
+        //------------------------------------------------------------------
+
+        List<String> macAddressList = new ArrayList<>();
+        List<String> signalStrengths = new ArrayList<>();
+
+        for (BluetoothLEResult bleResult : bleScanResult.bluetoothLEResults.keySet()) {
+
+            macAddressList.add(bleResult.macAddress);
+            signalStrengths.add(Integer.toString(bleScanResult.bluetoothLEResults.get(bleResult)));
+        }
+
+        Map<String, String> parameters = new HashMap<>();
+
+
+        parameters.put("MAGIC_NUM", Constants.verificationCode);
+
+        parameters.put("UUID", deviceID);
+
+        parameters.put("DATABASE", dataBase);
+
+        parameters.put("MESSAGE", this.manualScanMessage);
+
+        parameters.put("BLE_TIME", bleScanResult.dateTime);
+
+        String macAddressJson = new Gson().toJson(macAddressList);
+
+        parameters.put("MacAddressesJson", macAddressJson);
+
+        parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
+
+
+        String message = new JSONObject(parameters).toString();
+
+        //------------------------------------------------------------------
+        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.useSSL = useSSL;
+        serverMessage.address = address;
+
+
+        return serverMessage;
+    }// end of encodeBLEResult
+    //==============================================================================================
+
+    //==============================================================================================
+    private void postBLEResult() {
+
+        // empty the queue
+        while (this.bluetoothLEScanResultQueue.size() > 0) {
+
+            ServerMessage serverMessage = encodeBLEResult(bluetoothLEScanResultQueue.poll());
+
+            PostToServer thisPost = new PostToServer(this,
+                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    serverMessage
+            );
+            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
+            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
+
+            thisPost.execute();
+
+            this.sendResult("Sending to server: BLE scan result.");
+
+
+        }// end of looping queue
+
+
+    }// end of postBLEResult
+    //==============================================================================================
+
+
+
+    //==============================================================================================
     private ServerMessage encodeMagResult(SensorResult magSensorResult){
 
         ServerMessage serverMessage = new ServerMessage();
@@ -1734,6 +1833,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         postCombinedResult();
         postWifiResult();
+        postBLEResult();
 
         if(magAvailable)
             postMagResult();
