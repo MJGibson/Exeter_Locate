@@ -316,6 +316,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         );
 
+        //----------------------------------------------------------------
+        // BLE
+
+        SeekBarPreference pref_interval_BLE = getPreferenceManager().findPreference("interval_ble");
+
+
+        int bleInterval = SP.getInt("defaultVal_ble", -1);
+        if (bleInterval == -1) {
+            bleInterval = getContext().getResources().getInteger(R.integer.defaultVal_ble);
+        }
+        pref_interval_BLE.setValue(bleInterval);
+
+        // set lister for end results
+        pref_interval_BLE.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_ble", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+
+        );
+
+
+
 
         //----------------------------------------------------------------
         // magnetometer
