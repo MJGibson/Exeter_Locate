@@ -76,6 +76,7 @@ public class QRScannerFragment extends Fragment {
     private Button qrCodeFoundButton;
     private TextView qrCodeLabel;
     private String qrCode;
+    private String plainCode;
 
     boolean scanCompleted = true;
 
@@ -433,6 +434,7 @@ public class QRScannerFragment extends Fragment {
 
                 String outputCheckDigit = checkdigit(plainID);
 
+                plainCode = plainID;
 
                 //----------------------------
 
@@ -487,7 +489,8 @@ public class QRScannerFragment extends Fragment {
 
 
         //String imageName = getCharForNumber(selectedLocation);
-        String message = qrCode;
+        //String message = qrCode;
+        String message = plainCode;
 
 
 
