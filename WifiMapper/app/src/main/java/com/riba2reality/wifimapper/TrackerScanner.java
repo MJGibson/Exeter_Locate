@@ -467,7 +467,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
 
-            startBLEScan();
+            if (!bluetoothAdapter.isEnabled()) {
+                // not alot we can do at this point, UI has to of already asked for this
+            }else{
+                startBLEScan();
+            }
 
             //sendResult("Wifi Scan initiated.");
 
@@ -679,7 +683,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
 
-            Log.d("WIFI_UPDATE: ", String.valueOf(arrayList.size()));
+            ///Log.d("WIFI_UPDATE: ", String.valueOf(arrayList.size()));
 
 
             //-------------------------------------------------------------
@@ -1028,6 +1032,22 @@ public class TrackerScanner extends Service implements LocationListener {
             bluetoothLeScanner.stopScan(leScanCallback);
 
             bluetoothLEScanResultQueue.add(currentResult);
+
+            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+            //if(!running){
+            if(durationRemaining > 0){
+
+                //combinedScanResult.wifiScanResult = result;
+                //checkAllScansCompleted();
+
+                sendResult(MANUAL_SCAN_MESSAGE +
+                        "Ble: Scan complete."+ "Location: " + manualScanMessage
+                );
+
+            }else{
+                sendResult("Ble: Scan complete.");
+            }
 
             if(_bluetooth_scan_queued){
                 String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
@@ -2029,11 +2049,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //handler.post(periodicUpdate_scan);
 
-        if (!bluetoothAdapter.isEnabled()) {
-            // not alot we can do at this point, UI has to of already asked for this
-        }else{
-            startBLEScan();
-        }
+        handler.post(periodicUpdate_ble);
 
 
     }
