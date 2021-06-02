@@ -4,12 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -26,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.riba2reality.wifimapper.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -46,6 +41,7 @@ public class BluetoothTabFragment extends Fragment {
 
 
     public final ArrayList<String> arrayList = new ArrayList<>();
+    public final HashMap<String,Integer> rssiMap = new HashMap<>();
     private ArrayAdapter<String> adapter;
 
 
@@ -204,8 +200,15 @@ public class BluetoothTabFragment extends Fragment {
 
                 message = "" + device + "---"+ name;
 
-                if(!arrayList.contains(message))
+                if(!rssiMap.keySet().contains(message)){
+                    rssiMap.put(message,result.getRssi());
+
+                    message += "; "+ result.getRssi();
+
                     arrayList.add(message);
+
+
+                }
             }
             adapter.notifyDataSetChanged();
         }
@@ -229,8 +232,18 @@ public class BluetoothTabFragment extends Fragment {
 
             message = "" + device + "---"+ name;
 
-            if(!arrayList.contains(message))
+            //if(!arrayList.contains(message))
+            //    arrayList.add(message);
+
+            if(!rssiMap.keySet().contains(message)){
+                rssiMap.put(message,result.getRssi());
+
+                message += "; "+ result.getRssi();
+
                 arrayList.add(message);
+
+
+            }
 
 
             adapter.notifyDataSetChanged();
