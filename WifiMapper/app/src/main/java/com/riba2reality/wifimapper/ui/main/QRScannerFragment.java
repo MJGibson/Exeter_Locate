@@ -159,10 +159,9 @@ public class QRScannerFragment extends Fragment {
             //Toast.makeText(getActivity().getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
             Log.i(QRScannerFragment.class.getSimpleName(), "QR Code Found: " + qrCode);
 
-            // turn off QR code analysis
-            requestCamera(false);
 
-            manualScan();
+
+            //manualScan();
 
 
 
@@ -329,6 +328,9 @@ public class QRScannerFragment extends Fragment {
 
         qrCodeLabel.setTextColor(Color.GREEN);
         qrCodeFoundButton.setOnClickListener(codeFoundButtonListerner);
+
+        manualScan();
+
     }
     //==============================================================================================
 
@@ -479,6 +481,9 @@ public class QRScannerFragment extends Fragment {
     private void manualScan(){
 
         Log.d("Trace", "QRScannerFragment.ManualScan()");
+
+        // turn off QR code analysis
+        requestCamera(false);
 
         scanCompleted = false;
 
