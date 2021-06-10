@@ -1,5 +1,37 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'jacoco'
+
+
+jacoco {
+    toolVersion = "$jacocoVersion"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/*$ViewInjector*.*',
+                      '**/*$ViewBinder*.*','**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "$project.buildDir/intermediates/javac/debug", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    getSourceDirectories().setFrom(files([mainSrc]))
+    getClassDirectories().setFrom(files([debugTree]))
+    getExecutionData().setFrom(fileTree(dir: project.buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec'
+    ]))
+}
+
 
 android {
     compileSdkVersion 30
@@ -20,7 +52,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
+
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+            testCoverageEnabled true
+        }
+
+    }// end of build types
 
     // require for camera
     compileOptions {
@@ -28,7 +67,21 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-}
+    testOptions {
+        /*execution 'ANDROIDX_TEST_ORCHESTRATOR'*/
+        animationsDisabled true
+
+        unitTests {
+            includeAndroidResources = true
+        }
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
+
+}// end of android section
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
