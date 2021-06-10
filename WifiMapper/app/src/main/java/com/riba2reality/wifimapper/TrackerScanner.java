@@ -1,5 +1,6 @@
 package com.riba2reality.wifimapper;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,6 +37,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
@@ -81,7 +84,6 @@ public class TrackerScanner extends Service implements LocationListener {
     //public final Queue<WifiScanResult> wifiScanResultResendQueue = new ConcurrentLinkedQueue<>();
 
 
-
     private final Queue<SensorResult> magSensorResultQueue = new ConcurrentLinkedQueue<>();
     //public final Queue<SensorResult> magSensorResultResendQueue = new ConcurrentLinkedQueue<>();
 
@@ -121,7 +123,6 @@ public class TrackerScanner extends Service implements LocationListener {
     static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
 
     final private long _bluetooth_scan_period = 1000;
-
 
 
     final public String MANUAL_SCAN_MESSAGE = "Manual Scan: ";
@@ -172,7 +173,6 @@ public class TrackerScanner extends Service implements LocationListener {
     private long LastTimeStamp = Long.MAX_VALUE;
 
 
-
     final Handler handler = new Handler(Looper.getMainLooper());
 
     //private boolean continueScanning = false;
@@ -186,7 +186,6 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private boolean magAvailable = false;
     private boolean accelAvailable = false;
-
 
 
     //----------------------------------------------------------------------------------------------
@@ -207,7 +206,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         //----------------------------------
 
@@ -238,7 +237,7 @@ public class TrackerScanner extends Service implements LocationListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(wl!=null) {
+        if (wl != null) {
             if (wl.isHeld())
                 wl.release();
         }
@@ -284,7 +283,6 @@ public class TrackerScanner extends Service implements LocationListener {
         intent.putExtra(TRACKERSCANNER_BLE_QUEUE_COUNT, this.manualScanCount_ble);
 
 
-
         broadcaster.sendBroadcast(intent);
     }
     //==============================================================================================
@@ -319,9 +317,6 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
-
-
-
     //##############################################################################################
     // runnable periodic updates
 
@@ -331,18 +326,17 @@ public class TrackerScanner extends Service implements LocationListener {
         public void run() {
             long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
 
-            if(durationRemaining > 0){
+            if (durationRemaining > 0) {
                 //if(!running){
 
 
                 sendManualScanUpdate();
 
 
-                handler.postDelayed(updateManualScanCounts,  1000 );
+                handler.postDelayed(updateManualScanCounts, 1000);
             } else {
                 return;
             }
-
 
 
         }
@@ -359,7 +353,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
                 sendManualScanResult();
 
-                if(stopScanning){
+                if (stopScanning) {
                     stopScanning();
                 }
 
@@ -427,7 +421,6 @@ public class TrackerScanner extends Service implements LocationListener {
         public void run() {
 
 
-
             if (running) {
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
@@ -456,7 +449,6 @@ public class TrackerScanner extends Service implements LocationListener {
         public void run() {
 
 
-
             if (running) {
                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int wifiInterval = getResources().getInteger(R.integer.defaultVal_ble);
@@ -469,10 +461,9 @@ public class TrackerScanner extends Service implements LocationListener {
             }
 
 
-
             if (!bluetoothAdapter.isEnabled()) {
                 // not alot we can do at this point, UI has to of already asked for this
-            }else{
+            } else {
                 startBLEScan();
             }
 
@@ -505,7 +496,6 @@ public class TrackerScanner extends Service implements LocationListener {
             ScanMag();
 
 
-
         }
     };
     //==============================================================================================
@@ -529,7 +519,6 @@ public class TrackerScanner extends Service implements LocationListener {
             ScanAccel();
 
 
-
         }
     };
     //==============================================================================================
@@ -545,7 +534,23 @@ public class TrackerScanner extends Service implements LocationListener {
         criteria.setPowerRequirement(Criteria.POWER_HIGH);
         String provider = locationManager.getBestProvider(criteria, true);
 
-        if(singleUpdate){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        if (singleUpdate) {
+
             locationManager.requestSingleUpdate(provider, this, Looper.getMainLooper());
         }else {
 

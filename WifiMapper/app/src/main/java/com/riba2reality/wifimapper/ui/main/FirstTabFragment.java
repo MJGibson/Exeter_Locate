@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -311,6 +313,19 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
         criteria.setPowerRequirement(Criteria.POWER_HIGH);
         String provider = locationManager.getBestProvider(criteria, true);
 
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(provider,
                 updateTimeMilliSecs,
                 updateRange,
@@ -325,6 +340,7 @@ public class FirstTabFragment extends Fragment implements OnMapReadyCallback, Lo
     }//end of isLocationEnabled
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean isPermissionGranted() {
         if (//checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
             //     PackageManager.PERMISSION_GRANTED ||
