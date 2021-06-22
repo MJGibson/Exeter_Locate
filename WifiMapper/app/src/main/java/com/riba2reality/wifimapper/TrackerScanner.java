@@ -1,7 +1,6 @@
 package com.riba2reality.wifimapper;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -41,7 +40,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
-import androidx.preference.SeekBarPreference;
 
 import com.google.gson.Gson;
 import com.riba2reality.wifimapper.DataStores.BluetoothLEResult;
@@ -58,7 +56,6 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,8 +63,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static android.app.Activity.RESULT_OK;
 
 public class TrackerScanner extends Service implements LocationListener {
 
@@ -122,7 +117,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
 
-    final private long _bluetooth_scan_period = 1000;
+    //final private long _bluetooth_scan_period = 1000;
 
 
     final public String MANUAL_SCAN_MESSAGE = "Manual Scan: ";
@@ -460,12 +455,36 @@ public class TrackerScanner extends Service implements LocationListener {
                 return;
             }
 
+            Log.d("mgdev", "periodicUpdate_ble[" + currentResult.bluetoothLEResults.size() + "]");
 
-            if (!bluetoothAdapter.isEnabled()) {
-                // not alot we can do at this point, UI has to of already asked for this
+            bluetoothLEScanResultQueue.add(currentResult);
+
+            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+            BluetoothLEScanResult result = new BluetoothLEScanResult();
+            result.dateTime = currentTime;
+
+            result.message = MANUAL_SCAN_MESSAGE;
+
+            currentResult = result;
+
+            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+            manualScanCount_ble += 1;
+
+            //if(!running){
+            if (durationRemaining > 0) {
+
+                //combinedScanResult.wifiScanResult = result;
+                //checkAllScansCompleted();
+
+                sendResult(MANUAL_SCAN_MESSAGE +
+                        "Ble: Scan complete." + "Location: " + manualScanMessage
+                );
+
             } else {
-                startBLEScan();
+                sendResult("Ble: Scan complete.");
             }
+
 
             //sendResult("Wifi Scan initiated.");
 
@@ -986,17 +1005,20 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if (!_bluetooth_scanning) {
             // Stops scanning after a predefined scan period.
-            handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
+            //handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
 
             currentResult = result;
 
             _bluetooth_scanning = true;
             bluetoothLeScanner.startScan(leScanCallback);
-        } else {
-            _bluetooth_scanning = false;
-            //bluetoothLeScanner.stopScan(leScanCallback);
-            _bluetooth_scan_queued = true;
         }
+//            else {
+//                //_bluetooth_scanning = false;
+//                //bluetoothLeScanner.stopScan(leScanCallback);
+//                //_bluetooth_scan_queued = true;
+//                Log.d("mgdev", "startBLEScan._bluetooth_scan_queued");
+//            }
+
 
     }// end of startBLEScan
     //==============================================================================================
@@ -1032,53 +1054,61 @@ public class TrackerScanner extends Service implements LocationListener {
     }; // end of ScanCallback
     //==============================================================================================
 
-    //==============================================================================================
-    private final Runnable periodicUpdate_finaliseBleScan = new Runnable() {
-        @Override
-        public void run() {
-            _bluetooth_scanning = false;
-            bluetoothLeScanner.stopScan(leScanCallback);
-
-            bluetoothLEScanResultQueue.add(currentResult);
-
-            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
-
-            manualScanCount_ble += 1;
-
-            //if(!running){
-            if(durationRemaining > 0){
-
-                //combinedScanResult.wifiScanResult = result;
-                //checkAllScansCompleted();
-
-                sendResult(MANUAL_SCAN_MESSAGE +
-                        "Ble: Scan complete."+ "Location: " + manualScanMessage
-                );
-
-            }else{
-                sendResult("Ble: Scan complete.");
-            }
-
-            if(_bluetooth_scan_queued){
-                String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
-                BluetoothLEScanResult result = new BluetoothLEScanResult();
-                result.dateTime = currentTime;
-
-                result.message = MANUAL_SCAN_MESSAGE;
-
-                currentResult = result;
-
-                _bluetooth_scanning = true;
-                bluetoothLeScanner.startScan(leScanCallback);
-                _bluetooth_scan_queued = false;
-
-                // Stops scanning after a predefined scan period.
-                handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
-            }
-
-        }// end of run function
-    };// end of runable
-    //==============================================================================================
+//    //==============================================================================================
+//    private final Runnable periodicUpdate_finaliseBleScan = new Runnable() {
+//        @Override
+//        public void run() {
+//
+//            synchronized(ble_lock) {
+//
+//                _bluetooth_scanning = false;
+//                bluetoothLeScanner.flushPendingScanResults(leScanCallback);
+//                bluetoothLeScanner.stopScan(leScanCallback);
+//
+//                Log.d("mgdev", "periodicUpdate_finaliseBleScan[" + currentResult.bluetoothLEResults.size() + "]");
+//
+//                bluetoothLEScanResultQueue.add(currentResult);
+//
+//                long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+//
+//                manualScanCount_ble += 1;
+//
+//                //if(!running){
+//                if (durationRemaining > 0) {
+//
+//                    //combinedScanResult.wifiScanResult = result;
+//                    //checkAllScansCompleted();
+//
+//                    sendResult(MANUAL_SCAN_MESSAGE +
+//                            "Ble: Scan complete." + "Location: " + manualScanMessage
+//                    );
+//
+//                } else {
+//                    sendResult("Ble: Scan complete.");
+//                }
+//
+//                if (_bluetooth_scan_queued) {
+//                    String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+//                    BluetoothLEScanResult result = new BluetoothLEScanResult();
+//                    result.dateTime = currentTime;
+//
+//                    result.message = MANUAL_SCAN_MESSAGE;
+//
+//                    currentResult = result;
+//
+//                    _bluetooth_scanning = true;
+//                    bluetoothLeScanner.startScan(leScanCallback);
+//                    _bluetooth_scan_queued = false;
+//
+//                    // Stops scanning after a predefined scan period.
+//                    handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
+//                }
+//
+//            }
+//
+//        }// end of run function
+//    };// end of runable
+//    //==============================================================================================
 
 
 
@@ -1979,6 +2009,10 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //handler.removeCallbacks(periodicUpdate_scan);
 
+        handler.removeCallbacks(periodicUpdate_ble);
+        _bluetooth_scanning = false;
+        bluetoothLeScanner.stopScan(leScanCallback);
+
         running = false;
 
         System.out.println("Stop initiated...");
@@ -2058,6 +2092,12 @@ public class TrackerScanner extends Service implements LocationListener {
         requestlocation(false);
 
         //handler.post(periodicUpdate_scan);
+
+        if (!bluetoothAdapter.isEnabled()) {
+            // not alot we can do at this point, UI has to of already asked for this
+        } else {
+            startBLEScan();
+        }
 
         handler.post(periodicUpdate_ble);
 

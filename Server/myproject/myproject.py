@@ -403,7 +403,7 @@ def ble():
 
         # check we've got some WiFi access points to post
         if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
-            return "Server: No WiFi access points included in post."
+            return "Server: No BLE Beacons included in post."
 
         else:
             # combine each record into a list to update the db in one go
