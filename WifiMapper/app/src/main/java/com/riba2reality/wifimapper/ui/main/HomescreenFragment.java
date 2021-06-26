@@ -9,13 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
-
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,9 +20,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
 import com.riba2reality.wifimapper.DataStores.Constants;
-import com.riba2reality.wifimapper.DataStores.ServerMessage;
-import com.riba2reality.wifimapper.MainActivity;
 import com.riba2reality.wifimapper.R;
 import com.riba2reality.wifimapper.TrackerScanner;
 
@@ -255,7 +252,7 @@ public class HomescreenFragment extends Fragment {
             logTextView.append( message );
 
             // count the number of lines to remove, i.e. the number of lines > the maximum
-            int linesToRemove = logTextView.getLineCount() - getActivity().getBaseContext().getResources().getInteger(R.integer.max_log_lines);
+            int linesToRemove = logTextView.getLineCount() - getActivity().getBaseContext().getResources().getInteger(R.integer.max_log_lines); // TODO check we can get activity...
 
             // if there some to remove
             if (linesToRemove > 0) {

@@ -67,15 +67,15 @@
             app:showSeekBarValue="true"
             app:title="Time interval between posts (seconds)" />
 
-<!--        <SeekBarPreference-->
-<!--                    android:max="@integer/max"-->
-<!--                    app:adjustable="true"-->
-<!--                    app:defaultValue="@integer/defaultVal_gps"-->
-<!--                    app:isPreferenceVisible="true"-->
-<!--                    app:key="interval_scan"-->
-<!--                    app:min="@integer/min"-->
-<!--                    app:showSeekBarValue="true"-->
-<!--                    app:title="Time interval between scans (seconds)" />-->
+        <SeekBarPreference
+                    android:max="@integer/max"
+                    app:adjustable="true"
+                    app:defaultValue="@integer/defaultVal_gps"
+                    app:isPreferenceVisible="true"
+                    app:key="interval_scan"
+                    app:min="@integer/min"
+                    app:showSeekBarValue="true"
+                    app:title="Time interval between scans (seconds)" />
 
         <SeekBarPreference
             android:max="@integer/max"

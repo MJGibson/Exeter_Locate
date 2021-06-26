@@ -241,28 +241,28 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         //----------------------------------------------------------------
         // combined scanning (deprecated - on continious scanning)
 
-//        SeekBarPreference pref_interval_gps = getPreferenceManager().findPreference("interval_scan");
-//
-//        //System.out.println("Post interval: "+Integer.toString(postInterval));
-//
-//        int scanInterval = SP.getInt("defaultVal_gps", -1);
-//        if (scanInterval == -1) {
-//            scanInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
-//        }
-//        pref_interval_gps.setValue(scanInterval);
-//
-//        // set lister for end results
-//        pref_interval_gps.setOnPreferenceChangeListener(
-//                new Preference.OnPreferenceChangeListener() {
-//                    @Override
-//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                        SPeditor.putInt("defaultVal_gps", (int) newValue);
-//                        SPeditor.apply();
-//                        stopLocationService();
-//                        return true;
-//                    }
-//                }
-//        );
+        SeekBarPreference pref_interval_scan = getPreferenceManager().findPreference("interval_scan");
+
+        //System.out.println("Post interval: "+Integer.toString(postInterval));
+
+        int scanInterval = SP.getInt("defaultVal_scan", -1);
+        if (scanInterval == -1) {
+            scanInterval = getContext().getResources().getInteger(R.integer.defaultVal_gps);
+        }
+        pref_interval_scan.setValue(scanInterval);
+
+        // set lister for end results
+        pref_interval_scan.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putInt("defaultVal_scan", (int) newValue);
+                        SPeditor.apply();
+                        stopLocationService();
+                        return true;
+                    }
+                }
+        );
 
         //----------------------------------------------------------------
 
@@ -452,10 +452,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         // set default
         EditTextPreference databasePref = getPreferenceManager().findPreference("database");
-        databasePref.setText(Constants.database);
 
+        String databaseString = SP.getString("database", "");
+        if (databaseString.equals("")) {
+            databaseString = Constants.database;
+
+        }
+        databasePref.setText(databaseString);
         // set lister for end results
         databasePref.setOnPreferenceChangeListener(this);
+
+        databasePref.setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        SPeditor.putString("database", (String)newValue);
+                        SPeditor.apply();
+                        return true;
+                    };
+                }
+        );
 
 
 /*

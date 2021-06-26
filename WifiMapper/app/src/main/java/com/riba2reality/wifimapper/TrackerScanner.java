@@ -56,6 +56,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +92,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     // single combined scan
-    private CombinedScanResult combinedScanResult = null;
+    //private CombinedScanResult combinedScanResult = null;
 
 
     //----------------------------------------------------------------------------------------------
@@ -124,6 +125,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //----------------------------------------------------------------------------------------------
     // class variables
+
+
+    private LocationResult lastLocation = new LocationResult();
+    private WifiScanResult lastWifiScan;
+    private SensorResult lastMagScan;
+    private SensorResult lastAccelScan;
+
+
+
 
     BluetoothLEScanResult currentResult;
 
@@ -387,26 +397,26 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
-//    //==============================================================================================
-//    private final Runnable periodicUpdate_scan = new Runnable() {
-//        @Override
-//        public void run() {
-//            if (running) {
-//
-//                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//                int postInterval = getResources().getInteger(R.integer.defaultVal_post);
-//                int interval = SP.getInt("interval_scan", postInterval);
-//
-//                handler.postDelayed(periodicUpdate_scan, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
-//            } else {
-//                return;
-//            }
-//
-//            scanAll("None");
-//
-//
-//        }
-//    };
+    //==============================================================================================
+    private final Runnable periodicUpdate_scan = new Runnable() {
+        @Override
+        public void run() {
+            if (running) {
+
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int postInterval = getResources().getInteger(R.integer.defaultVal_post);
+                int interval = SP.getInt("interval_scan", postInterval);
+
+                handler.postDelayed(periodicUpdate_scan, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+            } else {
+                return;
+            }
+
+            combinedScan();
+
+
+        }
+    };
     //==============================================================================================
 
 
@@ -620,6 +630,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //-------------------------------------------------------------
 
+        lastLocation = result;
+
         locationResultQueue.add(result);
 
         //-------------------------------------------------------------
@@ -715,6 +727,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
             //-------------------------------------------------------------
 
+            lastWifiScan = result;
+
             wifiScanResultQueue.add(result);
 
 //            if(running) {
@@ -804,6 +818,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             //-------------------------------------------------------------
+
+            lastMagScan = result;
 
             magSensorResultQueue.add(result);
 
@@ -915,6 +931,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             //-------------------------------------------------------------
+
+            lastAccelScan = result;
 
             accelSensorResultQueue.add(result);
 
@@ -1851,7 +1869,7 @@ public class TrackerScanner extends Service implements LocationListener {
             thisPost.execute();
 
 
-            this.sendResult("Sending to server: GPS location and WiFi scan.");
+            this.sendResult("Sending to server: Combined scan.");
 
 
         }// end of looping queue
@@ -2007,7 +2025,7 @@ public class TrackerScanner extends Service implements LocationListener {
         if(accelAvailable)
             handler.removeCallbacks(periodicUpdate_accel);
 
-        //handler.removeCallbacks(periodicUpdate_scan);
+        handler.removeCallbacks(periodicUpdate_scan);
 
         handler.removeCallbacks(periodicUpdate_ble);
         _bluetooth_scanning = false;
@@ -2026,27 +2044,98 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    public void scanAll(String message){
+    public void combinedScan(){
+
+        Log.d("Trace", "TrackerScanner.combinedScan()");
+
+        CombinedScanResult thisCombinedScanResult = new CombinedScanResult();
+        thisCombinedScanResult.message = manualScanMessage;
+
+//        if (lastLocation == null){
+//            return; // bail
+//        }
+
+        thisCombinedScanResult.location = lastLocation.location;
+        thisCombinedScanResult.dateTime = lastLocation.dateTime;
+
+        if(lastWifiScan == null){
+            return; // bail
+        }
+
+        thisCombinedScanResult.wifiScanResult = lastWifiScan;
+
+
+        if(lastMagScan == null){
+            return; // bail
+        }
+
+        if(!magAvailable){
+            thisCombinedScanResult.magSensorResult = new SensorResult();
+        }
+        else{
+            thisCombinedScanResult.magSensorResult = lastMagScan;
+        }
+
+        if(lastAccelScan == null){
+            return; // bail
+        }
+
+        if(!accelAvailable){
+            thisCombinedScanResult.accelSensorResult = new SensorResult();
+        }
+        else{
+            thisCombinedScanResult.accelSensorResult = lastAccelScan;
+        }
+
+        if(magAvailable && accelAvailable) {
+
+            float gravity[] = {thisCombinedScanResult.accelSensorResult.X,
+                    thisCombinedScanResult.accelSensorResult.Y,
+                    thisCombinedScanResult.accelSensorResult.Z};
+
+            float geomagnetic[] = {thisCombinedScanResult.magSensorResult.X,
+                    thisCombinedScanResult.magSensorResult.Y,
+                    thisCombinedScanResult.magSensorResult.Z};
+
+            float identifyMatrix_R[] = new float[9];
+            float rotationMatrix_I[] = new float[9];
 
 
 
+            boolean success = sensorManager.getRotationMatrix(identifyMatrix_R, rotationMatrix_I,
+                    gravity, geomagnetic
+            );
+
+            Log.d("getRotationMatrix", "identifyMatrix_R: " + Arrays.toString(identifyMatrix_R));
+            Log.d("getRotationMatrix", "rotationMatrix_I: " + Arrays.toString(rotationMatrix_I));
+
+            thisCombinedScanResult.matrix_R = identifyMatrix_R;
+            thisCombinedScanResult.matrix_I = rotationMatrix_I;
+
+        }
+
+        //--------------
 
 
-        Log.d("Trace", "TrackerScanner.scanAll()");
+        this.combinedScanResultQueue.add(thisCombinedScanResult);
 
-        combinedScanResult = new CombinedScanResult();
-        combinedScanResult.message = message;
 
-        // request single updates
-        requestlocation(true);
+        long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
 
-        scanWifi();
+        //manualScanCount_ += 1;
 
-        if(magAvailable)
-            ScanMag();
+        //if(!running){
+        if (durationRemaining > 0) {
 
-        if(accelAvailable)
-            ScanAccel();
+            sendResult(MANUAL_SCAN_MESSAGE +
+                    "Combined: Scan complete." + "Location: " + manualScanMessage
+            );
+
+        } else {
+            sendResult("Combined: Scan complete.");
+        }
+
+
 
 
     }// end of scan all
@@ -2091,7 +2180,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         requestlocation(false);
 
-        //handler.post(periodicUpdate_scan);
+        handler.post(periodicUpdate_scan);
 
         if (!bluetoothAdapter.isEnabled()) {
             // not alot we can do at this point, UI has to of already asked for this
