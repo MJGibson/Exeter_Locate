@@ -91,7 +91,7 @@ def parse_request(request):
 
     # check we've not just been sent garbage
     try:
-        jsonData = json.loads(key_list[0])
+        jsonData = request.form
         jsonData.keys()
 
     except AttributeError:

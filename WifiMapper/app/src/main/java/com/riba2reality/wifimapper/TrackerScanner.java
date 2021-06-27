@@ -52,8 +52,8 @@ import com.riba2reality.wifimapper.DataStores.ServerMessage;
 import com.riba2reality.wifimapper.DataStores.WifiResult;
 import com.riba2reality.wifimapper.DataStores.WifiScanResult;
 
-import org.json.JSONObject;
-
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1274,7 +1274,7 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         // build message...
 
-        Map<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<>();
 
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
@@ -1293,7 +1293,15 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("ALTITUDE", Double.toString(altitude));
         parameters.put("ACC", Double.toString(accuracy));
 
-        String message = new JSONObject(parameters).toString();
+        //String message = new JSONObject(parameters).toString();
+
+        String message = "";
+
+        try {
+            message = getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
@@ -1371,7 +1379,7 @@ public class TrackerScanner extends Service implements LocationListener {
             signalStrengths.add(Integer.toString(wifiResult.signalStrength));
         }
 
-        Map<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<>();
 
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
@@ -1391,7 +1399,15 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
 
-        String message = new JSONObject(parameters).toString();
+        //String message = new JSONObject(parameters).toString();
+
+        String message = "";
+
+        try {
+            message = getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
@@ -1468,7 +1484,7 @@ public class TrackerScanner extends Service implements LocationListener {
             signalStrengths.add(Integer.toString(bleScanResult.bluetoothLEResults.get(bleResult)));
         }
 
-        Map<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<>();
 
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
@@ -1488,7 +1504,15 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
 
-        String message = new JSONObject(parameters).toString();
+        //String message = new JSONObject(parameters).toString();
+
+        String message = "";
+
+        try {
+            message = getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
@@ -1558,7 +1582,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //------------------------------------------------------------------
 
-        Map<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<>();
 
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
@@ -1579,7 +1603,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //-----
 
-        String message = new JSONObject(parameters).toString();
+        //String message = new JSONObject(parameters).toString();
+
+        String message = "";
+
+        try {
+            message = getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
@@ -1649,7 +1681,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //------------------------------------------------------------------
 
-        Map<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<>();
 
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
@@ -1670,7 +1702,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //-----
 
-        String message = new JSONObject(parameters).toString();
+        //String message = new JSONObject(parameters).toString();
+
+        String message = "";
+
+        try {
+            message = getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
@@ -1746,6 +1786,7 @@ public class TrackerScanner extends Service implements LocationListener {
         double longitude = 0.0;
         double altitude = 0.0;
         double accuracy = 0.0;
+        String gpsTime = "";
         // String provider = "";
         if (combinedScanResult.location != null) {
             latitude = combinedScanResult.location.getLatitude();
@@ -1754,11 +1795,17 @@ public class TrackerScanner extends Service implements LocationListener {
             accuracy = combinedScanResult.location.getAccuracy();
 
             // provider = combinedScanResult.location.getProvider();
+
+            gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+                    Locale.getDefault()).format(new Date(combinedScanResult.location.getTime()));
+
         }
 
 
         List<String> macAddressList = new ArrayList<>();
         List<String> signalStrengths = new ArrayList<>();
+
+
 
         if(combinedScanResult.wifiScanResult!= null) {
             if(combinedScanResult.wifiScanResult.wifiResult!= null) {
@@ -1770,14 +1817,13 @@ public class TrackerScanner extends Service implements LocationListener {
             }
         }
 
-        String gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
-                Locale.getDefault()).format(new Date(combinedScanResult.location.getTime()));
+
 
 
         //------------------------------------------------------------------
         // build message...
 
-        Map<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<>();
 
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
@@ -1837,7 +1883,15 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("matrix_I", new Gson().toJson(combinedScanResult.matrix_I));
 
 
-        String message = new JSONObject(parameters).toString();
+        //String message = new JSONObject(parameters).toString();
+
+        String message = "";
+
+        try {
+            message = getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
@@ -1850,6 +1904,24 @@ public class TrackerScanner extends Service implements LocationListener {
     }// end of encodeCombinedResult
     //==============================================================================================
 
+    //==============================================================================================
+    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : params.entrySet()){
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
+    }
+    //==============================================================================================
 
     //==============================================================================================
     private void postCombinedResult() {
