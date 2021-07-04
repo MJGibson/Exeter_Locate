@@ -195,6 +195,12 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //----------------------------------------------------------------------------------------------
 
+    private int gPS_lambda = 3600;
+    private int wifi_lambda = 60;
+
+
+    //----------------------------------------------------------------------------------------------
+
     //##############################################################################################
     // class functions
 
@@ -342,6 +348,22 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //##############################################################################################
     // runnable periodic updates
+
+    //==============================================================================================
+    public static int getPoisson(double lambda) {
+        double L = Math.exp(-lambda);
+        double p = 1.0;
+        int k = 0;
+
+        do {
+            k++;
+            p *= Math.random();
+        } while (p > L);
+
+        return k - 1;
+    }// end of getPoisson
+    //==============================================================================================
+
 
     //==============================================================================================
     private final Runnable updateManualScanCounts = new Runnable() {

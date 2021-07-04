@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Exeter Locate Core" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/exeterlocateapp" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
