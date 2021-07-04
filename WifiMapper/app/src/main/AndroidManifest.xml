@@ -60,7 +60,7 @@
         </activity>
 
         <service
-            android:name=".TrackerScanner"
+            android:name="com.riba2reality.exeterlocatecore.TrackerScanner"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />

@@ -1,33 +1,23 @@
 package com.riba2reality.wifimapper;
 
-import android.Manifest;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.text.Editable;
 import android.util.Log;
-import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.riba2reality.wifimapper.DataStores.Constants;
+import com.riba2reality.exeterlocatecore.DataStores.Constants;
+import com.riba2reality.exeterlocatecore.TrackerScanner;
 import com.riba2reality.wifimapper.ui.main.HomescreenFragment;
 import com.riba2reality.wifimapper.ui.main.SectionsPagerAdapter;
 

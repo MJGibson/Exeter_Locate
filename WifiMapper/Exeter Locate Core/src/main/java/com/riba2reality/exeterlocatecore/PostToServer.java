@@ -1,8 +1,8 @@
-package com.riba2reality.wifimapper;
+package com.riba2reality.exeterlocatecore;
 
 import android.os.AsyncTask;
 
-import com.riba2reality.wifimapper.DataStores.ServerMessage;
+import com.riba2reality.exeterlocatecore.DataStores.ServerMessage;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -16,7 +16,6 @@ import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;

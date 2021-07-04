@@ -1,4 +1,4 @@
-package com.riba2reality.wifimapper.DataStores;
+package com.riba2reality.exeterlocatecore.DataStores;
 
 public class WifiResult {
     public String macAddress;

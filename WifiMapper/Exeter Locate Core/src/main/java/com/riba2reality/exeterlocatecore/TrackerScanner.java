@@ -1,4 +1,4 @@
-package com.riba2reality.wifimapper;
+package com.riba2reality.exeterlocatecore;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -42,15 +42,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.Gson;
-import com.riba2reality.wifimapper.DataStores.BluetoothLEResult;
-import com.riba2reality.wifimapper.DataStores.BluetoothLEScanResult;
-import com.riba2reality.wifimapper.DataStores.CombinedScanResult;
-import com.riba2reality.wifimapper.DataStores.Constants;
-import com.riba2reality.wifimapper.DataStores.LocationResult;
-import com.riba2reality.wifimapper.DataStores.SensorResult;
-import com.riba2reality.wifimapper.DataStores.ServerMessage;
-import com.riba2reality.wifimapper.DataStores.WifiResult;
-import com.riba2reality.wifimapper.DataStores.WifiScanResult;
+import com.riba2reality.exeterlocatecore.DataStores.BluetoothLEResult;
+import com.riba2reality.exeterlocatecore.DataStores.BluetoothLEScanResult;
+import com.riba2reality.exeterlocatecore.DataStores.CombinedScanResult;
+import com.riba2reality.exeterlocatecore.DataStores.Constants;
+import com.riba2reality.exeterlocatecore.DataStores.LocationResult;
+import com.riba2reality.exeterlocatecore.DataStores.SensorResult;
+import com.riba2reality.exeterlocatecore.DataStores.ServerMessage;
+import com.riba2reality.exeterlocatecore.DataStores.WifiResult;
+import com.riba2reality.exeterlocatecore.DataStores.WifiScanResult;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -98,25 +98,25 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
     // class constants
 
-    static final public String TRACKERSCANNER_RESULT = "com.riba2reality.wifimapper.TrackerScanner.REQUEST_PROCESSED";
+    static final public String TRACKERSCANNER_RESULT = "com.riba2reality.exeterlocatecore.TrackerScanner.REQUEST_PROCESSED";
 
 
-    static final public String TRACKERSCANNER_MANUAL_SCAN_RESULT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_RESULT";
-    static final public String TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE";
+    static final public String TRACKERSCANNER_MANUAL_SCAN_RESULT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_RESULT";
+    static final public String TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE";
 
     // tags
-    static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MSG";
+    static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MSG";
 
-    static final public String TRACKERSCANNER_COMBINED_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT";
-    static final public String TRACKERSCANNER_RESEND_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_COMBINED_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_RESEND_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT";
 
-    static final public String TRACKERSCANNER_LOCATION_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_LOCATION_QUEUE_COUNT";
-    static final public String TRACKERSCANNER_WIFI_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT";
-    static final public String TRACKERSCANNER_MAG_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT";
-    static final public String TRACKERSCANNER_ACCEL_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT";
-    static final public String TRACKERSCANNER_BLE_QUEUE_COUNT = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_LOCATION_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_LOCATION_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_WIFI_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_MAG_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_ACCEL_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT";
+    static final public String TRACKERSCANNER_BLE_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT";
 
-    static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.wifimapper.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
+    static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
 
     //final private long _bluetooth_scan_period = 1000;
 
@@ -215,12 +215,29 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //----------------------------------
 
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         // check has sensors
-        magAvailable = SP.getBoolean("magAvailable", false);
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null)
 
-        accelAvailable = SP.getBoolean("accelAvailable", false);
+        {
+            // Success! There's a magnetometer.
+            magAvailable = true;
+        } else {
+            // Failure! No magnetometer.
+            magAvailable = false;
+
+        }
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+        {
+            // Success! There's a magnetometer.
+            accelAvailable = true;
+        } else {
+            // Failure! No magnetometer.
+            accelAvailable = false;
+
+        }
 
         //---------------------------------
         //initiate the bluetooth
@@ -229,10 +246,11 @@ public class TrackerScanner extends Service implements LocationListener {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             // Device doesn't support Bluetooth
-        }
+        }else {
 
-        // ble stuff
-        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            // ble stuff
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        }
 
 
     }// end of onCreate
