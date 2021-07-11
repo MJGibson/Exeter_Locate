@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import json
 from pymongo import MongoClient
+import pandas as pd
 
 
 app = Flask(__name__)
@@ -79,6 +80,19 @@ KEYS_REQUIRED_FOR_COMBINED = list(
     )
 )
 
+
+PARAMETERS_FILE = 'parameters.dat'
+
+
+#-------------------------------------------------------------------------------------
+def format_message(message):
+
+    df = pd.read_csv(PARAMETERS_FILE)
+
+    gpsLamda = df['gpsLamda'].values[0]
+    wifiLamda = df['wifiLamda'].values[0]
+
+    return '{};{};{}'.format(message, gpsLamda, wifiLamda)
 
 #-------------------------------------------------------------------------------------
 def parse_request(request):
@@ -205,7 +219,7 @@ def combined():
             collection.insert(record)
         
         
-            return "Server: GPS data stored but no WiFi access points included in post."
+            return format_message("Server: GPS data stored but no WiFi access points included in post.")
 
         else:
             # combine each record into a list to update the db in one go
@@ -253,7 +267,7 @@ def combined():
             collection = db[combinedCollection]
             collection.insert_many(records)
             
-            return "Server: Combined GPS and WiFi data stored successfully."
+            return format_message("Server: Combined GPS and WiFi data stored successfully.")
 
     return DEFAULT_GET_RESPONSE
 
@@ -301,7 +315,7 @@ def gps():
                 "message": jsonData["MESSAGE"],
             }
         )
-        return "Server: GPS data stored successfully."
+        return format_message("Server: GPS data stored successfully.")
 
     return DEFAULT_GET_RESPONSE
 
@@ -343,7 +357,7 @@ def wifi():
 
         # check we've got some WiFi access points to post
         if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
-            return "Server: No WiFi access points included in post."
+            return format_message("Server: No WiFi access points included in post.")
 
         else:
             # combine each record into a list to update the db in one go
@@ -362,7 +376,7 @@ def wifi():
             # select the collection and post the data
             collection = db[wifiCollection]
             collection.insert_many(records)
-            return "Server: WiFi data stored successfully."
+            return format_message("Server: WiFi data stored successfully.")
 
     return DEFAULT_GET_RESPONSE
 
@@ -403,7 +417,7 @@ def ble():
 
         # check we've got some WiFi access points to post
         if len(MacAddressesJSON) == 0 or len(signalStregthsJSON) == 0:
-            return "Server: No BLE Beacons included in post."
+            return format_message("Server: No BLE Beacons included in post.")
 
         else:
             # combine each record into a list to update the db in one go
@@ -422,7 +436,7 @@ def ble():
             # select the collection and post the data
             collection = db[bleCollection]
             collection.insert_many(records)
-            return "Server: BLE data stored successfully."
+            return format_message("Server: BLE data stored successfully.")
 
     return DEFAULT_GET_RESPONSE
 
@@ -473,7 +487,7 @@ def mag():
         
         collection.insert(record)
 
-        return "Server: Magnetic data stored successfully."
+        return format_message("Server: Magnetic data stored successfully.")
     return DEFAULT_GET_RESPONSE
     
     
@@ -524,7 +538,7 @@ def accel():
         
         collection.insert(record)
 
-        return "Server: Accelerometer data stored successfully."
+        return format_message("Server: Accelerometer data stored successfully.")
     return DEFAULT_GET_RESPONSE
 
     
@@ -534,3 +548,4 @@ def accel():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
+    
