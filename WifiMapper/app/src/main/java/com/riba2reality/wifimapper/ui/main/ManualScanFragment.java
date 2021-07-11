@@ -21,9 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
-import com.riba2reality.exeterlocatecore.DataStores.Constants;
+import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.R;
-import com.riba2reality.exeterlocatecore.TrackerScanner;
+import com.riba2reality.wifimapper.TrackerScanner;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -26,9 +26,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import com.riba2reality.exeterlocatecore.DataStores.Constants;
+import com.riba2reality.wifimapper.DataStores.Constants;
 import com.riba2reality.wifimapper.R;
-import com.riba2reality.exeterlocatecore.TrackerScanner;
+import com.riba2reality.wifimapper.TrackerScanner;
 
 import java.util.Calendar;
 import java.util.Date;
