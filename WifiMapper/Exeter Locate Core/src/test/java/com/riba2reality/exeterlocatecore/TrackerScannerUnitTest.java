@@ -4,12 +4,38 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+//@RunWith(MockitoJUnitRunner.class)
 public class TrackerScannerUnitTest {
 
 
+//    @Mock
+//    TrackerScanner testSubjectClass;
+//
+//
+//    //==============================================================================================
+//    @Test
+//    public void test_onCreate(){
+//
+//        ////testSubjectClass.onCreate();
+//        testSubjectClass = new TrackerScanner();
+//
+//
+//        assertNotNull(testSubjectClass);
+//        assertNotNull(testSubjectClass.broadcaster);
+//
+//
+//        //assertEquals(4, 2 + 2);
+//
+//    }
+//    //==============================================================================================
+
+
+
+
+
+    //==============================================================================================
     @Test
-    public void getPoisson_tests()
-    {
+    public void getPoisson_tests() {
 
         double lambda = 60.0;
 
@@ -33,7 +59,8 @@ public class TrackerScannerUnitTest {
         );
 
 
-    }
+    }// end of getPoisson_tests
+    //==============================================================================================
 
 
 

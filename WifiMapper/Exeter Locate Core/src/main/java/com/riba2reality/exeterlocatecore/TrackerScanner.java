@@ -223,6 +223,7 @@ public class TrackerScanner extends Service implements LocationListener {
         super.onCreate();
 
         Log.d("Trace", "TrackerScanner.onCreate()");
+        System.out.println("TrackerScanner.onCreate()");
 
         broadcaster = LocalBroadcastManager.getInstance(this);
 
