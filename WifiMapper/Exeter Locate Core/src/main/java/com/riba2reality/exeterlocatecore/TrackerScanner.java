@@ -198,6 +198,13 @@ public class TrackerScanner extends Service implements LocationListener {
     private int gPS_lambda = 3600;
     private int wifi_lambda = 60;
 
+    // citizen science mode (true), or development mode (false)
+    private boolean _mode = false;
+
+    private String _serverAddress;
+    private String _database;
+    private String _deviceID;
+    private boolean _useSSL;
 
     //----------------------------------------------------------------------------------------------
 
@@ -1281,18 +1288,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
+        //String[] server_values = getResources().getStringArray(R.array.server_values);
+        //SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        String deviceID = SP.getString("DeviceID", "");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if (useSSL) {
+        if (_useSSL) {
             protocol += "s";
         }
 
@@ -1300,7 +1307,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String endpoint = "/gps/";
 
-        String urlString = protocol + "://" + address + port + endpoint;
+        String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
         //------------------------------------------------------------------
 
@@ -1333,9 +1340,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID", deviceID);
+        parameters.put("UUID", _deviceID);
 
-        parameters.put("DATABASE", dataBase);
+        parameters.put("DATABASE", _database);
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
@@ -1360,8 +1367,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
         serverMessage.message = message;
-        serverMessage.useSSL = useSSL;
-        serverMessage.address = address;
+        serverMessage.useSSL = _useSSL;
+        serverMessage.address = _serverAddress;
 
 
         return serverMessage;
@@ -1401,18 +1408,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        String deviceID = SP.getString("DeviceID", "");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if (useSSL) {
+        if (_useSSL) {
             protocol += "s";
         }
 
@@ -1420,7 +1427,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String endpoint = "/wifi/";
 
-        String urlString = protocol + "://" + address + port + endpoint;
+        String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
         //------------------------------------------------------------------
 
@@ -1438,9 +1445,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID", deviceID);
+        parameters.put("UUID", _deviceID);
 
-        parameters.put("DATABASE", dataBase);
+        parameters.put("DATABASE", _database);
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
@@ -1466,8 +1473,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
         serverMessage.message = message;
-        serverMessage.useSSL = useSSL;
-        serverMessage.address = address;
+        serverMessage.useSSL = _useSSL;
+        serverMessage.address = _serverAddress;
 
 
         return serverMessage;
@@ -1506,18 +1513,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        String deviceID = SP.getString("DeviceID", "");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if (useSSL) {
+        if (_useSSL) {
             protocol += "s";
         }
 
@@ -1525,7 +1532,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String endpoint = "/ble/";
 
-        String urlString = protocol + "://" + address + port + endpoint;
+        String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
         //------------------------------------------------------------------
 
@@ -1543,9 +1550,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID", deviceID);
+        parameters.put("UUID", _deviceID);
 
-        parameters.put("DATABASE", dataBase);
+        parameters.put("DATABASE", _database);
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
@@ -1571,8 +1578,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
         serverMessage.message = message;
-        serverMessage.useSSL = useSSL;
-        serverMessage.address = address;
+        serverMessage.useSSL = _useSSL;
+        serverMessage.address = _serverAddress;
 
 
         return serverMessage;
@@ -1613,18 +1620,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        String deviceID = SP.getString("DeviceID", "");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if (useSSL) {
+        if (_useSSL) {
             protocol += "s";
         }
 
@@ -1632,7 +1639,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String endpoint = "/mag/";
 
-        String urlString = protocol + "://" + address + port + endpoint;
+        String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
         //------------------------------------------------------------------
 
@@ -1641,9 +1648,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID", deviceID);
+        parameters.put("UUID", _deviceID);
 
-        parameters.put("DATABASE", dataBase);
+        parameters.put("DATABASE", _database);
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
@@ -1670,8 +1677,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
         serverMessage.message = message;
-        serverMessage.useSSL = useSSL;
-        serverMessage.address = address;
+        serverMessage.useSSL = _useSSL;
+        serverMessage.address = _serverAddress;
 
 
         return serverMessage;
@@ -1712,18 +1719,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        String deviceID = SP.getString("DeviceID", "");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if (useSSL) {
+        if (_useSSL) {
             protocol += "s";
         }
 
@@ -1731,7 +1738,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String endpoint = "/accel/";
 
-        String urlString = protocol + "://" + address + port + endpoint;
+        String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
         //------------------------------------------------------------------
 
@@ -1740,9 +1747,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID", deviceID);
+        parameters.put("UUID", _deviceID);
 
-        parameters.put("DATABASE", dataBase);
+        parameters.put("DATABASE", _database);
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
@@ -1769,8 +1776,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
         serverMessage.message = message;
-        serverMessage.useSSL = useSSL;
-        serverMessage.address = address;
+        serverMessage.useSSL = _useSSL;
+        serverMessage.address = _serverAddress;
 
 
         return serverMessage;
@@ -1812,19 +1819,19 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-        String[] server_values = getResources().getStringArray(R.array.server_values);
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-        String address = SP.getString("ServerAddress", server_values[1]);
-
-        String dataBase = SP.getString("database", "alpha");
-
-        String deviceID = SP.getString("DeviceID", "");
-
-        boolean useSSL = SP.getBoolean("SSL_switch", true);
+//        String[] server_values = getResources().getStringArray(R.array.server_values);
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//
+//        String address = SP.getString("ServerAddress", server_values[1]);
+//
+//        String dataBase = SP.getString("database", "alpha");
+//
+//        String deviceID = SP.getString("DeviceID", "");
+//
+//        boolean useSSL = SP.getBoolean("SSL_switch", true);
 
         String protocol = "http";
-        if (useSSL) {
+        if (_useSSL) {
             protocol += "s";
         }
 
@@ -1832,7 +1839,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         String endpoint = "/";
 
-        String urlString = protocol + "://" + address + port + endpoint;
+        String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
         //------------------------------------------------------------------
 
@@ -1882,9 +1889,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MAGIC_NUM", Constants.verificationCode);
 
-        parameters.put("UUID", deviceID);
+        parameters.put("UUID", _deviceID);
 
-        parameters.put("DATABASE", dataBase);
+        parameters.put("DATABASE", _database);
 
         parameters.put("MESSAGE", combinedScanResult.message);
 
@@ -1950,8 +1957,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------------------------------------------------------------
         serverMessage.urlString = urlString;
         serverMessage.message = message;
-        serverMessage.useSSL = useSSL;
-        serverMessage.address = address;
+        serverMessage.useSSL = _useSSL;
+        serverMessage.address = _serverAddress;
 
 
         return serverMessage;
@@ -2353,6 +2360,14 @@ public class TrackerScanner extends Service implements LocationListener {
                 //if (action.equals(Constants.ACTION_START_LOCATION_SERVICE))
                 {
                     case Constants.ACTION_START_LOCATION_SERVICE:
+
+                        _mode = intent.getBooleanExtra("MODE", false);
+
+                        _serverAddress = intent.getStringExtra("ServerAddress");
+                        _database = intent.getStringExtra("database");
+                        _deviceID = intent.getStringExtra("DeviceID");
+                        _useSSL = intent.getBooleanExtra("SSL_switch", true);
+
 
                         startScanning();
 

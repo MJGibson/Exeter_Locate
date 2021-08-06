@@ -6,8 +6,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,8 @@ import androidx.core.content.ContextCompat;
 
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1;
@@ -33,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean running = false;
 
     private ConstraintLayout mainLayout;
+
+    private String _deviceID;
 
 
     //##############################################################################################
@@ -48,6 +54,15 @@ public class MainActivity extends AppCompatActivity {
 
         mainLayout = findViewById(R.id.main_layout);
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        String _deviceID = SP.getString("DeviceID", "");
+        if(_deviceID.isEmpty()){
+            _deviceID = UUID.randomUUID().toString();
+            SPeditor.putString("DeviceID", _deviceID);
+            SPeditor.apply();
+        }
+
 
     }// end of onCreate
     //==============================================================================================
@@ -60,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
 
             if(!running){
                 startStopButton.setText(R.string.start_button_stop_text);
-                mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
+                //mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
                 running = true;
             }else{
-                mainLayout.setBackgroundColor(getResources().getColor(R.color.red));
+                //mainLayout.setBackgroundColor(getResources().getColor(R.color.red));
                 startStopButton.setText(R.string.start_button_initial_text);
                 running = false;
                 return; // close any services up here...
@@ -167,6 +182,22 @@ public class MainActivity extends AppCompatActivity {
         intent.setAction(
                 getResources().getString(R.string.action_start_location_service)
         );
+        intent.putExtra("MODE", true); // engage citizen mode
+
+        String address = "3.9.100.243";
+
+        String dataBase = "alpha";
+
+        String deviceID = _deviceID;
+
+        boolean useSSL = true;
+
+        intent.putExtra("ServerAddress", address);
+        intent.putExtra("database", dataBase);
+        intent.putExtra("DeviceID", deviceID);
+        intent.putExtra("SSL_switch", useSSL);
+
+
         startService(intent);
         Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
 
@@ -204,27 +235,33 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
-//    private void runThread() {
-//
-//        new Thread() {
-//            public void run() {
-//                while (i++ < 1000) {
-//                    try {
-//                        runOnUiThread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                btn.setText("#" + i);
-//                            }
-//                        });
-//                        Thread.sleep(300);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }.start();
-//    }
+    private void runThread() {
+
+        new Thread() {
+            public void run() {
+                while (running) {
+                    try {
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                //btn.setText("#" + i);
+
+
+
+
+
+
+                            }// end of run function
+                        });
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }
     //==============================================================================================
 
 

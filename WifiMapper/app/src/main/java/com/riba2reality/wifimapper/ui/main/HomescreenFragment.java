@@ -380,6 +380,23 @@ public class HomescreenFragment extends Fragment {
 
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
         intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+        intent.putExtra("MODE", false); // disengage citizen mode, thus dev mode
+
+        String[] server_values = getResources().getStringArray(com.riba2reality.exeterlocatecore.R.array.server_values);
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        intent.putExtra("ServerAddress", address);
+        intent.putExtra("database", dataBase);
+        intent.putExtra("DeviceID", deviceID);
+        intent.putExtra("SSL_switch", useSSL);
+
         getActivity().startService(intent);
         Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
 
