@@ -36,12 +36,50 @@ public class MainActivity extends AppCompatActivity {
     private Button startStopButton;
     private boolean running = false;
 
+    private boolean active = false;
+
     private ConstraintLayout mainLayout;
 
     private String _deviceID;
 
 
     //##############################################################################################
+
+    //==============================================================================================
+    @Override
+    protected void onStart() {
+        active = true;
+        super.onStart();
+        runThread();
+        checkButtons();
+        Log.d("mgdev", "MainActivity.onStart");
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    @Override
+    protected void onStop() {
+        active = false;
+        super.onStop();
+        Log.d("mgdev", "MainActivity.onStop");
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkButtons(){
+
+        if( isLocationServiceRunning() ){
+            startStopButton.setText(R.string.start_button_stop_text);
+            //mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
+            running = true;
+        }else{
+            startStopButton.setText(R.string.start_button_initial_text);
+            running = false;
+        }
+
+
+    }//end of checkButtons
+    //==============================================================================================
 
     //==============================================================================================
     @Override
@@ -63,6 +101,18 @@ public class MainActivity extends AppCompatActivity {
             SPeditor.apply();
         }
 
+        Log.d("mgdev", "MainActivity.onCreate._deviceID="+_deviceID);
+
+        // check if bluetooth is available and fetch it
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+        }
+
+        // ble stuff
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+
+
 
     }// end of onCreate
     //==============================================================================================
@@ -73,34 +123,43 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-            if(!running){
+            Log.d("mgdev", "MainActivity.onClick");
+
+            if (!running) {
                 startStopButton.setText(R.string.start_button_stop_text);
                 //mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
                 running = true;
-            }else{
+
+                if (ContextCompat.checkSelfPermission(
+                        getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                            MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_CODE_LOCATION_PERMISSIONS
+                    );
+                } else {
+
+                    Log.d("mgdev", "MainActivity.onClick.permission.accepted");
+
+                    startLocationService();
+
+                }//end of if permission already accepted
+
+            } else {
                 //mainLayout.setBackgroundColor(getResources().getColor(R.color.red));
                 startStopButton.setText(R.string.start_button_initial_text);
                 running = false;
+
+                stopLocationService();
+
                 return; // close any services up here...
             }
 
 
 
-            if (ContextCompat.checkSelfPermission(
-                    getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                        MainActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        REQUEST_CODE_LOCATION_PERMISSIONS
-                );
-            } else {
-                //startLocationService();
 
-            }
-
-
-        }
+        }// end of onClick
     };
     //==============================================================================================
 
@@ -114,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CODE_LOCATION_PERMISSIONS && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //startLocationService();
+                startLocationService();
             } else {
                 Toast.makeText(MainActivity.this,
                         "Permission denied!",
@@ -151,8 +210,12 @@ public class MainActivity extends AppCompatActivity {
 
     //==============================================================================================
     private void startLocationService() {
+
+        Log.d("mgdev", "MainActivity.startLocationService");
+
         if (!isLocationServiceRunning()) {
 
+            //Log.d("mgdev", "MainActivity.startLocationService.!isLocationServiceRunning()");
 
             if(bluetoothAdapter == null){
                 // then no bluetooth capabilties
@@ -178,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     private void startService(){
 
+        Log.d("mgdev", "MainActivity.startService");
+
         Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
         intent.setAction(
                 getResources().getString(R.string.action_start_location_service)
@@ -186,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "3.9.100.243";
 
-        String dataBase = "alpha";
+        String dataBase = "dev";
 
         String deviceID = _deviceID;
 
@@ -200,6 +265,8 @@ public class MainActivity extends AppCompatActivity {
 
         startService(intent);
         Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
+
+        //runThread();
 
     }// end of startService
     //==============================================================================================
@@ -222,6 +289,8 @@ public class MainActivity extends AppCompatActivity {
 
     //==============================================================================================
     private void stopLocationService() {
+
+
         if (isLocationServiceRunning()) {
             Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
             intent.setAction(
@@ -239,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
 
         new Thread() {
             public void run() {
-                while (running) {
+                while (active) {
                     try {
                         runOnUiThread(new Runnable() {
 
@@ -247,7 +316,11 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 //btn.setText("#" + i);
 
-
+                                if(isLocationServiceRunning()){
+                                    mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
+                                }else{
+                                    mainLayout.setBackgroundColor(getResources().getColor(R.color.red));
+                                }
 
 
 

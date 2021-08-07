@@ -1977,7 +1977,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
             result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
             result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            if(entry.getValue()==null){
+                result.append(URLEncoder.encode("", "UTF-8"));
+            }else {
+                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
         }
 
         return result.toString();
