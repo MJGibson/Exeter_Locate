@@ -195,8 +195,13 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //----------------------------------------------------------------------------------------------
 
-    private int gPS_lambda = 3600;
+
+    private int gPS_lambda = 600;   // gps and combined
     private int wifi_lambda = 60;
+    private int post_lambda = 300;
+    private int ble_lambda = 60;
+    private int mag_lambda = 60;
+    private int accel_lambda = 60;
 
     // citizen science mode (true), or development mode (false)
     private boolean _mode = false;
@@ -438,20 +443,23 @@ public class TrackerScanner extends Service implements LocationListener {
         public void run() {
             if (running) {
 
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int postInterval = getResources().getInteger(R.integer.defaultVal_post);
-                int interval = SP.getInt("interval_posts", postInterval);
+                int interval = postInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(post_lambda);
+
+                }else{
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_posts", postInterval);
+                }
+
 
                 handler.postDelayed(periodicUpdate, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
             } else {
                 return;
             }
 
-            //postCombinedResult();
-            //postWifiResult();
-            //postMagResult();
             postALL();
-
 
         }
     };
@@ -463,11 +471,14 @@ public class TrackerScanner extends Service implements LocationListener {
         @Override
         public void run() {
             if (running) {
-
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int postInterval = getResources().getInteger(R.integer.defaultVal_post);
-                int interval = SP.getInt("interval_scan", postInterval);
-
+                int interval = postInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(gPS_lambda);
+                }else {
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_scan", postInterval);
+                }
                 handler.postDelayed(periodicUpdate_scan, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
             } else {
                 return;
@@ -485,26 +496,24 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Runnable periodicUpdate_wifi = new Runnable() {
         @Override
         public void run() {
-
-
             if (running) {
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int wifiInterval = getResources().getInteger(R.integer.defaultVal_wifi);
-                int interval = SP.getInt("interval_wifi", wifiInterval);
+                int interval = wifiInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(wifi_lambda);
+                }else {
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_wifi", wifiInterval);
 
+                }
                 handler.postDelayed(periodicUpdate_wifi, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
-                //wifi_scan_in_queue = true;
             } else {
                 return;
             }
 
             scanWifi();
 
-            //sendResult("Wifi Scan initiated.");
-
-            // after we've ran the event, remove the in-queue flag
-            //wifi_scan_in_queue = false;
-        }
+        }// end of run
     };
     //==============================================================================================
 
@@ -513,54 +522,24 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Runnable periodicUpdate_ble = new Runnable() {
         @Override
         public void run() {
-
-
             if (running) {
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                int wifiInterval = getResources().getInteger(R.integer.defaultVal_ble);
-                int interval = SP.getInt("interval_ble", wifiInterval);
-
+                int bleInterval = getResources().getInteger(R.integer.defaultVal_ble);
+                int interval = bleInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(ble_lambda);
+                }else {
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_ble", bleInterval);
+                }
                 handler.postDelayed(periodicUpdate_ble, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
-                //wifi_scan_in_queue = true;
+
             } else {
                 return;
             }
 
-            Log.d("mgdev", "periodicUpdate_ble[" + currentResult.bluetoothLEResults.size() + "]");
+            //Log.d("mgdev", "periodicUpdate_ble[" + currentResult.bluetoothLEResults.size() + "]");
 
-            bluetoothLEScanResultQueue.add(currentResult);
-
-            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
-            BluetoothLEScanResult result = new BluetoothLEScanResult();
-            result.dateTime = currentTime;
-
-            result.message = MANUAL_SCAN_MESSAGE;
-
-            currentResult = result;
-
-            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
-
-            manualScanCount_ble += 1;
-
-            //if(!running){
-            if (durationRemaining > 0) {
-
-                //combinedScanResult.wifiScanResult = result;
-                //checkAllScansCompleted();
-
-                sendResult(MANUAL_SCAN_MESSAGE +
-                        "Ble: Scan complete." + "Location: " + manualScanMessage
-                );
-
-            } else {
-                sendResult("Ble: Scan complete.");
-            }
-
-
-            //sendResult("Wifi Scan initiated.");
-
-            // after we've ran the event, remove the in-queue flag
-            //wifi_scan_in_queue = false;
+            completeBLEScan();
 
         }// end of run function
     };// end of runable periodicUpdate_ble
@@ -571,13 +550,15 @@ public class TrackerScanner extends Service implements LocationListener {
     private final Runnable periodicUpdate_mag = new Runnable() {
         @Override
         public void run() {
-
             if (running) {
-
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int magInterval = getResources().getInteger(R.integer.defaultVal_mag);
-                int interval = SP.getInt("interval_mag", magInterval);
-
+                int interval = magInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(mag_lambda);
+                }else {
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_mag", magInterval);
+                }
                 handler.postDelayed(periodicUpdate_mag, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
             } else {
                 return;
@@ -586,21 +567,23 @@ public class TrackerScanner extends Service implements LocationListener {
             ScanMag();
 
 
-        }
-    };
+        }// end of run
+    };// end of runnable periodicUpdate_mag
     //==============================================================================================
 
     //==============================================================================================
     private final Runnable periodicUpdate_accel = new Runnable() {
         @Override
         public void run() {
-
             if (running) {
-
-                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int accelInterval = getResources().getInteger(R.integer.defaultVal_accel);
-                int interval = SP.getInt("interval_accel", accelInterval);
-
+                int interval = accelInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(accel_lambda);
+                }else {
+                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_accel", accelInterval);
+                }
                 handler.postDelayed(periodicUpdate_accel, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
             } else {
                 return;
@@ -1069,6 +1052,42 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //##############################################################################################
     // bluetooth low engergy sensor function
+
+    //==============================================================================================
+    private void completeBLEScan(){
+
+        bluetoothLEScanResultQueue.add(currentResult);
+
+        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+        BluetoothLEScanResult result = new BluetoothLEScanResult();
+        result.dateTime = currentTime;
+
+        result.message = MANUAL_SCAN_MESSAGE;
+
+        currentResult = result;
+
+        long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+
+        manualScanCount_ble += 1;
+
+        //if(!running){
+        if (durationRemaining > 0) {
+
+            //combinedScanResult.wifiScanResult = result;
+            //checkAllScansCompleted();
+
+            sendResult(MANUAL_SCAN_MESSAGE +
+                    "Ble: Scan complete." + "Location: " + manualScanMessage
+            );
+
+        } else {
+            sendResult("Ble: Scan complete.");
+        }
+
+
+    }// end of completeBLEScan
+    //==============================================================================================
+
 
     //==============================================================================================
     private void startBLEScan(){
