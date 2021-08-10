@@ -20,6 +20,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application>
+        <uses-library
+            android:name="com.google.android.maps" />
         <service
             android:name=".TrackerScanner"
             android:enabled="true"

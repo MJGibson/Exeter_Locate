@@ -41,7 +41,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.google.maps.android.PolyUtil;
 import com.riba2reality.exeterlocatecore.DataStores.BluetoothLEResult;
 import com.riba2reality.exeterlocatecore.DataStores.BluetoothLEScanResult;
 import com.riba2reality.exeterlocatecore.DataStores.CombinedScanResult;
@@ -211,6 +213,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private String _deviceID;
     private boolean _useSSL;
 
+    private boolean insideGeoFence = false;
+
     //----------------------------------------------------------------------------------------------
 
     //##############################################################################################
@@ -374,6 +378,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //##############################################################################################
     // runnable periodic updates
+
 
     //==============================================================================================
     public static int getPoisson(double lambda) {
@@ -662,6 +667,17 @@ public class TrackerScanner extends Service implements LocationListener {
         // Location lastLocation = new Location(location);
 
         Log.d("Trace", "TrackerScanner.onLocationChanged()");
+        //-------------------------------------------------------------
+
+        if(_mode){
+
+            // check if inide polygon
+            LatLng locationCords = new LatLng(location.getLatitude(), location.getLongitude());
+
+            boolean inside = PolyUtil.containsLocation(locationCords, Constants.stethamCampusPolygon, true);
+
+
+        }// end of if citizen mode
 
         //-------------------------------------------------------------
 
