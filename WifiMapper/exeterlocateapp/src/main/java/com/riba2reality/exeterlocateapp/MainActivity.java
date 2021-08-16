@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     }// end of onCreate
     //==============================================================================================
 
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 startLocationService();
             } else {
                 Toast.makeText(MainActivity.this,
-                        "Permission denied!",
+                        getResources().getString(R.string.PermissionDeniedToastText),
                         Toast.LENGTH_SHORT).show();
             }
         }

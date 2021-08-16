@@ -13,7 +13,9 @@ tasks.withType(Test) {
     jacoco.excludes = ['jdk.internal.*']
 }
 
-task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest'
+                                                      ,'createDebugCoverageReport'
+]) {
 
     reports {
         xml.enabled = true
@@ -29,6 +31,7 @@ task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) 
     getClassDirectories().setFrom(files([debugTree]))
     getExecutionData().setFrom(fileTree(dir: project.buildDir, includes: [
             'jacoco/testDebugUnitTest.exec'
+            ,"outputs/code_coverage/debugAndroidTest/connected/*coverage.ec"
     ]))
 }
 
