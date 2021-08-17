@@ -107,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             // Device doesn't support Bluetooth
+        }else {
+
+            // ble stuff
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
-
-        // ble stuff
-        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-
 
 
 
@@ -228,12 +228,16 @@ public class MainActivity extends AppCompatActivity {
                     if (!bluetoothAdapter.isEnabled()) {
                         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                    }else{
-                        startService();
+                        return;
                     }
+//                    else{
+//                        startService();
+//                    }
 
                 }
             }
+
+            startService();
 
         }
     }// end of startLocationService
