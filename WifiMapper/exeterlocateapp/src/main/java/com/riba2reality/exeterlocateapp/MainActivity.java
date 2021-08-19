@@ -1,5 +1,6 @@
 package com.riba2reality.exeterlocateapp;
 
+
 import android.Manifest;
 import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
@@ -13,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,27 +27,59 @@ import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import java.util.UUID;
 
+/**
+ * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
+ * anonymized Location, Wi-Fi, Bluetooth, accelerometer and magnetometer data. By many citizens
+ * contributing small amounts of data in the limited area of the geoFence (University of Exeter -
+ * Streatham campus), better locations service could be developed.
+ *
+ * MainActivity Class of type Android Activity, acts as the main frontend for Exeter Locate App.
+ * When active this class will display the status of the backend service by displaying a background
+ * colour (Red for deactivated, Green for active). NOTE: this is currently achieved by starting and
+ * stopping a monitoring thread that updates the status every 300 milliseconds.
+ *
+ * Also a button is provided to start and stop the backend service, depending on current status.
+ *
+ * Initial calls to start the service request the necessary location permissions from the user, and
+ * request to start up the bluetooth if it is not currently active.
+ *
+ * Upon first start up a random UUID will be generated and stored for future use in the backend.
+ *
+ * @author <a href="mailto:M.J.Gibson@Exeter.ac.uk">Michael J Gibson</a>
+ * @version 1.0
+ * @since   2021-08-19
+ *
+ */
 public class MainActivity extends AppCompatActivity {
 
+    // permission variables
     private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1;
-
-    private BluetoothLeScanner bluetoothLeScanner;
-    private BluetoothAdapter bluetoothAdapter;
     public static final int REQUEST_ENABLE_BT = 11;
 
+    // bluetooth
+    private BluetoothLeScanner bluetoothLeScanner;
+    private BluetoothAdapter bluetoothAdapter;
+
+    // UI variables
     private Button startStopButton;
     private boolean running = false;
-
     private boolean active = false;
-
     private ConstraintLayout mainLayout;
+    private TextView versionTextView;
 
+    // UUID
     private String _deviceID;
 
 
     //##############################################################################################
 
     //==============================================================================================
+
+    /**
+     * onStart Method
+     * Calls Overriden method, and starts the monitoring thread, and sets the buttons the correct
+     * status.
+     */
     @Override
     protected void onStart() {
         active = true;
@@ -57,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+
+    /**
+     * onStop Method
+     * Calls overriden method, and stops the monitoring thread by its while running bool to false.
+     */
     @Override
     protected void onStop() {
         active = false;
@@ -66,11 +105,16 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+
+    /**
+     * checkButtons method
+     * Uses isLocationServiceRunning to check if the service is running, and sets up the start/stop
+     * button appropriatley, along with the class boolean 'running'
+     */
     private void checkButtons(){
 
         if( isLocationServiceRunning() ){
             startStopButton.setText(R.string.start_button_stop_text);
-            //mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
             running = true;
         }else{
             startStopButton.setText(R.string.start_button_initial_text);
@@ -82,16 +126,36 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+
+    /**
+     * onCreate Method
+     * Sets up the front end, using the activity_main layout, and initialises UI class variables.
+     * Checks if a UUID is stored in the shared preferences, and if not creates and stores one,
+     * otherwise loading and using the stored UUID.
+     * If bluetooth is available on the device then the class variables are intialised.
+     * Displays the version of this app and the back end.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        // set up UI
+        setContentView(R.layout.activity_main);
         startStopButton = findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(startStopButtonPressed);
-
         mainLayout = findViewById(R.id.main_layout);
+        versionTextView = findViewById(R.id.version_textView);
 
+        //versionTextView.setEnabled(false);
+        versionTextView.setText(
+                "Version: " + BuildConfig.VERSION_NAME + "\n"
+                //+ "Core Version: " + versionName
+                + "Core Version: " + TrackerScanner.libraryVersion
+                );
+
+        // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
         String _deviceID = SP.getString("DeviceID", "");
@@ -120,6 +184,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
+    /**
+     * startStopButtonPressed OnClickListener
+     *
+     * Attached to the start/stop button, by onCreate; This function does the work of checking the
+     * class variables 'running', and either stops or starts the service via the stopLocationService()
+     * and startLocationService() functions. Before firing the startLocationService() function however,
+     * it checks it has location permission and if not requests them, leaving the launching of the
+     * service the function that deals with said permission request result
+     *
+     */
     View.OnClickListener startStopButtonPressed = new View.OnClickListener(){
         @Override
         public void onClick(View v) {
@@ -127,9 +201,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("mgdev", "MainActivity.onClick");
 
             if (!running) {
-                startStopButton.setText(R.string.start_button_stop_text);
-                //mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
-                running = true;
+
 
                 if (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
@@ -148,9 +220,6 @@ public class MainActivity extends AppCompatActivity {
                 }//end of if permission already accepted
 
             } else {
-                //mainLayout.setBackgroundColor(getResources().getColor(R.color.red));
-                startStopButton.setText(R.string.start_button_initial_text);
-                running = false;
 
                 stopLocationService();
 
@@ -165,6 +234,17 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+
+    /**
+     * onRequestPermissionsResult method
+     * Deals with permission request result from the users, if the request is granted then it calls
+     * the startLocationService() function, otherwise displaying a toast message.
+     *
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -186,6 +266,13 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+
+    /**
+     * isLocationServiceRunning method
+     * Checks if the TrackerScanner Service is running.
+     *
+     * @return True if the TrackerScanner Service is running, othewise false
+     */
     private boolean isLocationServiceRunning() {
 
         ActivityManager activityManager =
@@ -210,6 +297,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
+
+    /**
+     * startLocationService Method
+     * Checks if the Service is running via the isLocationServiceRunning() method, and then checks
+     * if this device has bluetooth and initialises the relavant class variables. If bluetooth is
+     * available and not activated, then a request of the user to activate it is made, and the
+     * function that deals with the bluetooth activation request result will be left to call the
+     * startService() function. If no bluetooth is available on this device, then this function
+     * calls startService().
+     *
+     */
     private void startLocationService() {
 
         Log.d("mgdev", "MainActivity.startLocationService");
@@ -244,7 +342,16 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * startService method
+     * Sets start/stop button text to "stop", and class variable 'running' to true.
+     * Then launches the TrackerScanner service in citizen science mode
+     *
+     */
     private void startService(){
+
+        startStopButton.setText(R.string.start_button_stop_text);
+        running = true;
 
         Log.d("mgdev", "MainActivity.startService");
 
@@ -277,6 +384,17 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+
+    /**
+     * onActivityResult method
+     * Deals with the result of requesting the user activate bluetooth, if accepted it calls the
+     * startService method, otherwise displaying a toast message.
+     *
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode,  data);
@@ -286,6 +404,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d("mgdev", "HomescreenFragment.onActivityResult.RESULT_OK");
         }else{
             Log.d("mgdev", "HomescreenFragment.onActivityResult. ELSE");
+            Toast.makeText(MainActivity.this,
+                    getResources().getString(R.string.BluetoothRequired),
+                    Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -293,10 +414,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
+
+    /**
+     * stopLocationService method
+     *
+     * Checks if the TrackerScanner service is running and stops it, also setting class variable
+     * 'running' to false, and the start/stop button back to "start"
+     *
+     */
     private void stopLocationService() {
 
 
         if (isLocationServiceRunning()) {
+
+            startStopButton.setText(R.string.start_button_initial_text);
+            running = false;
+
             Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
             intent.setAction(
                     getResources().getString(R.string.action_stop_location_service)
@@ -309,6 +442,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
+
+    /**
+     * runThread method
+     *
+     * Creates a new monitor thread which will run while the activity is shown, and changes the
+     * background colour every 300 milliseconds to either green or red if the TrackerScanner is
+     * running or not respectively.
+     *
+     */
     private void runThread() {
 
         new Thread() {
@@ -322,9 +464,13 @@ public class MainActivity extends AppCompatActivity {
                                 //btn.setText("#" + i);
 
                                 if(isLocationServiceRunning()){
-                                    mainLayout.setBackgroundColor(getResources().getColor(R.color.green));
+                                    mainLayout.setBackgroundColor(getResources().getColor(
+                                            R.color.green)
+                                    );
                                 }else{
-                                    mainLayout.setBackgroundColor(getResources().getColor(R.color.red));
+                                    mainLayout.setBackgroundColor(getResources().getColor(
+                                            R.color.red)
+                                    );
                                 }
 
 

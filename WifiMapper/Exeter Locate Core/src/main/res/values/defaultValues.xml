@@ -40,5 +40,6 @@
         <item>version</item>
     </string-array>
 
+<!--    <string name="VERSION_CODE">1.0.0</string>-->
 
 </resources>

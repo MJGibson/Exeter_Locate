@@ -67,6 +67,27 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
+ * anonymized Location, Wi-Fi, Bluetooth, accelerometer and magnetometer data. By many citizens
+ * contributing small amounts of data in the limited area of the geoFence (University of Exeter -
+ * Streatham campus), better locations service could be developed.
+ *
+ * TrackerScanner Service acts as the main backend for the Exeter Locate App. When running it has two
+ * modes, either citizen science mode or development mode. In either mode it performs regular scans
+ * of the GPS, Wi-Fi, Bluetooth low-energy, accelerometer and magnetometer, which are placed in a
+ * queues for each. At regular intervals the these queues are emptied, converted into json encoded
+ * messages to the server, and a new thread is lauched to asynchronously post each message to the
+ * server.
+ * Each message that fails to post to the server is placed back into a resend queue, which is
+ * attempted again at each posting interval.
+ *
+ *
+ *
+ * @author <a href="mailto:M.J.Gibson@Exeter.ac.uk">Michael J Gibson</a>
+ * @version 1.0
+ * @since   2021-08-19
+ */
 public class TrackerScanner extends Service implements LocationListener {
 
 
@@ -232,14 +253,23 @@ public class TrackerScanner extends Service implements LocationListener {
     }
     //==============================================================================================
 
+    //==============================================================================================
+    public static final String libraryVersion = "1.4.0";
+    //==============================================================================================
+
+
 
     //==============================================================================================
+    /**
+     * onCreate function initialises the class variables
+     *
+     */
     @Override
     public void onCreate() {
         super.onCreate();
 
         Log.d("Trace", "TrackerScanner.onCreate()");
-        System.out.println("TrackerScanner.onCreate()");
+        //System.out.println("TrackerScanner.onCreate()");
 
         broadcaster = LocalBroadcastManager.getInstance(this);
 
