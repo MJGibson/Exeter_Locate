@@ -80,14 +80,21 @@ public class PostToServer extends AsyncTask<String, String, String> {
             String message = splitResult[0];
 
             // note here collect parameter data attached and digest
-            if(splitResult.length > 1) {
-                int gpsLamda = Integer.parseInt(splitResult[1].trim());
+            if(splitResult.length == 7) {
+                int index = 1; // as main message is on zero
+                int gpsLamda = Integer.parseInt(splitResult[index++].trim());
+                int wifiLamda = Integer.parseInt(splitResult[index++].trim());
+                int postLamda = Integer.parseInt(splitResult[index++].trim());
+                int bleLamda = Integer.parseInt(splitResult[index++].trim());
+                int accelLamda = Integer.parseInt(splitResult[index++].trim());
+                int magLamda = Integer.parseInt(splitResult[index++].trim());
 
                 _trackerScanner.setgPS_lambda(gpsLamda);
-
-                int wifiLamda = Integer.parseInt(splitResult[2].trim());
-
-                _trackerScanner.setgPS_lambda(wifiLamda);
+                _trackerScanner.setwifi_lambda(wifiLamda);
+                _trackerScanner.setpost_lambda(postLamda);
+                _trackerScanner.setble_lambda(bleLamda);
+                _trackerScanner.setaccel_lambda(accelLamda);
+                _trackerScanner.setmag_lambda(magLamda);
             }
 
             _trackerScanner.sendResult(message);

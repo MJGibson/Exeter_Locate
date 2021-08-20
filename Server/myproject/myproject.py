@@ -85,14 +85,44 @@ PARAMETERS_FILE = 'parameters.dat'
 
 
 #-------------------------------------------------------------------------------------
+"""
+    Adds lambda settings for GPS (and combined scans),Wi-fi, Posting, Bluetooth, accellerometer, 
+    and magnetometer to the message passed as parameter. These lambda settings are the base times used 
+    for poisson distribution.
+
+    Parameters
+    ----------
+    message : str
+        The input message
+    
+
+    Returns
+    -------
+    str
+        The message with lambda settin appended
+
+
+"""
 def format_message(message):
 
     df = pd.read_csv(PARAMETERS_FILE)
 
-    gpsLamda = df['gpsLamda'].values[0]
-    wifiLamda = df['wifiLamda'].values[0]
+    gpsLamda = df['gpsLambda'].values[0]
+    wifiLamda = df['wifiLambda'].values[0]
+    postLambda = df['postLambda'].values[0]
+    bleLambda = df['bleLambda'].values[0]
+    accelLambda = df['accelLambda'].values[0]
+    magLambda = df['magLambda'].values[0]
 
-    return '{};{};{}'.format(message, gpsLamda, wifiLamda)
+    return '{};{};{};{};{};{};{}'.format(
+        message, 
+        gpsLamda, 
+        wifiLamda,
+        postLambda,
+        bleLambda,
+        accelLambda,
+        magLambda
+        )
 
 #-------------------------------------------------------------------------------------
 def parse_request(request):
