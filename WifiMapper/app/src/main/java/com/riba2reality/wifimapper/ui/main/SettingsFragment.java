@@ -547,12 +547,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         //----------------------------------------------------------------
 
-        // set default
+        // display version number of this app
         EditTextPreference versionPref = getPreferenceManager().findPreference("versionNum");
 
 
         versionPref.setEnabled(false);
         versionPref.setText(BuildConfig.VERSION_NAME);
+
+        //----------------------------------------------------------------
+
+        // display core version number
+        EditTextPreference versionCorePref =
+                getPreferenceManager().findPreference("coreVersionNum");
+
+
+        versionCorePref.setEnabled(false);
+        versionCorePref.setText(TrackerScanner.libraryVersion);
 
 
     }// end of onCreatePreferences

@@ -137,6 +137,11 @@
             app:title="Version:"
             app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+            app:key="coreVersionNum"
+            app:title="Core Version:"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
