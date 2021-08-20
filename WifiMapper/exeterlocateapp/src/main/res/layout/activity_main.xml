@@ -8,6 +8,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
+    <TextView
+        android:id="@+id/version_textView"
+        android:layout_width="125dp"
+        android:layout_height="74dp"
+        android:textAlignment="viewStart"
+        android:textSize="14sp"
+        app:autoSizeTextType="none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/startStopButton"
         android:layout_width="wrap_content"
@@ -18,14 +29,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/version_textView"
-        android:layout_width="125dp"
-        android:layout_height="74dp"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        app:autoSizeTextType="none"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/infoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:srcCompat="@android:drawable/ic_dialog_info" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import java.util.UUID;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean active = false;
     private ConstraintLayout mainLayout;
     private TextView versionTextView;
+    private FloatingActionButton infoButton;
 
     // UUID
     private String _deviceID;
@@ -146,6 +148,10 @@ public class MainActivity extends AppCompatActivity {
         startStopButton = findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(startStopButtonPressed);
         mainLayout = findViewById(R.id.main_layout);
+        infoButton = findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(infoButtonPressed);
+
+        // set versions
         versionTextView = findViewById(R.id.version_textView);
 
         //versionTextView.setEnabled(false);
@@ -181,6 +187,39 @@ public class MainActivity extends AppCompatActivity {
 
     }// end of onCreate
     //==============================================================================================
+
+    //==============================================================================================
+    /**
+     * infoButtonPressed OnClickListener
+     *
+     * Attached to the info button, by onCreate; This function
+     *
+     */
+    View.OnClickListener infoButtonPressed = new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+
+            Log.d("mgdev", "MainActivity.infoButtonPressed");
+
+            // start the Info activity
+            startInfoActivty();
+
+        }// end of onClick
+    };// end of infoButtonPressed
+    //==============================================================================================
+
+    //==============================================================================================
+    /**
+     * startInfoActivty method
+     * Starts the InfoActivity
+     */
+    public void startInfoActivty(){
+        Intent intent = new Intent(this, InfoActivity.class);
+        startActivity(intent);
+    }//end of
+    //==============================================================================================
+
+
 
 
     //==============================================================================================

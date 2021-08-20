@@ -4,4 +4,5 @@
     <string name="start_button_stop_text">STOP</string>
     <string name="PermissionDeniedToastText">Permission denied!</string>
     <string name="BluetoothRequired">Bluetooth is require</string>
+    <string name="information_t_c_s"><![CDATA[Information/T&C\'s]]></string>
 </resources>
