@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -149,6 +150,17 @@ public class MainActivity extends AppCompatActivity {
         infoButton = findViewById(R.id.infoButton);
         infoButton.setOnClickListener(infoButtonPressed);
         imageView = findViewById(R.id.imageView);
+
+        ActionBar actionBar = getSupportActionBar();
+        //actionBar.setDisplayShowHomeEnabled(true);
+
+        actionBar.setTitle(R.string.app_name);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setLogo(R.mipmap.uoe_logo);
+        actionBar.setDisplayUseLogoEnabled(true);
+
+
 
         // set versions
 //        versionTextView = findViewById(R.id.version_textView);
