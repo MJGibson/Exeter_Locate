@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout mainLayout;
     private TextView versionTextView;
     private FloatingActionButton infoButton;
+    private ImageView imageView;
 
     // UUID
     private String _deviceID;
@@ -76,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     //##############################################################################################
 
     //==============================================================================================
-
     /**
      * onStart Method
      * Calls Overriden method, and starts the monitoring thread, and sets the buttons the correct
@@ -93,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
-
     /**
      * onStop Method
      * Calls overriden method, and stops the monitoring thread by its while running bool to false.
@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
-
     /**
      * checkButtons method
      * Uses isLocationServiceRunning to check if the service is running, and sets up the start/stop
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
-
     /**
      * onCreate Method
      * Sets up the front end, using the activity_main layout, and initialises UI class variables.
@@ -150,16 +148,17 @@ public class MainActivity extends AppCompatActivity {
         mainLayout = findViewById(R.id.main_layout);
         infoButton = findViewById(R.id.infoButton);
         infoButton.setOnClickListener(infoButtonPressed);
+        imageView = findViewById(R.id.imageView);
 
         // set versions
-        versionTextView = findViewById(R.id.version_textView);
-
-        //versionTextView.setEnabled(false);
-        versionTextView.setText(
-                "Version: " + BuildConfig.VERSION_NAME + "\n"
-                //+ "Core Version: " + versionName
-                + "Core Version: " + TrackerScanner.libraryVersion
-                );
+//        versionTextView = findViewById(R.id.version_textView);
+//
+//        //versionTextView.setEnabled(false);
+//        versionTextView.setText(
+//                "Version: " + BuildConfig.VERSION_NAME + "\n"
+//                //+ "Core Version: " + versionName
+//                + "Core Version: " + TrackerScanner.libraryVersion
+//                );
 
         // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
@@ -183,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
 
+        // add displayIconView
+        //setContentView(new DisplayIconView(imageView));
 
 
     }// end of onCreate
@@ -525,6 +526,41 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
     }
+    //==============================================================================================
+
+//    //==============================================================================================
+//    public class DisplayIconView extends View
+//    {
+//        Paint paint = null;
+//
+//        public DisplayIconView(Context context)
+//        {
+//            super(context);
+//            paint = new Paint();
+//        }
+//
+//        public DisplayIconView(Context context, AttributeSet attrs)
+//        {
+//            super(context,attrs);
+//            paint = new Paint();
+//        }
+//
+//        @Override
+//        protected void onDraw(Canvas canvas)
+//        {
+//            super.onDraw(canvas);
+//            int x = getWidth();
+//            int y = getHeight();
+//            int radius;
+//            radius = x/4;
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setColor(Color.RED);
+//            //canvas.drawPaint(paint);
+//            // Use Color.parseColor to define HTML colors
+//            //paint.setColor(Color.parseColor("#CD5C5C"));
+//            canvas.drawCircle(x / 2, y / 4, radius, paint);
+//        }
+//    }
     //==============================================================================================
 
 

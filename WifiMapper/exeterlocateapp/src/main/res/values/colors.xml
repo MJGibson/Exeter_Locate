@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#E6080D</color>
     <color name="green">#309E41</color>
+
+    <color name="ExeterBlue">#005DAA</color>
 </resources>
