@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -166,11 +167,7 @@ public class MainActivity extends AppCompatActivity {
         this.circleAnimation1 = findViewById(R.id.circleAnimation1);
         this.circleAnimation2 = findViewById(R.id.circleAnimation2);
 
-
-
-
-
-
+        // set up title bar
         ActionBar actionBar = getSupportActionBar();
         //actionBar.setDisplayShowHomeEnabled(true);
 
@@ -214,11 +211,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
 
-        // add displayIconView
-        //setContentView(new DisplayIconView(imageView));
 
-
-        startDisplayIconAnimation();
 
     }// end of onCreate
     //==============================================================================================
@@ -541,18 +534,43 @@ public class MainActivity extends AppCompatActivity {
 //                                    mainLayout.setBackgroundColor(getResources().getColor(
 //                                            R.color.green)
 //                                    );
+
+                                    //circleCore.setImageResource(R.drawable.circle_img);
+                                    circleCore.setColorFilter(
+                                            getResources().getColor(R.color.green),
+                                            PorterDuff.Mode.SRC_ATOP);
+                                    circleAnimation1.setColorFilter(
+                                            getResources().getColor(R.color.green),
+                                            PorterDuff.Mode.SRC_ATOP);
+                                    circleAnimation2.setColorFilter(
+                                            getResources().getColor(R.color.green),
+                                            PorterDuff.Mode.SRC_ATOP);
+
+                                    startDisplayIconAnimation();
+
+
                                 }else{
 //                                    mainLayout.setBackgroundColor(getResources().getColor(
 //                                            R.color.red)
 //                                    );
-                                }
+
+                                    circleCore.setColorFilter(
+                                            getResources().getColor(R.color.red),
+                                            PorterDuff.Mode.SRC_ATOP);
+                                    circleAnimation1.setColorFilter(
+                                            getResources().getColor(R.color.red),
+                                            PorterDuff.Mode.SRC_ATOP);
+                                    circleAnimation2.setColorFilter(
+                                            getResources().getColor(R.color.red),
+                                            PorterDuff.Mode.SRC_ATOP);
 
 
 
+                                }// end of else location service running
 
                             }// end of run function
                         });
-                        Thread.sleep(300);
+                        Thread.sleep(1500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -562,58 +580,45 @@ public class MainActivity extends AppCompatActivity {
     }
     //==============================================================================================
 
-//    //==============================================================================================
-//    public class DisplayIconView extends View
-//    {
-//        Paint paint = null;
-//
-//        public DisplayIconView(Context context)
-//        {
-//            super(context);
-//            paint = new Paint();
-//        }
-//
-//        public DisplayIconView(Context context, AttributeSet attrs)
-//        {
-//            super(context,attrs);
-//            paint = new Paint();
-//        }
-//
-//        @Override
-//        protected void onDraw(Canvas canvas)
-//        {
-//            super.onDraw(canvas);
-//            int x = getWidth();
-//            int y = getHeight();
-//            int radius;
-//            radius = x/4;
-//            paint.setStyle(Paint.Style.FILL);
-//            paint.setColor(Color.RED);
-//            //canvas.drawPaint(paint);
-//            // Use Color.parseColor to define HTML colors
-//            //paint.setColor(Color.parseColor("#CD5C5C"));
-//            canvas.drawCircle(x / 2, y / 4, radius, paint);
-//        }
-//    }
-    //==============================================================================================
+
 
     //==============================================================================================
+    /**
+     * startDisplayIconAnimation
+     *
+     * starts a display animation thread.
+//     * Makes the view visible.
+     *
+     */
     private void startDisplayIconAnimation(){
         this.diplayIconAnimation.run();
-        this.displayIconView.setVisibility(View.VISIBLE);
+//        this.displayIconView.setVisibility(View.VISIBLE);
     }// end of startDisplayIconAnimation
     //==============================================================================================
 
 
     //==============================================================================================
-    private void stopDisplayIconAnimation(){
-        iconAniHandler.removeCallbacks(diplayIconAnimation);
-        this.displayIconView.setVisibility(View.GONE);
-    }// end of startDisplayIconAnimation
+    /**
+     * stopDisplayIconAnimation
+     *
+     * stops the icon animation if in profress, and makes it invisible.
+     *
+     */
+//    private void stopDisplayIconAnimation(){
+//        iconAniHandler.removeCallbacks(diplayIconAnimation);
+//        this.displayIconView.setVisibility(View.GONE);
+//    }// end of startDisplayIconAnimation
     //==============================================================================================
 
 
     //==============================================================================================
+    /**
+     * diplayIconAnimation Runnable
+     *
+     * Create a location pulse, by enlarging one circle then the next, and fading them as they go.
+     * Finally setting the circles back to their original state.
+     *
+     */
     private Runnable diplayIconAnimation = new Runnable() {
         @Override
         public void run() {
@@ -647,7 +652,7 @@ public class MainActivity extends AppCompatActivity {
                             }// end of Runable
                     );
 
-            iconAniHandler.postDelayed(diplayIconAnimation, 1500);
+            //iconAniHandler.postDelayed(diplayIconAnimation, 1500);
 
 
         }// end of run

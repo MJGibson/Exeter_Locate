@@ -11,9 +11,7 @@
     >
 
 
-    <include layout="@layout/display_icon_layout"
-        android:id="@+id/displayIcon"
-        />
+
 
     <!--Background-->
     <ImageView
@@ -36,7 +34,9 @@
 
     <!--activity display icon-->
 
-
+    <include layout="@layout/display_icon_layout"
+        android:id="@+id/displayIcon"
+        />
 
 
     <Button
