@@ -128,11 +128,34 @@ public class MainActivity extends AppCompatActivity {
         if( isLocationServiceRunning() ){
             startStopButton.setText(R.string.start_button_stop_text);
             running = true;
+
+            circleCore.setColorFilter(
+                    getResources().getColor(R.color.green),
+                    PorterDuff.Mode.SRC_ATOP);
+            circleAnimation1.setColorFilter(
+                    getResources().getColor(R.color.green),
+                    PorterDuff.Mode.SRC_ATOP);
+            circleAnimation2.setColorFilter(
+                    getResources().getColor(R.color.green),
+                    PorterDuff.Mode.SRC_ATOP);
+
+            startDisplayIconAnimation();
+
         }else{
             startStopButton.setText(R.string.start_button_initial_text);
             running = false;
-        }
 
+            circleCore.setColorFilter(
+                    getResources().getColor(R.color.red),
+                    PorterDuff.Mode.SRC_ATOP);
+            circleAnimation1.setColorFilter(
+                    getResources().getColor(R.color.red),
+                    PorterDuff.Mode.SRC_ATOP);
+            circleAnimation2.setColorFilter(
+                    getResources().getColor(R.color.red),
+                    PorterDuff.Mode.SRC_ATOP);
+
+        }// end of if/else isLocationServiceRunning
 
     }//end of checkButtons
     //==============================================================================================
@@ -417,8 +440,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void startService(){
 
-        startStopButton.setText(R.string.start_button_stop_text);
-        running = true;
+//        startStopButton.setText(R.string.start_button_stop_text);
+//        running = true;
 
         Log.d("mgdev", "MainActivity.startService");
 
@@ -444,6 +467,8 @@ public class MainActivity extends AppCompatActivity {
 
         startService(intent);
         Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
+
+        checkButtons();
 
         //runThread();
 
@@ -494,8 +519,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (isLocationServiceRunning()) {
 
-            startStopButton.setText(R.string.start_button_initial_text);
-            running = false;
+//            startStopButton.setText(R.string.start_button_initial_text);
+//            running = false;
 
             Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
             intent.setAction(
@@ -503,7 +528,10 @@ public class MainActivity extends AppCompatActivity {
             );
             startService(intent);
             Toast.makeText(this, "Location service stopped", Toast.LENGTH_SHORT).show();
-        }
+
+            checkButtons();
+
+        }// end of if isLocationServiceRunning
     }// end of startLocationService
     //==============================================================================================
 
@@ -528,45 +556,9 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void run() {
-                                //btn.setText("#" + i);
 
-                                if(isLocationServiceRunning()){
-//                                    mainLayout.setBackgroundColor(getResources().getColor(
-//                                            R.color.green)
-//                                    );
+                                checkButtons();
 
-                                    //circleCore.setImageResource(R.drawable.circle_img);
-                                    circleCore.setColorFilter(
-                                            getResources().getColor(R.color.green),
-                                            PorterDuff.Mode.SRC_ATOP);
-                                    circleAnimation1.setColorFilter(
-                                            getResources().getColor(R.color.green),
-                                            PorterDuff.Mode.SRC_ATOP);
-                                    circleAnimation2.setColorFilter(
-                                            getResources().getColor(R.color.green),
-                                            PorterDuff.Mode.SRC_ATOP);
-
-                                    startDisplayIconAnimation();
-
-
-                                }else{
-//                                    mainLayout.setBackgroundColor(getResources().getColor(
-//                                            R.color.red)
-//                                    );
-
-                                    circleCore.setColorFilter(
-                                            getResources().getColor(R.color.red),
-                                            PorterDuff.Mode.SRC_ATOP);
-                                    circleAnimation1.setColorFilter(
-                                            getResources().getColor(R.color.red),
-                                            PorterDuff.Mode.SRC_ATOP);
-                                    circleAnimation2.setColorFilter(
-                                            getResources().getColor(R.color.red),
-                                            PorterDuff.Mode.SRC_ATOP);
-
-
-
-                                }// end of else location service running
 
                             }// end of run function
                         });
