@@ -10,12 +10,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -68,9 +68,18 @@ public class MainActivity extends AppCompatActivity {
     private boolean running = false;
     private boolean active = false;
     private ConstraintLayout mainLayout;
-    private TextView versionTextView;
+    //private TextView versionTextView;
     private FloatingActionButton infoButton;
-    private ImageView imageView;
+    private ImageView imageViewBackground;
+
+    private View displayIconView;
+    private ImageView circleCore;
+    private ImageView circleAnimation1;
+    private ImageView circleAnimation2;
+    private Handler iconAniHandler;
+
+
+
 
     // UUID
     private String _deviceID;
@@ -149,7 +158,18 @@ public class MainActivity extends AppCompatActivity {
         mainLayout = findViewById(R.id.main_layout);
         infoButton = findViewById(R.id.infoButton);
         infoButton.setOnClickListener(infoButtonPressed);
-        imageView = findViewById(R.id.imageView);
+        imageViewBackground = findViewById(R.id.imageViewBackground);
+
+        this.iconAniHandler = new Handler();
+        this.displayIconView = findViewById(R.id.displayIcon);
+        this.circleCore = findViewById(R.id.circleBase);
+        this.circleAnimation1 = findViewById(R.id.circleAnimation1);
+        this.circleAnimation2 = findViewById(R.id.circleAnimation2);
+
+
+
+
+
 
         ActionBar actionBar = getSupportActionBar();
         //actionBar.setDisplayShowHomeEnabled(true);
@@ -197,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
         // add displayIconView
         //setContentView(new DisplayIconView(imageView));
 
+
+        startDisplayIconAnimation();
 
     }// end of onCreate
     //==============================================================================================
@@ -516,13 +538,13 @@ public class MainActivity extends AppCompatActivity {
                                 //btn.setText("#" + i);
 
                                 if(isLocationServiceRunning()){
-                                    mainLayout.setBackgroundColor(getResources().getColor(
-                                            R.color.green)
-                                    );
+//                                    mainLayout.setBackgroundColor(getResources().getColor(
+//                                            R.color.green)
+//                                    );
                                 }else{
-                                    mainLayout.setBackgroundColor(getResources().getColor(
-                                            R.color.red)
-                                    );
+//                                    mainLayout.setBackgroundColor(getResources().getColor(
+//                                            R.color.red)
+//                                    );
                                 }
 
 
@@ -573,6 +595,63 @@ public class MainActivity extends AppCompatActivity {
 //            canvas.drawCircle(x / 2, y / 4, radius, paint);
 //        }
 //    }
+    //==============================================================================================
+
+    //==============================================================================================
+    private void startDisplayIconAnimation(){
+        this.diplayIconAnimation.run();
+        this.displayIconView.setVisibility(View.VISIBLE);
+    }// end of startDisplayIconAnimation
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void stopDisplayIconAnimation(){
+        iconAniHandler.removeCallbacks(diplayIconAnimation);
+        this.displayIconView.setVisibility(View.GONE);
+    }// end of startDisplayIconAnimation
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private Runnable diplayIconAnimation = new Runnable() {
+        @Override
+        public void run() {
+
+
+            circleAnimation1.animate().scaleX(4f).scaleY(4f).alpha(0f).setDuration(1000)
+                    .withEndAction(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    circleAnimation1.setScaleX(1f);
+                                    circleAnimation1.setScaleY(1f);
+                                    circleAnimation1.setAlpha(1f);
+
+                                }// end of run
+                            }// end of Runable
+                    );
+
+            circleAnimation2.animate().scaleX(4f).scaleY(4f).alpha(0f).setDuration(700)
+                    .withEndAction(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    circleAnimation2.setScaleX(1f);
+                                    circleAnimation2.setScaleY(1f);
+                                    circleAnimation2.setAlpha(1f);
+
+                                }// end of run
+                            }// end of Runable
+                    );
+
+            iconAniHandler.postDelayed(diplayIconAnimation, 1500);
+
+
+        }// end of run
+    }; // end of diplayIconAnimation
     //==============================================================================================
 
 

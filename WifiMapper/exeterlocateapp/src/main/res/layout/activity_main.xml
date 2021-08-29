@@ -11,10 +11,13 @@
     >
 
 
+    <include layout="@layout/display_icon_layout"
+        android:id="@+id/displayIcon"
+        />
 
     <!--Background-->
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewBackground"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:adjustViewBounds="false"
@@ -34,16 +37,7 @@
     <!--activity display icon-->
 
 
-    <view
-        android:id="@+id/IconView"
-        class="com.riba2reality.exeterlocateapp.DisplayIconView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/startStopButton"
