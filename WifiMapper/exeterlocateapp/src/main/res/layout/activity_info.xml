@@ -4,15 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:alwaysDrawnWithCache="true"
     tools:context=".InfoActivity">
 
-    <TextView
-        android:id="@+id/textView"
+    <WebView
+        android:id="@+id/infoWebView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/information_t_c_s"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textViewVersion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewVersion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="2"
+        android:paddingVertical="5dp"
+        android:text="ver"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@+id/infoWebView"
+        app:layout_constraintBottom_toTopOf="@+id/textViewID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="2"
+        android:paddingVertical="5dp"
+        android:text="ID"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@+id/textViewVersion"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

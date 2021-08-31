@@ -1,8 +1,18 @@
 package com.riba2reality.exeterlocateapp;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.riba2reality.exeterlocatecore.TrackerScanner;
+
+import java.util.UUID;
+
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
  * anonymized Location, Wi-Fi, Bluetooth, accelerometer and magnetometer data. By many citizens
@@ -20,12 +30,74 @@ import androidx.appcompat.app.AppCompatActivity;
 public class InfoActivity extends AppCompatActivity {
 
 
+    private TextView versionTextView;
+    private TextView idTextView;
+    private WebView infoWebView;
 
     //==============================================================================================
+    /**
+     * Sets up front end
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
+
+        versionTextView = findViewById(R.id.textViewVersion);
+        //idTextView = findViewById(R.id.textViewID);
+        infoWebView = findViewById(R.id.infoWebView);
+
+        // check if we already have a UUID, if not make a new one and store it
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        String _deviceID = SP.getString("DeviceID", "");
+        if(_deviceID.isEmpty()){
+            _deviceID = UUID.randomUUID().toString();
+            SPeditor.putString("DeviceID", _deviceID);
+            SPeditor.apply();
+        }
+
+
+
+        // set versions
+        //versionTextView.setEnabled(false);
+        versionTextView.setText(
+                "Version: " + BuildConfig.VERSION_NAME + "\t"
+                //+ "Core Version: " + versionName
+                + "Core Version: " + TrackerScanner.libraryVersion + "\n"
+                + "Device ID: " + _deviceID
+                );
+
+//        // set ID disply
+//        idTextView.setText(
+//                "Device ID: " + _deviceID
+//        );
+
+        // set up webview - information, T&C's
+
+        infoWebView.setWebViewClient(new WebViewClient());
+        // load from asset file, but could check an actualy website and default to this
+        infoWebView.loadUrl("file:///android_asset/Citizen Science information.htm");
+
+
+
+    }// end of onCreate
+    //==============================================================================================
+
+    //==============================================================================================
+    /**
+     * Alters the normal back pressed, so if the webView can go back then that goes back, if not
+     * then it exits as normal
+     */
+    @Override
+    public void onBackPressed() {
+        if(infoWebView.canGoBack()){
+            infoWebView.goBack();
+        }else {
+            super.onBackPressed();
+        }
     }
     //==============================================================================================
 

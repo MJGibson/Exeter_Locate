@@ -5,4 +5,5 @@
     <string name="PermissionDeniedToastText">Permission denied!</string>
     <string name="BluetoothRequired">Bluetooth is required</string>
     <string name="information_t_c_s"><![CDATA[Information/T&C\'s]]></string>
+    <string name="versionInfoText">versions: <br /> ID:</string>
 </resources>

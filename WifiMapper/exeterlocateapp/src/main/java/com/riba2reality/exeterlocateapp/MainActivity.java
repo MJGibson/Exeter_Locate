@@ -38,9 +38,9 @@ import java.util.UUID;
  * Streatham campus), better locations service could be developed.
  *
  * MainActivity Class of type Android Activity, acts as the main frontend for Exeter Locate App.
- * When active this class will display the status of the backend service by displaying a background
- * colour (Red for deactivated, Green for active). NOTE: this is currently achieved by starting and
- * stopping a monitoring thread that updates the status every 300 milliseconds.
+ * When active this class will display the status of the backend service.
+ *
+ * Display Icon colour code (Red for deactivated, Green for active).
  *
  * Also a button is provided to start and stop the backend service, depending on current status.
  *
