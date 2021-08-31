@@ -453,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "3.9.100.243";
 
-        String dataBase = "dev";
+        String dataBase = "alpha";
 
         String deviceID = _deviceID;
 
