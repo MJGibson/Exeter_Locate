@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.cross_round);
 
-            status_textView.setText("Your app is stopped,\n please press start");
+            status_textView.setText("Your app inactive,\n please press start");
 
         }// end of if/else isLocationServiceRunning
 
@@ -212,6 +212,9 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setLogo(R.mipmap.uoe_logo);
         actionBar.setDisplayUseLogoEnabled(true);
+
+        // get rid of action bar...
+        actionBar.hide();
 
 
 
