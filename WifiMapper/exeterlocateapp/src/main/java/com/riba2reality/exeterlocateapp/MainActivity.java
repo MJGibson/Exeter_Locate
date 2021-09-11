@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView circleAnimation1;
     private ImageView circleAnimation2;
     private ImageView circleIcon;
+    private TextView status_textView;
     private Handler iconAniHandler;
 
 
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.tick_round);
 
+            status_textView.setText("Your app is active\n and scanning");
 
 
             startDisplayIconAnimation();
@@ -160,6 +163,8 @@ public class MainActivity extends AppCompatActivity {
                     getResources().getColor(R.color.red),
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.cross_round);
+
+            status_textView.setText("Your app is stopped,\n please press start");
 
         }// end of if/else isLocationServiceRunning
 
@@ -196,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         this.circleIcon = findViewById(R.id.circleIcon);
         this.circleAnimation1 = findViewById(R.id.circleAnimation1);
         this.circleAnimation2 = findViewById(R.id.circleAnimation2);
+        this.status_textView =  findViewById(R.id.textView_status);
 
         // set up title bar
         ActionBar actionBar = getSupportActionBar();
