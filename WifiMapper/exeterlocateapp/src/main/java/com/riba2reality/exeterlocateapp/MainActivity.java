@@ -5,8 +5,10 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
@@ -120,6 +122,24 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.d("mgdev", "MainActivity.onStop");
     }
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "receiver.onReceive");
+
+            if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
+                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        == BluetoothAdapter.STATE_OFF)
+                // Bluetooth was disconnected
+                    Log.d("mgdev", "receiver.onReceive.BluetoothAdapter.STATE_OFF");
+            }
+
+        }// end of onReceive
+    };
     //==============================================================================================
 
     //==============================================================================================
@@ -253,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
 
+        // add broadcast receivers for ble, wifi turned off
+        this.registerReceiver(receiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 
 
     }// end of onCreate
