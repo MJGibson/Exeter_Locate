@@ -82,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     private Handler iconAniHandler;
 
 
+    private final int pulseDuration = 2000;
+    private final int pulseDuration2 = 1000;
+    private final int pulseInterval = 3500; // note must be bigger than pulseDuration
 
 
     // UUID
@@ -578,7 +581,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }// end of run function
                         });
-                        Thread.sleep(1500);
+                        Thread.sleep(pulseInterval);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -598,10 +601,10 @@ public class MainActivity extends AppCompatActivity {
 //     * Makes the view visible.
      *
      */
-    private void startDisplayIconAnimation(){
-        this.diplayIconAnimation.run();
-//        this.displayIconView.setVisibility(View.VISIBLE);
-    }// end of startDisplayIconAnimation
+//    private void startDisplayIconAnimation(){
+//        this.diplayIconAnimation.run();
+////        this.displayIconView.setVisibility(View.VISIBLE);
+//    }// end of startDisplayIconAnimation
     //==============================================================================================
 
 
@@ -627,44 +630,65 @@ public class MainActivity extends AppCompatActivity {
      * Finally setting the circles back to their original state.
      *
      */
-    private Runnable diplayIconAnimation = new Runnable() {
-        @Override
-        public void run() {
+    private void startDisplayIconAnimation() {
+
+        new Thread() {
+            @Override
+            public void run() {
+
+                float scaleFactor = 8f;
+
+                circleAnimation1.animate()
+                        .scaleX(scaleFactor)
+                        .scaleY(scaleFactor)
+                        .alpha(0f)
+                        .setDuration(pulseDuration)
+                        .withEndAction(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        circleAnimation1.setScaleX(1f);
+                                        circleAnimation1.setScaleY(1f);
+                                        circleAnimation1.setAlpha(1f);
 
 
-            circleAnimation1.animate().scaleX(4f).scaleY(4f).alpha(0f).setDuration(1000)
-                    .withEndAction(
-                            new Runnable() {
-                                @Override
-                                public void run() {
+                                    }// end of run
+                                }// end of Runable
+                        )
+                ;
 
-                                    circleAnimation1.setScaleX(1f);
-                                    circleAnimation1.setScaleY(1f);
-                                    circleAnimation1.setAlpha(1f);
+                try {
 
-                                }// end of run
-                            }// end of Runable
-                    );
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-            circleAnimation2.animate().scaleX(4f).scaleY(4f).alpha(0f).setDuration(700)
-                    .withEndAction(
-                            new Runnable() {
-                                @Override
-                                public void run() {
+                circleAnimation2.animate()
+                        .scaleX(scaleFactor)
+                        .scaleY(scaleFactor)
+                        .alpha(0f)
+                        .setDuration(pulseDuration)
+                        .withEndAction(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
 
-                                    circleAnimation2.setScaleX(1f);
-                                    circleAnimation2.setScaleY(1f);
-                                    circleAnimation2.setAlpha(1f);
+                                        circleAnimation2.setScaleX(1f);
+                                        circleAnimation2.setScaleY(1f);
+                                        circleAnimation2.setAlpha(1f);
 
-                                }// end of run
-                            }// end of Runable
-                    );
+                                    }// end of run
+                                }// end of Runable
+                        );
 
-            //iconAniHandler.postDelayed(diplayIconAnimation, 1500);
+                //iconAniHandler.postDelayed(diplayIconAnimation, 1500);
 
 
-        }// end of run
-    }; // end of diplayIconAnimation
+            }// end of run
+        }.start(); // end of Runnable
+    }// end of startDiplayIconAnimation
     //==============================================================================================
 
 
