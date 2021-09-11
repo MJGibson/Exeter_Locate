@@ -27,7 +27,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import java.util.UUID;
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean active = false;
     private ConstraintLayout mainLayout;
     //private TextView versionTextView;
-    private FloatingActionButton infoButton;
+    private ConstraintLayout infoButton;
     private ImageView imageViewBackground;
 
     private View displayIconView;
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkButtons(){
 
         if( isLocationServiceRunning() ){
-            startStopButton.setText(R.string.start_button_stop_text);
+            //startStopButton.setText(R.string.start_button_stop_text);
             running = true;
 
             circleCore.setColorFilter(
@@ -150,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             startDisplayIconAnimation();
 
         }else{
-            startStopButton.setText(R.string.start_button_initial_text);
+            //startStopButton.setText(R.string.start_button_initial_text);
             running = false;
 
             circleCore.setColorFilter(
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.cross_round);
 
-            status_textView.setText("Your app inactive,\n please press start");
+            status_textView.setText("Your app inactive,\n please tap the screen");
 
         }// end of if/else isLocationServiceRunning
 
@@ -188,12 +187,13 @@ public class MainActivity extends AppCompatActivity {
 
         // set up UI
         setContentView(R.layout.activity_main);
-        startStopButton = findViewById(R.id.startStopButton);
-        startStopButton.setOnClickListener(startStopButtonPressed);
+        //startStopButton = findViewById(R.id.startStopButton);
+        //startStopButton.setOnClickListener(startStopButtonPressed);
         mainLayout = findViewById(R.id.main_layout);
-        infoButton = findViewById(R.id.infoButton);
+        infoButton = findViewById(R.id.information);
         infoButton.setOnClickListener(infoButtonPressed);
         imageViewBackground = findViewById(R.id.imageViewBackground);
+        imageViewBackground.setOnClickListener(startStopButtonPressed);
 
         this.iconAniHandler = new Handler();
         this.displayIconView = findViewById(R.id.displayIcon);
