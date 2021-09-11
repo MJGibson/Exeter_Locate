@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView circleCore;
     private ImageView circleAnimation1;
     private ImageView circleAnimation2;
+    private ImageView circleIcon;
     private Handler iconAniHandler;
 
 
@@ -121,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * checkButtons method
      * Uses isLocationServiceRunning to check if the service is running, and sets up the start/stop
-     * button appropriatley, along with the class boolean 'running'
+     * button appropriatley, along with the class boolean 'running'.
+     * Also sets the DisplayIcon to the correct settings
      */
     private void checkButtons(){
 
@@ -138,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
             circleAnimation2.setColorFilter(
                     getResources().getColor(R.color.green),
                     PorterDuff.Mode.SRC_ATOP);
+            circleIcon.setImageResource(R.mipmap.tick_round);
+
+
 
             startDisplayIconAnimation();
 
@@ -154,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
             circleAnimation2.setColorFilter(
                     getResources().getColor(R.color.red),
                     PorterDuff.Mode.SRC_ATOP);
+            circleIcon.setImageResource(R.mipmap.cross_round);
 
         }// end of if/else isLocationServiceRunning
 
@@ -187,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         this.iconAniHandler = new Handler();
         this.displayIconView = findViewById(R.id.displayIcon);
         this.circleCore = findViewById(R.id.circleBase);
+        this.circleIcon = findViewById(R.id.circleIcon);
         this.circleAnimation1 = findViewById(R.id.circleAnimation1);
         this.circleAnimation2 = findViewById(R.id.circleAnimation2);
 
@@ -453,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "3.9.100.243";
 
-        String dataBase = "alpha";
+        String dataBase = "dev";
 
         String deviceID = _deviceID;
 

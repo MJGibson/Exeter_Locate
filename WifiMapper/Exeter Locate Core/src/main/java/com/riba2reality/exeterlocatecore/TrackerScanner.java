@@ -2188,7 +2188,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         handler.removeCallbacks(periodicUpdate_ble);
         _bluetooth_scanning = false;
-        bluetoothLeScanner.stopScan(leScanCallback);
+
+        if(bluetoothLeScanner != null)
+            bluetoothLeScanner.stopScan(leScanCallback);
 
 
 
