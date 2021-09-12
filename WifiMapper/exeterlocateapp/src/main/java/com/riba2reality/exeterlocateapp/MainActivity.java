@@ -133,9 +133,13 @@ public class MainActivity extends AppCompatActivity {
 
             if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
                 if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                        == BluetoothAdapter.STATE_OFF)
-                // Bluetooth was disconnected
+                        == BluetoothAdapter.STATE_OFF) {
+                    // Bluetooth was disconnected
                     Log.d("mgdev", "receiver.onReceive.BluetoothAdapter.STATE_OFF");
+
+                    startMessageActivityBluetoothOff();
+                    
+                }
             }
 
         }// end of onReceive
@@ -312,6 +316,27 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
 
+    //==============================================================================================
+    /**
+     * startMessageActivityBluetoothOff method
+     * Starts a MessageActivity about bluetooth being turned off
+     */
+    public void startMessageActivityBluetoothOff(){
+        Intent intent = new Intent(this, MessageActivity.class);
+
+
+
+        intent.putExtra("title","For this app to work, you must have Bluetooth on");
+        intent.putExtra("message","This App Bluetooth to locate nearby Bluetooth devices" +
+                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
+                "'Bluetooth low energy' - a battery saving technology.\n\n" +
+                "Please go to setting and turn on Bluetooth.");
+        intent.putExtra("icon",R.drawable.bluetoot_disconnected_foreground);
+
+
+        startActivity(intent);
+    }//end of
+    //==============================================================================================
 
 
     //==============================================================================================
