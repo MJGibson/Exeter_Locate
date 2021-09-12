@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         checkButtons();
         checkBluetoothEnabled();
         checkWifiEnabled();
+        checkForInternetConnection();
         // add broadcast receivers for ble, wifi turned off
         this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         this.registerReceiver(receiverWifi, new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
@@ -159,22 +162,6 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
-    private void checkBluetoothEnabled(){
-
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth ???
-        } else {
-            if (!mBluetoothAdapter.isEnabled()) {
-                // Bluetooth is not enable :)
-                startMessageActivityBluetoothOff();
-            }
-        }
-
-    }// end of checkBluetoothEnabled
-    //==============================================================================================
-
-    //==============================================================================================
     BroadcastReceiver receiverWifi = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -190,6 +177,40 @@ public class MainActivity extends AppCompatActivity {
 
         }// end of onReceive
     };
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkForInternetConnection(){
+
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+        }
+        else {
+            connected = false;
+            startMessageActivityInternetOff();
+        }
+
+    }// end of checkForInternetConnection
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkBluetoothEnabled(){
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth ???
+        } else {
+            if (!mBluetoothAdapter.isEnabled()) {
+                // Bluetooth is not enable :)
+                startMessageActivityBluetoothOff();
+            }
+        }
+
+    }// end of checkBluetoothEnabled
     //==============================================================================================
 
     //==============================================================================================
@@ -373,6 +394,27 @@ public class MainActivity extends AppCompatActivity {
     }//end of
     //==============================================================================================
 
+    //==============================================================================================
+    /**
+     * startMessageActivityInternetOff method
+     * Starts a MessageActivity about internet being turned off
+     */
+    public void startMessageActivityInternetOff(){
+        Intent intent = new Intent(this, InternetMessageActivity.class);
+
+
+
+//        intent.putExtra("title","For this app to work, you must have Bluetooth on");
+//        intent.putExtra("message","This App uses Bluetooth to locate nearby Bluetooth devices" +
+//                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
+//                "'Bluetooth low energy' - a battery saving technology.\n\n" +
+//                "Please go to setting and turn on Bluetooth.");
+//        intent.putExtra("icon",R.drawable.bluetoot_disconnected_foreground);
+
+
+        startActivity(intent);
+    }//end of
+    //=============================================================================================
 
     //==============================================================================================
     /**
@@ -692,6 +734,10 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
 
                                 checkButtons();
+
+                                // would be better to have broadcast receive for this too, but
+                                // otherwise this will check every time there is a pulse
+                                checkForInternetConnection();
 
 
                             }// end of run function

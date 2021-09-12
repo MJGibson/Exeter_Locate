@@ -3,6 +3,8 @@
     package="com.riba2reality.exeterlocateapp">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- need for wifi scans on Android 8+ -->
@@ -22,6 +24,7 @@
         android:theme="@style/Theme.WifiMapper">
         <activity android:name=".BluetoothMessageActivity"></activity>
         <activity android:name=".WifiMessageActivity"></activity>
+        <activity android:name=".InternetMessageActivity"></activity>
         <activity android:name=".InfoActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
