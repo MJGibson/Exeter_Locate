@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,14 +50,22 @@ public class WifiMessageActivity extends AppCompatActivity {
 
         Log.d("mgdev", "WifiMessageActivity.onStart");
 
+
+        checkWifiEnabled();
+
+
+    }// end of onStart
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkWifiEnabled(){
+
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifi.isWifiEnabled()){
             finish();
         }
 
-
-
-    }// end of onStart
+    }// end of checkWifiEnabled
     //==============================================================================================
 
     //==============================================================================================
@@ -105,7 +112,7 @@ public class WifiMessageActivity extends AppCompatActivity {
         ok_button.setOnClickListener(allowWifiButtonPressed);
 
         // add broadcast receivers for ble turned on
-        this.registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        this.registerReceiver(receiver, new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
 
 
 
@@ -140,12 +147,9 @@ public class WifiMessageActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d("mgdev", "BluetoothMessageActivity.onReceive");
+            Log.d("mgdev", "WifiMessageActivity.onReceive");
 
-            WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifi.isWifiEnabled()){
-                finish();
-            }
+            checkWifiEnabled();
 
 //            NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 //            NetworkInfo otherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);

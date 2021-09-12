@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
-import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         checkWifiEnabled();
         // add broadcast receivers for ble, wifi turned off
         this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-        this.registerReceiver(receiverWifi, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        this.registerReceiver(receiverWifi, new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
 
         Log.d("mgdev", "MainActivity.onStart");
     }
@@ -195,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
 
     //==============================================================================================
     private void checkWifiEnabled(){
+
+        Log.d("mgdev", "MainActivity.checkWifiEnabled");
 
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!wifi.isWifiEnabled()){
