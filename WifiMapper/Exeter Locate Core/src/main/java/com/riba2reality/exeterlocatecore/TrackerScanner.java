@@ -93,7 +93,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.4.0";
+    public static final String libraryVersion = "1.4.1";
 
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues

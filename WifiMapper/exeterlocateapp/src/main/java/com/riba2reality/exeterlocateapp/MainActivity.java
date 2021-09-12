@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("mgdev", "receiver.onReceive.BluetoothAdapter.STATE_OFF");
 
                     startMessageActivityBluetoothOff();
-                    
+
                 }
             }
 
@@ -322,16 +322,16 @@ public class MainActivity extends AppCompatActivity {
      * Starts a MessageActivity about bluetooth being turned off
      */
     public void startMessageActivityBluetoothOff(){
-        Intent intent = new Intent(this, MessageActivity.class);
+        Intent intent = new Intent(this, BluetoothMessageActivity.class);
 
 
 
-        intent.putExtra("title","For this app to work, you must have Bluetooth on");
-        intent.putExtra("message","This App Bluetooth to locate nearby Bluetooth devices" +
-                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
-                "'Bluetooth low energy' - a battery saving technology.\n\n" +
-                "Please go to setting and turn on Bluetooth.");
-        intent.putExtra("icon",R.drawable.bluetoot_disconnected_foreground);
+//        intent.putExtra("title","For this app to work, you must have Bluetooth on");
+//        intent.putExtra("message","This App uses Bluetooth to locate nearby Bluetooth devices" +
+//                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
+//                "'Bluetooth low energy' - a battery saving technology.\n\n" +
+//                "Please go to setting and turn on Bluetooth.");
+//        intent.putExtra("icon",R.drawable.bluetoot_disconnected_foreground);
 
 
         startActivity(intent);

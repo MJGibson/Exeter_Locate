@@ -20,7 +20,7 @@
         android:roundIcon="@drawable/uoelogo"
         android:supportsRtl="true"
         android:theme="@style/Theme.WifiMapper">
-        <activity android:name=".MessageActivity"></activity>
+        <activity android:name=".BluetoothMessageActivity"></activity>
         <activity android:name=".InfoActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
