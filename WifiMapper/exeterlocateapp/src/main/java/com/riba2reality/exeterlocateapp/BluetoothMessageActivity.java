@@ -191,6 +191,10 @@ public class BluetoothMessageActivity extends AppCompatActivity {
     {
         // Don't do anything, until they turn bluetooth
         //super.onBackPressed();
+
+        //close the whole app??
+        // System.exit(0);
+
     }
     //==============================================================================================
 
