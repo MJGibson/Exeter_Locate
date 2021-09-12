@@ -799,25 +799,36 @@ public class MainActivity extends AppCompatActivity {
 
                 float scaleFactor = 8f;
 
-                circleAnimation1.animate()
-                        .scaleX(scaleFactor)
-                        .scaleY(scaleFactor)
-                        .alpha(0f)
-                        .setDuration(pulseDuration)
-                        .withEndAction(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
+                runOnUiThread(new Runnable() {
 
-                                        circleAnimation1.setScaleX(1f);
-                                        circleAnimation1.setScaleY(1f);
-                                        circleAnimation1.setAlpha(1f);
+                    @Override
+                    public void run() {
+
+                        circleAnimation1.animate()
+                                .scaleX(scaleFactor)
+                                .scaleY(scaleFactor)
+                                .alpha(0f)
+                                .setDuration(pulseDuration)
+                                .withEndAction(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                                circleAnimation1.setScaleX(1f);
+                                                circleAnimation1.setScaleY(1f);
+                                                circleAnimation1.setAlpha(1f);
 
 
-                                    }// end of run
-                                }// end of Runable
-                        )
-                ;
+                                            }// end of run
+                                        }// end of Runable
+                                )
+                        ;
+
+
+                    }// end of run function
+                });
+
+
 
                 try {
 
@@ -826,23 +837,34 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                circleAnimation2.animate()
-                        .scaleX(scaleFactor)
-                        .scaleY(scaleFactor)
-                        .alpha(0f)
-                        .setDuration(pulseDuration)
-                        .withEndAction(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
+                runOnUiThread(new Runnable() {
 
-                                        circleAnimation2.setScaleX(1f);
-                                        circleAnimation2.setScaleY(1f);
-                                        circleAnimation2.setAlpha(1f);
+                    @Override
+                    public void run() {
 
-                                    }// end of run
-                                }// end of Runable
-                        );
+                        circleAnimation2.animate()
+                                .scaleX(scaleFactor)
+                                .scaleY(scaleFactor)
+                                .alpha(0f)
+                                .setDuration(pulseDuration)
+                                .withEndAction(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                                circleAnimation2.setScaleX(1f);
+                                                circleAnimation2.setScaleY(1f);
+                                                circleAnimation2.setAlpha(1f);
+
+                                            }// end of run
+                                        }// end of Runable
+                                );
+
+
+                    }// end of run function
+                });
+
+
 
                 //iconAniHandler.postDelayed(diplayIconAnimation, 1500);
 
