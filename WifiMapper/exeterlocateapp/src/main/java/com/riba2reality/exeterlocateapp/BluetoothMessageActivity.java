@@ -40,6 +40,32 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 
     //----------------------------------------------------------------------------------------------
 
+    //==============================================================================================
+    /**
+     *  Checks if bluetooth has been re-activated, and finishes this activity if so
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Log.d("mgdev", "BluetoothMessageActivity.onStart");
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+        } else if (!mBluetoothAdapter.isEnabled()) {
+            // Bluetooth is not enabled :)
+        } else {
+            // Bluetooth is enabled, so finish
+
+            finish();
+
+        }
+
+
+
+    }// end of onStart
+    //==============================================================================================
 
     //==============================================================================================
     /**
@@ -155,8 +181,21 @@ public class BluetoothMessageActivity extends AppCompatActivity {
             }
 
         }// end of onReceive
-    };
+    };// end of BroadcastReceiver receiver
     //==============================================================================================
+
+
+    //==============================================================================================
+    @Override
+    public void onBackPressed()
+    {
+        // Don't do anything, until they turn bluetooth
+        //super.onBackPressed();
+    }
+    //==============================================================================================
+
+
+
 
 
 }//end of MessageActivity
