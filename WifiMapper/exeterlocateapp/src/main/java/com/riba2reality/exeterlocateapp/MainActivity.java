@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -107,6 +109,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         runThread();
         checkButtons();
+        checkBluetoothEnabled();
+        checkWifiEnabled();
+        // add broadcast receivers for ble, wifi turned off
+        this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        this.registerReceiver(receiverWifi, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
         Log.d("mgdev", "MainActivity.onStart");
     }
     //==============================================================================================
@@ -121,29 +129,79 @@ public class MainActivity extends AppCompatActivity {
         active = false;
         super.onStop();
         Log.d("mgdev", "MainActivity.onStop");
+        // add broadcast receivers for ble, wifi turned off
+        this.unregisterReceiver(receiverBle);
+        this.unregisterReceiver(receiverWifi);
     }
     //==============================================================================================
 
     //==============================================================================================
-    BroadcastReceiver receiver = new BroadcastReceiver() {
+    BroadcastReceiver receiverBle = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
             Log.d("mgdev", "receiver.onReceive");
 
-            if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
-                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                        == BluetoothAdapter.STATE_OFF) {
-                    // Bluetooth was disconnected
-                    Log.d("mgdev", "receiver.onReceive.BluetoothAdapter.STATE_OFF");
-
-                    startMessageActivityBluetoothOff();
-
-                }
-            }
+//            // check if bluetooth is turned off.
+//            if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
+//                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+//                        == BluetoothAdapter.STATE_OFF) {
+//                    // Bluetooth was disconnected
+//                    Log.d("mgdev", "receiver.onReceive.BluetoothAdapter.STATE_OFF");
+//
+//                    startMessageActivityBluetoothOff();
+//
+//                }
+//            }
+            checkBluetoothEnabled();
 
         }// end of onReceive
     };
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkBluetoothEnabled(){
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth ???
+        } else {
+            if (!mBluetoothAdapter.isEnabled()) {
+                // Bluetooth is not enable :)
+                startMessageActivityBluetoothOff();
+            }
+        }
+
+    }// end of checkBluetoothEnabled
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverWifi = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "MainActivity.receiverWifi.onReceive");
+
+//            //  check if wifi is off, and activate the wifi message....
+//            WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//            if (!wifi.isWifiEnabled()){
+//                startMessageActivityWifiOff();
+//            }
+            checkWifiEnabled();
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkWifiEnabled(){
+
+        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()){
+            startMessageActivityWifiOff();
+        }
+
+    }// end of checkWifiEnabled
     //==============================================================================================
 
     //==============================================================================================
@@ -190,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.cross_round);
 
-            status_textView.setText("Your app inactive,\n please tap the screen");
+            status_textView.setText("Your app is inactive,\n please tap the screen to start");
 
         }// end of if/else isLocationServiceRunning
 
@@ -277,8 +335,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
 
-        // add broadcast receivers for ble, wifi turned off
-        this.registerReceiver(receiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+
 
 
     }// end of onCreate
@@ -338,6 +395,16 @@ public class MainActivity extends AppCompatActivity {
     }//end of
     //==============================================================================================
 
+    //==============================================================================================
+    /**
+     * startMessageActivityWifiOff method
+     * Starts a MessageActivity about Wifi being turned off
+     */
+    public void startMessageActivityWifiOff(){
+        Intent intent = new Intent(this, WifiMessageActivity.class);
+        startActivity(intent);
+    }//end of
+    //==============================================================================================
 
     //==============================================================================================
     /**

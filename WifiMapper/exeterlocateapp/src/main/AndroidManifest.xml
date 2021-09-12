@@ -21,6 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WifiMapper">
         <activity android:name=".BluetoothMessageActivity"></activity>
+        <activity android:name=".WifiMessageActivity"></activity>
         <activity android:name=".InfoActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

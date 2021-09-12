@@ -1,10 +1,11 @@
 package com.riba2reality.exeterlocateapp;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,16 +22,16 @@ import androidx.appcompat.app.AppCompatActivity;
  * contributing small amounts of data in the limited area of the geoFence (University of Exeter -
  * Streatham campus), better locations service could be developed.
  *
- * BluetoothMessageActivity Class of type Android Activity, informs the user that the bluetooth is
- * required, and shows a button which will take the user to the bluetooth settings.
- * Automatically closing if/when bluetooth is re-activated
+ * WifiMessageActivity Class of type Android Activity, informs the user that the Wi-Fi is
+ * required, and shows a button which will take the user to the Wi-Fi settings.
+ * Automatically closing if/when Wi-Fi is re-activated
  *
  * @author <a href="mailto:M.J.Gibson@Exeter.ac.uk">Michael J Gibson</a>
  * @version 1.0
  * @since   2021-09-12
  *
  */
-public class BluetoothMessageActivity extends AppCompatActivity {
+public class WifiMessageActivity extends AppCompatActivity {
 
 
     private ImageView messageIcon;
@@ -42,24 +43,17 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     *  Checks if bluetooth has been re-activated, and finishes this activity if so
+     *  Checks if Wi-Fi has been re-activated, and finishes this activity if so
      */
     @Override
     protected void onStart() {
         super.onStart();
 
-        Log.d("mgdev", "BluetoothMessageActivity.onStart");
+        Log.d("mgdev", "WifiMessageActivity.onStart");
 
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-        } else if (!mBluetoothAdapter.isEnabled()) {
-            // Bluetooth is not enabled :)
-        } else {
-            // Bluetooth is enabled, so finish
-
+        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifi.isWifiEnabled()){
             finish();
-
         }
 
 
@@ -99,38 +93,19 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 
         // get rid of action bar...
         actionBar.hide();
-//
-//        Intent intent = getIntent();
-//
-//        if(intent != null) {
-//            String titleText = intent.getStringExtra("title");
-//            String messageText = intent.getStringExtra("message");
-//            int iconResource = intent.getIntExtra("icon",-1);
-//
-//            if(titleText != null)
-//                title.setText(titleText);
-//            if(messageText != null)
-//                message.setText(messageText);
-//            if(iconResource != -1) {
-//
-//                messageIcon.setImageResource(iconResource);
-//            }
-//
-//
-//        }
 
+        // set up text
 
-        title.setText("For this app to work, you must have Bluetooth on");
-        message.setText("This App uses Bluetooth to locate nearby Bluetooth devices" +
-                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
-                "'Bluetooth low energy' - a battery saving technology.\n\n" +
-                "Please go to setting and turn on Bluetooth.");
-        messageIcon.setImageResource(R.drawable.bluetoot_disconnected_foreground);
-        ok_button.setText("Allow Bluetooth");
-        ok_button.setOnClickListener(allowBluetoothButtonPressed);
+        title.setText("For this app to work, you must have Wi-Fi on");
+        message.setText("This App uses Wi-Fi to locate nearby Wi-Fi devices" +
+                ". If you have Wi-Fi turned off, this app will not work.\n\n" +
+                "Please go to setting and turn on Wi-Fi.");
+        messageIcon.setImageResource(R.drawable.wifi_disconnected_foreground);
+        ok_button.setText("Allow Wi-Fi");
+        ok_button.setOnClickListener(allowWifiButtonPressed);
 
         // add broadcast receivers for ble turned on
-        this.registerReceiver(receiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        this.registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
 
 
@@ -139,26 +114,26 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     * Click Listener for the 'Allow bluetooth' button, which opens the users bluetooth settings
+     * Click Listener for the 'Allow Wi-Fi' button, which opens the users Wi-Fi settings
      */
-    View.OnClickListener allowBluetoothButtonPressed = new View.OnClickListener() {
+    View.OnClickListener allowWifiButtonPressed = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             // open bluetooth settings
-            Intent intentOpenBluetoothSettings = new Intent();
-            intentOpenBluetoothSettings.setAction(
-                    android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-            startActivity(intentOpenBluetoothSettings);
+            Intent intentOpenWifiSettings = new Intent();
+            intentOpenWifiSettings.setAction(
+                    android.provider.Settings.ACTION_WIFI_SETTINGS);
+            startActivity(intentOpenWifiSettings);
 
 
         }// end of onClick
-    };// end of allowBluetoothButtonPressed click listerner
+    };// end of allowWifiButtonPressed click listener
     //==============================================================================================
 
     //==============================================================================================
     /**
-     * Broadcast receiver for if bluetooth settings are changed; if they are turned on it will close
+     * Broadcast receiver for if Wi-Fi settings are changed; if they are turned on it will close
      * this activity.
      */
     BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -167,18 +142,19 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 
             Log.d("mgdev", "BluetoothMessageActivity.onReceive");
 
-            if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
-                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                        == BluetoothAdapter.STATE_ON) {
-                    // Bluetooth was re-connected
-                    Log.d("mgdev", "BluetoothMessageActivity.onReceive.BluetoothAdapter.STATE_ON");
-
-                    //close this activity
-                    finish();
-
-
-                }
+            WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wifi.isWifiEnabled()){
+                finish();
             }
+
+//            NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+//            NetworkInfo otherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
+//
+//            if(currentNetworkInfo.isConnected()){
+//                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+//            }else{
+//                Toast.makeText(getApplicationContext(), "Not Connected", Toast.LENGTH_LONG).show();
+//            }
 
         }// end of onReceive
     };// end of BroadcastReceiver receiver
@@ -202,4 +178,4 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 
 
 
-}//end of BluetoothMessageActivity
+}//end of WifiMessageActivity
