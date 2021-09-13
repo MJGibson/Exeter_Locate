@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -132,8 +133,8 @@ public class InternetMessageActivity extends AppCompatActivity {
                 ". If you have no internet connection, this app will not work.\n\n" +
                 "Please go to setting and turn on Wi-Fi or mobile data.");
         messageIcon.setImageResource(R.drawable.internet_disconnected_foreground);
-        ok_button.setText("Allow Wi-Fi");
-        ok_button.setOnClickListener(allowWifiButtonPressed);
+        ok_button.setText("Allow Internet");
+        ok_button.setOnClickListener(allowInternetButtonPressed);
 
         // add broadcast receivers for ble turned on
         //this.registerReceiver(receiver, new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
@@ -145,21 +146,21 @@ public class InternetMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     * Click Listener for the 'Allow Wi-Fi' button, which opens the users Wi-Fi settings
+     * Click Listener for the 'Allow Internet' button, which opens the users Connection settings
      */
-    View.OnClickListener allowWifiButtonPressed = new View.OnClickListener() {
+    View.OnClickListener allowInternetButtonPressed = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             // open bluetooth settings
             Intent intentOpenWifiSettings = new Intent();
             intentOpenWifiSettings.setAction(
-                    android.provider.Settings.ACTION_WIFI_SETTINGS);
+                    Settings.ACTION_WIRELESS_SETTINGS);
             startActivity(intentOpenWifiSettings);
 
 
         }// end of onClick
-    };// end of allowWifiButtonPressed click listener
+    };// end of allowInternetButtonPressed click listener
     //==============================================================================================
 
 //    //==============================================================================================
