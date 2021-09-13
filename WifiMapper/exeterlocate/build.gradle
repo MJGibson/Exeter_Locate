@@ -41,7 +41,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.riba2reality.exeterlocateapp"
+        applicationId "com.riba2reality.exeterlocate"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 3
