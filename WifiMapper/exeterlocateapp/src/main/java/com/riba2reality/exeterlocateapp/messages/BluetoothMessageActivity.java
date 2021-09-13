@@ -1,4 +1,4 @@
-package com.riba2reality.exeterlocateapp;
+package com.riba2reality.exeterlocateapp.messages;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.riba2reality.exeterlocateapp.R;
 
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their

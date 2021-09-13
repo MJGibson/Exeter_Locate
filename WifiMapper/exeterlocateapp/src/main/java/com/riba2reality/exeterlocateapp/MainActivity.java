@@ -33,6 +33,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.riba2reality.exeterlocateapp.messages.BluetoothMessageActivity;
+import com.riba2reality.exeterlocateapp.messages.GpsMessageActivity;
+import com.riba2reality.exeterlocateapp.messages.InternetMessageActivity;
+import com.riba2reality.exeterlocateapp.messages.WifiMessageActivity;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import java.util.UUID;

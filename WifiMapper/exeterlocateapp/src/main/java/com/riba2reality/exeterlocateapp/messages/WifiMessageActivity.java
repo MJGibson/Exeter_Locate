@@ -1,12 +1,11 @@
-package com.riba2reality.exeterlocateapp;
+package com.riba2reality.exeterlocateapp.messages;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,22 +15,24 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.riba2reality.exeterlocateapp.R;
+
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
  * anonymized Location, Wi-Fi, Bluetooth, accelerometer and magnetometer data. By many citizens
  * contributing small amounts of data in the limited area of the geoFence (University of Exeter -
  * Streatham campus), better locations service could be developed.
  *
- * GpsMessageActivity Class of type Android Activity, informs the user that the GPS is
- * required, and shows a button which will take the user to the GPS settings.
- * Automatically closing if/when GPS is re-activated
+ * WifiMessageActivity Class of type Android Activity, informs the user that the Wi-Fi is
+ * required, and shows a button which will take the user to the Wi-Fi settings.
+ * Automatically closing if/when Wi-Fi is re-activated
  *
  * @author <a href="mailto:M.J.Gibson@Exeter.ac.uk">Michael J Gibson</a>
  * @version 1.0
  * @since   2021-09-12
  *
  */
-public class GpsMessageActivity extends AppCompatActivity {
+public class WifiMessageActivity extends AppCompatActivity {
 
 
     private ImageView messageIcon;
@@ -43,7 +44,7 @@ public class GpsMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     *  Checks if GPS has been re-activated, and finishes this activity if so
+     *  Checks if Wi-Fi has been re-activated, and finishes this activity if so
      */
     @Override
     protected void onStart() {
@@ -52,28 +53,21 @@ public class GpsMessageActivity extends AppCompatActivity {
         Log.d("mgdev", "WifiMessageActivity.onStart");
 
 
-        checkGpsEnabled();
+        checkWifiEnabled();
 
 
     }// end of onStart
     //==============================================================================================
 
-
-
     //==============================================================================================
-    private void checkGpsEnabled(){
+    private void checkWifiEnabled(){
 
-
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if (manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-
-            Log.d("mgdev", "GpsMessageActivity.checkGpsEnabled. GPS enabled");
-
+        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifi.isWifiEnabled()){
             finish();
+        }
 
-        }// end of if gps enabled
-
-    }// end of checkGpsEnabled
+    }// end of checkWifiEnabled
     //==============================================================================================
 
     //==============================================================================================
@@ -111,18 +105,16 @@ public class GpsMessageActivity extends AppCompatActivity {
 
         // set up text
 
-        title.setText("For this app to work, you must have GPS on");
-        message.setText("This App uses GPS to locate this device when scanning other devices." +
-                "This information helps researchers build a map of other scans." +
-                "If you have GPS turned off, this app will not work.\n\n" +
-                "Please go to setting and turn on GPS.");
-        messageIcon.setImageResource(R.drawable.gps_disconnected_foreground);
-        ok_button.setText("Allow GPS");
-        ok_button.setOnClickListener(allowGPSButtonPressed);
+        title.setText("For this app to work, you must have Wi-Fi on");
+        message.setText("This App uses Wi-Fi to locate nearby Wi-Fi devices" +
+                ". If you have Wi-Fi turned off, this app will not work.\n\n" +
+                "Please go to setting and turn on Wi-Fi.");
+        messageIcon.setImageResource(R.drawable.wifi_disconnected_foreground);
+        ok_button.setText("Allow Wi-Fi");
+        ok_button.setOnClickListener(allowWifiButtonPressed);
 
         // add broadcast receivers for ble turned on
-
-        this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        this.registerReceiver(receiver, new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
 
 
 
@@ -131,17 +123,17 @@ public class GpsMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     * Click Listener for the 'Allow GPS' button, which opens the users GPS settings
+     * Click Listener for the 'Allow Wi-Fi' button, which opens the users Wi-Fi settings
      */
-    View.OnClickListener allowGPSButtonPressed = new View.OnClickListener() {
+    View.OnClickListener allowWifiButtonPressed = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             // open bluetooth settings
-            Intent intentOpenGPSSettings = new Intent();
-            intentOpenGPSSettings.setAction(
-                    Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intentOpenGPSSettings);
+            Intent intentOpenWifiSettings = new Intent();
+            intentOpenWifiSettings.setAction(
+                    android.provider.Settings.ACTION_WIFI_SETTINGS);
+            startActivity(intentOpenWifiSettings);
 
 
         }// end of onClick
@@ -150,16 +142,25 @@ public class GpsMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     * Broadcast receiver for if GPS settings are changed; if they are turned on it will close
+     * Broadcast receiver for if Wi-Fi settings are changed; if they are turned on it will close
      * this activity.
      */
-    BroadcastReceiver receiverGPS = new BroadcastReceiver() {
+    BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
             Log.d("mgdev", "WifiMessageActivity.onReceive");
 
-            checkGpsEnabled();
+            checkWifiEnabled();
+
+//            NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+//            NetworkInfo otherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
+//
+//            if(currentNetworkInfo.isConnected()){
+//                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+//            }else{
+//                Toast.makeText(getApplicationContext(), "Not Connected", Toast.LENGTH_LONG).show();
+//            }
 
         }// end of onReceive
     };// end of BroadcastReceiver receiver
@@ -183,4 +184,4 @@ public class GpsMessageActivity extends AppCompatActivity {
 
 
 
-}//end of GpsMessageActivity
+}//end of WifiMessageActivity

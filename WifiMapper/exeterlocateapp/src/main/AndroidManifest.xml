@@ -22,10 +22,10 @@
         android:roundIcon="@mipmap/exeter_locate_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WifiMapper">
-        <activity android:name=".BluetoothMessageActivity"></activity>
-        <activity android:name=".WifiMessageActivity"></activity>
-        <activity android:name=".InternetMessageActivity"></activity>
-        <activity android:name=".GpsMessageActivity"></activity>
+        <activity android:name=".messages.BluetoothMessageActivity"></activity>
+        <activity android:name=".messages.WifiMessageActivity"></activity>
+        <activity android:name=".messages.InternetMessageActivity"></activity>
+        <activity android:name=".messages.GpsMessageActivity"></activity>
         <activity android:name=".InfoActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
