@@ -237,6 +237,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private String _database;
     private String _deviceID;
     private boolean _useSSL;
+    private String _callingPackage;
 
     private boolean insideGeoFence = false;
 
@@ -2219,13 +2220,31 @@ public class TrackerScanner extends Service implements LocationListener {
                 channelId
         );
 
-        builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentTitle("Location Service");
+        builder.setSmallIcon(R.mipmap.exeter_locate_icon);
+        builder.setContentTitle("Exeter Locate");
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setContentIntent(pendingIntent);
-        builder.setContentText("Running");
+        builder.setContentText("Scanning");
         builder.setAutoCancel(false);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
+        Class<?> clazz = null;
+
+        try {
+            clazz = Class.forName(_callingPackage);
+
+            Intent notificationIntent = new Intent(getApplicationContext(), clazz);
+
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntentNotifPressed = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+            builder.setContentIntent(pendingIntentNotifPressed);
+
+            Log.d("mgdev", "TrackerScanner.startNotificationService()._callingPackage: "+_callingPackage);
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -2234,10 +2253,10 @@ public class TrackerScanner extends Service implements LocationListener {
             ) {
                 NotificationChannel notificationChannel = new NotificationChannel(
                         channelId,
-                        "Location Service",
+                        "Exeter Locate",
                         NotificationManager.IMPORTANCE_HIGH
                 );
-                notificationChannel.setDescription("This channel is used by location service");
+                notificationChannel.setDescription("This channel is used by Exeter Locate");
                 notificationManager.createNotificationChannel(notificationChannel);
 
             }// end of if notificationManager not null
@@ -2357,6 +2376,8 @@ public class TrackerScanner extends Service implements LocationListener {
                         _database = intent.getStringExtra("database");
                         _deviceID = intent.getStringExtra("DeviceID");
                         _useSSL = intent.getBooleanExtra("SSL_switch", true);
+
+                        _callingPackage = intent.getStringExtra("PACKAGE");
 
 
                         startScanning();

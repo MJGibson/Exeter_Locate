@@ -659,7 +659,13 @@ public class MainActivity extends AppCompatActivity {
 //        startStopButton.setText(R.string.start_button_stop_text);
 //        running = true;
 
-        Log.d("mgdev", "MainActivity.startService");
+        String packageName =  this.getClass().getName();
+
+        Log.d("mgdev", "MainActivity.startService: "+packageName );
+        //Log.d("mgdev", "MainActivity.startService");
+
+
+
 
         Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
         intent.setAction(
@@ -679,6 +685,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("database", dataBase);
         intent.putExtra("DeviceID", deviceID);
         intent.putExtra("SSL_switch", useSSL);
+
+        intent.putExtra("PACKAGE", packageName);
 
 
         startService(intent);

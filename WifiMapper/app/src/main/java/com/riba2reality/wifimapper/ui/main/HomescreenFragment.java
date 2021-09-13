@@ -244,7 +244,7 @@ public class HomescreenFragment extends Fragment {
     //==============================================================================================
     public void addMessage(String message){
 
-        if (logTextView != null) {
+        if (logTextView != null && getActivity() != null) {
 
             Log.d("Trace", "HomeScreenFragment.addMessage, logTextView != null");
 
@@ -252,6 +252,8 @@ public class HomescreenFragment extends Fragment {
             logTextView.append( message );
 
             // count the number of lines to remove, i.e. the number of lines > the maximum
+
+
             int linesToRemove = logTextView.getLineCount() - getActivity().getBaseContext().getResources().getInteger(R.integer.max_log_lines); // TODO check we can get activity...
 
             // if there some to remove
@@ -392,10 +394,15 @@ public class HomescreenFragment extends Fragment {
 
         boolean useSSL = SP.getBoolean("SSL_switch", true);
 
+        // get the packagename of the main activity, note this is a fragment
+        String packageName =  getActivity().getClass().getName();
+
         intent.putExtra("ServerAddress", address);
         intent.putExtra("database", dataBase);
         intent.putExtra("DeviceID", deviceID);
         intent.putExtra("SSL_switch", useSSL);
+
+        intent.putExtra("PACKAGE", packageName);
 
         getActivity().startService(intent);
         Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();
