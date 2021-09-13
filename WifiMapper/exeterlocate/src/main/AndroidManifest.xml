@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.riba2reality.exeterlocateapp">
+    package="com.riba2reality.exeterlocate">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -22,12 +22,12 @@
         android:roundIcon="@mipmap/exeter_locate_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WifiMapper">
-        <activity android:name=".messages.BluetoothMessageActivity"></activity>
-        <activity android:name=".messages.WifiMessageActivity"></activity>
-        <activity android:name=".messages.InternetMessageActivity"></activity>
-        <activity android:name=".messages.GpsMessageActivity"></activity>
-        <activity android:name=".InfoActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name="com.riba2reality.exeterlocate.messages.BluetoothMessageActivity"></activity>
+        <activity android:name="com.riba2reality.exeterlocate.messages.WifiMessageActivity"></activity>
+        <activity android:name="com.riba2reality.exeterlocate.messages.InternetMessageActivity"></activity>
+        <activity android:name="com.riba2reality.exeterlocate.messages.GpsMessageActivity"></activity>
+        <activity android:name="com.riba2reality.exeterlocate.InfoActivity" />
+        <activity android:name="com.riba2reality.exeterlocate.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

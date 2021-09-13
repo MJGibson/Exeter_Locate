@@ -1,4 +1,4 @@
 include ':app'
 rootProject.name = "WifiMapper"
 include ':Exeter Locate Core'
-include ':exeterlocateapp'
+include ':exeterlocate'

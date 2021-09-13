@@ -1,4 +1,4 @@
-package com.riba2reality.exeterlocateapp.messages;
+package com.riba2reality.exeterlocate.messages;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.riba2reality.exeterlocateapp.R;
+import com.riba2reality.exeterlocate.R;
 
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their

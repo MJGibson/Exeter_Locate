@@ -1,4 +1,4 @@
-package com.riba2reality.exeterlocateapp;
+package com.riba2reality.exeterlocate;
 
 import org.junit.Test;
 

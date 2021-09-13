@@ -1,12 +1,11 @@
-package com.riba2reality.exeterlocateapp.messages;
+package com.riba2reality.exeterlocate.messages;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.riba2reality.exeterlocateapp.R;
+import com.riba2reality.exeterlocate.R;
 
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
@@ -24,16 +23,16 @@ import com.riba2reality.exeterlocateapp.R;
  * contributing small amounts of data in the limited area of the geoFence (University of Exeter -
  * Streatham campus), better locations service could be developed.
  *
- * GpsMessageActivity Class of type Android Activity, informs the user that the GPS is
- * required, and shows a button which will take the user to the GPS settings.
- * Automatically closing if/when GPS is re-activated
+ * BluetoothMessageActivity Class of type Android Activity, informs the user that the bluetooth is
+ * required, and shows a button which will take the user to the bluetooth settings.
+ * Automatically closing if/when bluetooth is re-activated
  *
  * @author <a href="mailto:M.J.Gibson@Exeter.ac.uk">Michael J Gibson</a>
  * @version 1.0
  * @since   2021-09-12
  *
  */
-public class GpsMessageActivity extends AppCompatActivity {
+public class BluetoothMessageActivity extends AppCompatActivity {
 
 
     private ImageView messageIcon;
@@ -45,37 +44,29 @@ public class GpsMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     *  Checks if GPS has been re-activated, and finishes this activity if so
+     *  Checks if bluetooth has been re-activated, and finishes this activity if so
      */
     @Override
     protected void onStart() {
         super.onStart();
 
-        Log.d("mgdev", "WifiMessageActivity.onStart");
+        Log.d("mgdev", "BluetoothMessageActivity.onStart");
 
-
-        checkGpsEnabled();
-
-
-    }// end of onStart
-    //==============================================================================================
-
-
-
-    //==============================================================================================
-    private void checkGpsEnabled(){
-
-
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if (manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-
-            Log.d("mgdev", "GpsMessageActivity.checkGpsEnabled. GPS enabled");
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+        } else if (!mBluetoothAdapter.isEnabled()) {
+            // Bluetooth is not enabled :)
+        } else {
+            // Bluetooth is enabled, so finish
 
             finish();
 
-        }// end of if gps enabled
+        }
 
-    }// end of checkGpsEnabled
+
+
+    }// end of onStart
     //==============================================================================================
 
     //==============================================================================================
@@ -110,21 +101,38 @@ public class GpsMessageActivity extends AppCompatActivity {
 
         // get rid of action bar...
         actionBar.hide();
+//
+//        Intent intent = getIntent();
+//
+//        if(intent != null) {
+//            String titleText = intent.getStringExtra("title");
+//            String messageText = intent.getStringExtra("message");
+//            int iconResource = intent.getIntExtra("icon",-1);
+//
+//            if(titleText != null)
+//                title.setText(titleText);
+//            if(messageText != null)
+//                message.setText(messageText);
+//            if(iconResource != -1) {
+//
+//                messageIcon.setImageResource(iconResource);
+//            }
+//
+//
+//        }
 
-        // set up text
 
-        title.setText("For this app to work, you must have GPS on");
-        message.setText("This App uses GPS to locate this device when scanning other devices." +
-                "This information helps researchers build a map of other scans." +
-                "If you have GPS turned off, this app will not work.\n\n" +
-                "Please go to setting and turn on GPS.");
-        messageIcon.setImageResource(R.drawable.gps_disconnected_foreground);
-        ok_button.setText("Allow GPS");
-        ok_button.setOnClickListener(allowGPSButtonPressed);
+        title.setText("For this app to work, you must have Bluetooth on");
+        message.setText("This App uses Bluetooth to locate nearby Bluetooth devices" +
+                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
+                "'Bluetooth low energy' - a battery saving technology.\n\n" +
+                "Please go to setting and turn on Bluetooth.");
+        messageIcon.setImageResource(R.drawable.bluetoot_disconnected_foreground);
+        ok_button.setText("Allow Bluetooth");
+        ok_button.setOnClickListener(allowBluetoothButtonPressed);
 
         // add broadcast receivers for ble turned on
-
-        this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        this.registerReceiver(receiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 
 
 
@@ -133,35 +141,46 @@ public class GpsMessageActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
-     * Click Listener for the 'Allow GPS' button, which opens the users GPS settings
+     * Click Listener for the 'Allow bluetooth' button, which opens the users bluetooth settings
      */
-    View.OnClickListener allowGPSButtonPressed = new View.OnClickListener() {
+    View.OnClickListener allowBluetoothButtonPressed = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             // open bluetooth settings
-            Intent intentOpenGPSSettings = new Intent();
-            intentOpenGPSSettings.setAction(
-                    Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intentOpenGPSSettings);
+            Intent intentOpenBluetoothSettings = new Intent();
+            intentOpenBluetoothSettings.setAction(
+                    android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+            startActivity(intentOpenBluetoothSettings);
 
 
         }// end of onClick
-    };// end of allowWifiButtonPressed click listener
+    };// end of allowBluetoothButtonPressed click listerner
     //==============================================================================================
 
     //==============================================================================================
     /**
-     * Broadcast receiver for if GPS settings are changed; if they are turned on it will close
+     * Broadcast receiver for if bluetooth settings are changed; if they are turned on it will close
      * this activity.
      */
-    BroadcastReceiver receiverGPS = new BroadcastReceiver() {
+    BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d("mgdev", "WifiMessageActivity.onReceive");
+            Log.d("mgdev", "BluetoothMessageActivity.onReceive");
 
-            checkGpsEnabled();
+            if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
+                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        == BluetoothAdapter.STATE_ON) {
+                    // Bluetooth was re-connected
+                    Log.d("mgdev", "BluetoothMessageActivity.onReceive.BluetoothAdapter.STATE_ON");
+
+                    //close this activity
+                    finish();
+
+
+                }
+            }
 
         }// end of onReceive
     };// end of BroadcastReceiver receiver
@@ -185,4 +204,4 @@ public class GpsMessageActivity extends AppCompatActivity {
 
 
 
-}//end of GpsMessageActivity
+}//end of BluetoothMessageActivity
