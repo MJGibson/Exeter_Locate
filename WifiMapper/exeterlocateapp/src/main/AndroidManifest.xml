@@ -25,6 +25,7 @@
         <activity android:name=".BluetoothMessageActivity"></activity>
         <activity android:name=".WifiMessageActivity"></activity>
         <activity android:name=".InternetMessageActivity"></activity>
+        <activity android:name=".GpsMessageActivity"></activity>
         <activity android:name=".InfoActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

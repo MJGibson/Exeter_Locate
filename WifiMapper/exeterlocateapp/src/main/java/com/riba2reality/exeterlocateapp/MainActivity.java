@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -113,9 +114,12 @@ public class MainActivity extends AppCompatActivity {
         checkBluetoothEnabled();
         checkWifiEnabled();
         checkForInternetConnection();
+        checkGpsEnabled();
         // add broadcast receivers for ble, wifi turned off
         this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-        this.registerReceiver(receiverWifi, new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
+        this.registerReceiver(receiverWifi,
+                new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
+        this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
         Log.d("mgdev", "MainActivity.onStart");
     }
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         // add broadcast receivers for ble, wifi turned off
         this.unregisterReceiver(receiverBle);
         this.unregisterReceiver(receiverWifi);
+        this.unregisterReceiver(receiverGPS);
     }
     //==============================================================================================
 
@@ -177,6 +182,36 @@ public class MainActivity extends AppCompatActivity {
 
         }// end of onReceive
     };
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverGPS = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "MainActivity.receiverGPS.onReceive");
+
+
+            checkGpsEnabled();
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkGpsEnabled(){
+
+
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+
+            Log.d("mgdev", "MainActivity.checkGpsEnabled. GPS disabled");
+
+            startMessageActivityGPSOff();
+
+        }// end of if gps not enabled
+
+    }// end of checkGpsEnabled
     //==============================================================================================
 
     //==============================================================================================
@@ -396,25 +431,26 @@ public class MainActivity extends AppCompatActivity {
 
     //==============================================================================================
     /**
+     * startMessageActivityGPSOff method
+     * Starts a MessageActivity about GPS being turned off
+     */
+    public void startMessageActivityGPSOff(){
+        Intent intent = new Intent(this, GpsMessageActivity.class);
+
+        startActivity(intent);
+    }//end of
+    //==============================================================================================
+    //==============================================================================================
+    /**
      * startMessageActivityInternetOff method
      * Starts a MessageActivity about internet being turned off
      */
     public void startMessageActivityInternetOff(){
         Intent intent = new Intent(this, InternetMessageActivity.class);
 
-
-
-//        intent.putExtra("title","For this app to work, you must have Bluetooth on");
-//        intent.putExtra("message","This App uses Bluetooth to locate nearby Bluetooth devices" +
-//                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
-//                "'Bluetooth low energy' - a battery saving technology.\n\n" +
-//                "Please go to setting and turn on Bluetooth.");
-//        intent.putExtra("icon",R.drawable.bluetoot_disconnected_foreground);
-
-
         startActivity(intent);
     }//end of
-    //=============================================================================================
+    //==============================================================================================
 
     //==============================================================================================
     /**
