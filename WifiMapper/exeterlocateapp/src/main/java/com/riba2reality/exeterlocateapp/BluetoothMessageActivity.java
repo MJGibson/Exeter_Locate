@@ -94,7 +94,7 @@ public class BluetoothMessageActivity extends AppCompatActivity {
         actionBar.setTitle(R.string.app_name);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setLogo(R.mipmap.uoe_logo);
+        actionBar.setLogo(R.mipmap.exeter_locate_icon);
         actionBar.setDisplayUseLogoEnabled(true);
 
         // get rid of action bar...

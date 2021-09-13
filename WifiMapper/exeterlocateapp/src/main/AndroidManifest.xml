@@ -16,10 +16,10 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/uoelogo"
+        android:icon="@mipmap/exeter_locate_icon"
         android:label="@string/app_name"
-        android:logo="@drawable/uoelogo"
-        android:roundIcon="@drawable/uoelogo"
+        android:logo="@mipmap/exeter_locate_icon"
+        android:roundIcon="@mipmap/exeter_locate_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WifiMapper">
         <activity android:name=".BluetoothMessageActivity"></activity>

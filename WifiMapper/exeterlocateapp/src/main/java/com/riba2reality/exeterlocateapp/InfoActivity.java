@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.riba2reality.exeterlocatecore.TrackerScanner;
@@ -59,7 +60,18 @@ public class InfoActivity extends AppCompatActivity {
             SPeditor.apply();
         }
 
+        // set up title bar
+        ActionBar actionBar = getSupportActionBar();
+        //actionBar.setDisplayShowHomeEnabled(true);
 
+        actionBar.setTitle(R.string.app_name);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setLogo(R.mipmap.exeter_locate_icon);
+        actionBar.setDisplayUseLogoEnabled(true);
+
+        // get rid of action bar...
+        actionBar.hide();
 
         // set versions
         //versionTextView.setEnabled(false);
