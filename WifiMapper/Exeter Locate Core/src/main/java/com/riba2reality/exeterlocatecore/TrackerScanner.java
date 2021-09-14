@@ -93,7 +93,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.4.1";
+    public static final String libraryVersion = "1.4.2";
 
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues
@@ -814,7 +814,7 @@ public class TrackerScanner extends Service implements LocationListener {
         if (location == null)
             return;
 
-        Log.d("Trace", "TrackerScanner.onLocationChanged()");
+        Log.d("mgdev", "TrackerScanner.onLocationChanged()");
         //-------------------------------------------------------------
 
         if(_mode){
@@ -2110,6 +2110,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private void postALL(){
 
 
+        Log.d("mgdev", "TrackerScanner.postALL()");
 
         postResends();
 
