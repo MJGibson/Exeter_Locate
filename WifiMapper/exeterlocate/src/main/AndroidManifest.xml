@@ -21,7 +21,7 @@
         android:logo="@mipmap/exeter_locate_icon"
         android:roundIcon="@mipmap/exeter_locate_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.WifiMapper">
+        android:theme="@style/Theme.ExeterLocate">
         <activity android:name="com.riba2reality.exeterlocate.messages.BluetoothMessageActivity"></activity>
         <activity android:name="com.riba2reality.exeterlocate.messages.WifiMessageActivity"></activity>
         <activity android:name="com.riba2reality.exeterlocate.messages.InternetMessageActivity"></activity>
