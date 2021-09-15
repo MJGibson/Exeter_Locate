@@ -65,37 +65,10 @@
 <!--        app:layout_constraintBottom_toBottomOf="parent"-->
 <!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
-    <LinearLayout
+    <include layout="@layout/banner_layout"
+        android:id="@+id/banner"
+        />
 
-
-
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:srcCompat="@mipmap/exeter_locate_icon_foreground"/>
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-
-            android:layout_marginTop="35dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-
-            android:layout_height="75dp"
-
-            app:srcCompat="@drawable/uoe_colour_logo" />
-    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/information"

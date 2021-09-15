@@ -11,53 +11,52 @@
     android:background="@color/white"
     >
 
-    <LinearLayout
-
-        android:id="@+id/banner"
-
-
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:srcCompat="@mipmap/exeter_locate_icon_foreground"/>
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-
-            android:layout_marginTop="35dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-
-            android:layout_height="75dp"
-
-            app:srcCompat="@drawable/uoe_colour_logo" />
-    </LinearLayout>
-
-
-
-    <WebView
-        android:id="@+id/infoWebView"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="@string/information_t_c_s"
-        android:paddingVertical="5dp"
-
-        app:layout_constraintBottom_toTopOf="@id/textViewVersion"
+        app:layout_constraintBottom_toTopOf="@+id/textViewVersion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/banner"
-        />
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/page"
+
+
+            >
+
+            <include layout="@layout/banner_layout"
+                android:id="@+id/banner"
+                />
+
+
+
+            <WebView
+                android:id="@+id/infoWebView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/information_t_c_s"
+                android:paddingVertical="5dp"
+
+                app:layout_constraintBottom_toTopOf="@id/textViewVersion"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/banner"
+                />
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+
 
     <TextView
         android:id="@+id/textViewVersion"
@@ -67,12 +66,14 @@
         android:paddingVertical="5dp"
         android:text="ver"
         android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@+id/infoWebView"
+        app:layout_constraintTop_toBottomOf="@+id/page"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-<!--    <TextView-->
+
+
+    <!--    <TextView-->
 <!--        android:id="@+id/textViewID"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
