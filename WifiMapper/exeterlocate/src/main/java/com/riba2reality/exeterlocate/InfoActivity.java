@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.UUID;
 
 /**
@@ -49,6 +52,7 @@ public class InfoActivity extends AppCompatActivity {
         versionTextView = findViewById(R.id.textViewVersion);
         //idTextView = findViewById(R.id.textViewID);
         infoWebView = findViewById(R.id.infoWebView);
+
 
         // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
@@ -91,11 +95,55 @@ public class InfoActivity extends AppCompatActivity {
 
         infoWebView.setWebViewClient(new WebViewClient());
         // load from asset file, but could check an actualy website and default to this
-        infoWebView.loadUrl("file:///android_asset/Citizen Science information.htm");
+        infoWebView.loadUrl("file:///android_asset/ExeterLocateInformationpage.html");
+
+//        String infoPageHtml = readTextFromAsset("ExeterLocateInformationpage.html");
+//
+//
+//        infoWebView.loadDataWithBaseURL(null,
+//                "<style>img{display: inline;height: auto;max-width: 100%;}</style>"
+//                        + infoPageHtml,
+//                "text/html",
+//                "UTF-8",
+//                null);
 
 
 
     }// end of onCreate
+    //==============================================================================================
+
+    //==============================================================================================
+    private String readTextFromAsset(String fileName){
+
+        String returnValue = "";
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open(fileName)));
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                //process line
+                returnValue+=mLine;
+
+            }
+        } catch (IOException e) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //log the exception
+                }
+            }
+        }
+
+        return returnValue;
+
+    }
     //==============================================================================================
 
     //==============================================================================================
