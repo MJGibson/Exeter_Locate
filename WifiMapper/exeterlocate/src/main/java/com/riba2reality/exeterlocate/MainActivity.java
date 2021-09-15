@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.location.LocationManager;
@@ -102,6 +103,98 @@ public class MainActivity extends AppCompatActivity {
 
 
     //##############################################################################################
+
+    //==============================================================================================
+    /**
+     * onCreate Method
+     * Sets up the front end, using the activity_main layout, and initialises UI class variables.
+     * Checks if a UUID is stored in the shared preferences, and if not creates and stores one,
+     * otherwise loading and using the stored UUID.
+     * If bluetooth is available on the device then the class variables are intialised.
+     * Displays the version of this app and the back end.
+     *
+     * @param savedInstanceState
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // set up UI
+        setContentView(R.layout.activity_main);
+
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+
+        //startStopButton = findViewById(R.id.startStopButton);
+        //startStopButton.setOnClickListener(startStopButtonPressed);
+        mainLayout = findViewById(R.id.main_layout);
+        infoButton = findViewById(R.id.information);
+        infoButton.setOnClickListener(infoButtonPressed);
+//        imageViewBackground = findViewById(R.id.imageViewBackground);
+//        imageViewBackground.setOnClickListener(startStopButtonPressed);
+
+        this.iconAniHandler = new Handler();
+        this.displayIconView = findViewById(R.id.displayIcon);
+        this.circleCore = findViewById(R.id.circleBase);
+        this.circleIcon = findViewById(R.id.circleIcon);
+        this.circleIcon.setOnClickListener(startStopButtonPressed);
+        this.circleAnimation1 = findViewById(R.id.circleAnimation1);
+        this.circleAnimation2 = findViewById(R.id.circleAnimation2);
+        this.status_textView =  findViewById(R.id.textView_status);
+
+        // set up title bar
+        ActionBar actionBar = getSupportActionBar();
+        //actionBar.setDisplayShowHomeEnabled(true);
+
+        actionBar.setTitle(R.string.app_name);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setLogo(R.mipmap.exeter_locate_icon);
+        actionBar.setDisplayUseLogoEnabled(true);
+
+        // get rid of action bar...
+        actionBar.hide();
+
+
+
+        // set versions
+//        versionTextView = findViewById(R.id.version_textView);
+//
+//        //versionTextView.setEnabled(false);
+//        versionTextView.setText(
+//                "Version: " + BuildConfig.VERSION_NAME + "\n"
+//                //+ "Core Version: " + versionName
+//                + "Core Version: " + TrackerScanner.libraryVersion
+//                );
+
+        // check if we already have a UUID, if not make a new one and store it
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        String _deviceID = SP.getString("DeviceID", "");
+        if(_deviceID.isEmpty()){
+            _deviceID = UUID.randomUUID().toString();
+            SPeditor.putString("DeviceID", _deviceID);
+            SPeditor.apply();
+        }
+
+        Log.d("mgdev", "MainActivity.onCreate._deviceID="+_deviceID);
+
+        // check if bluetooth is available and fetch it
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            // Device doesn't support Bluetooth
+        }else {
+
+            // ble stuff
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        }
+
+
+
+
+    }// end of onCreate
+    //==============================================================================================
 
     //==============================================================================================
     /**
@@ -289,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.tick_round);
 
-            status_textView.setText("Your app is active\n and scanning");
+            status_textView.setText("App is active and scanning.\n Please tap the tick to stop.");
 
 
             startDisplayIconAnimation();
@@ -310,98 +403,14 @@ public class MainActivity extends AppCompatActivity {
             circleIcon.setImageResource(R.mipmap.cross_round);
             //circleIcon.image
 
-            status_textView.setText("Your app is inactive,\n please tap the screen to start");
+            status_textView.setText("App is inactive.\n Please tap the cross to start.");
 
         }// end of if/else isLocationServiceRunning
 
     }//end of checkButtons
     //==============================================================================================
 
-    //==============================================================================================
-    /**
-     * onCreate Method
-     * Sets up the front end, using the activity_main layout, and initialises UI class variables.
-     * Checks if a UUID is stored in the shared preferences, and if not creates and stores one,
-     * otherwise loading and using the stored UUID.
-     * If bluetooth is available on the device then the class variables are intialised.
-     * Displays the version of this app and the back end.
-     *
-     * @param savedInstanceState
-     */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        // set up UI
-        setContentView(R.layout.activity_main);
-        //startStopButton = findViewById(R.id.startStopButton);
-        //startStopButton.setOnClickListener(startStopButtonPressed);
-        mainLayout = findViewById(R.id.main_layout);
-        infoButton = findViewById(R.id.information);
-        infoButton.setOnClickListener(infoButtonPressed);
-        imageViewBackground = findViewById(R.id.imageViewBackground);
-        imageViewBackground.setOnClickListener(startStopButtonPressed);
-
-        this.iconAniHandler = new Handler();
-        this.displayIconView = findViewById(R.id.displayIcon);
-        this.circleCore = findViewById(R.id.circleBase);
-        this.circleIcon = findViewById(R.id.circleIcon);
-        this.circleAnimation1 = findViewById(R.id.circleAnimation1);
-        this.circleAnimation2 = findViewById(R.id.circleAnimation2);
-        this.status_textView =  findViewById(R.id.textView_status);
-
-        // set up title bar
-        ActionBar actionBar = getSupportActionBar();
-        //actionBar.setDisplayShowHomeEnabled(true);
-
-        actionBar.setTitle(R.string.app_name);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setLogo(R.mipmap.exeter_locate_icon);
-        actionBar.setDisplayUseLogoEnabled(true);
-
-        // get rid of action bar...
-        actionBar.hide();
-
-
-
-        // set versions
-//        versionTextView = findViewById(R.id.version_textView);
-//
-//        //versionTextView.setEnabled(false);
-//        versionTextView.setText(
-//                "Version: " + BuildConfig.VERSION_NAME + "\n"
-//                //+ "Core Version: " + versionName
-//                + "Core Version: " + TrackerScanner.libraryVersion
-//                );
-
-        // check if we already have a UUID, if not make a new one and store it
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor SPeditor = SP.edit();
-        String _deviceID = SP.getString("DeviceID", "");
-        if(_deviceID.isEmpty()){
-            _deviceID = UUID.randomUUID().toString();
-            SPeditor.putString("DeviceID", _deviceID);
-            SPeditor.apply();
-        }
-
-        Log.d("mgdev", "MainActivity.onCreate._deviceID="+_deviceID);
-
-        // check if bluetooth is available and fetch it
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-        }else {
-
-            // ble stuff
-            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-        }
-
-
-
-
-    }// end of onCreate
-    //==============================================================================================
 
     //==============================================================================================
     /**
