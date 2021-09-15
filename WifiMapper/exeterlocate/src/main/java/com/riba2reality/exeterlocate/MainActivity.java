@@ -308,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
                     getResources().getColor(R.color.red),
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.cross_round);
+            //circleIcon.image
 
             status_textView.setText("Your app is inactive,\n please tap the screen to start");
 
