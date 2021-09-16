@@ -89,6 +89,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation project(path: ':Exeter Locate Core')
+    implementation 'com.google.android.play:core:1.8.0'
     //compile 'com.riba2reality.exeterlocatecore'
 
 

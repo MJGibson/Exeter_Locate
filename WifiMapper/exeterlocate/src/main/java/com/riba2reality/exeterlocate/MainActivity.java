@@ -2,13 +2,17 @@ package com.riba2reality.exeterlocate;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -35,6 +39,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
 import com.riba2reality.exeterlocate.messages.BluetoothMessageActivity;
 import com.riba2reality.exeterlocate.messages.GpsMessageActivity;
 import com.riba2reality.exeterlocate.messages.InternetMessageActivity;
@@ -72,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     // permission variables
     private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1;
     public static final int REQUEST_ENABLE_BT = 11;
+    public static final int UPDATE_REQUEST_CODE = 111;
 
     // bluetooth
     private BluetoothLeScanner bluetoothLeScanner;
@@ -202,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         active = true;
         super.onStart();
+        checkForUpdates();
         runThread();
         checkButtons();
         checkBluetoothEnabled();
@@ -235,6 +247,12 @@ public class MainActivity extends AppCompatActivity {
         this.unregisterReceiver(receiverGPS);
     }
     //==============================================================================================
+
+
+    //##############################################################################################
+    //###########################       Receiver Functions     #####################################
+    //##############################################################################################
+
 
     //==============================================================================================
     BroadcastReceiver receiverGeoFenceUpdates = new BroadcastReceiver() {
@@ -300,6 +318,61 @@ public class MainActivity extends AppCompatActivity {
     //###########################       Check Functions     ########################################
     //##############################################################################################
 
+    //==============================================================================================
+    private void checkForUpdates(){
+
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(getBaseContext());
+
+        // Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        Activity MainActivity = this;
+
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+
+                new AlertDialog.Builder(getBaseContext())
+                        .setTitle("Update Available")
+                        .setMessage("An update is available, please click OK to update now.")
+
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // operation
+                                try {
+                                    appUpdateManager.startUpdateFlowForResult(
+                                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                                            appUpdateInfo,
+                                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                                            AppUpdateType.IMMEDIATE,
+                                            // The current activity making the update request.
+                                            MainActivity,
+                                            // Include a request code to later monitor this update request.
+                                            UPDATE_REQUEST_CODE);
+                                } catch (IntentSender.SendIntentException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }// end of onClick
+                        })
+
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+//                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+
+            }// end of if update available
+        });// end of update info listener
+
+    }// end of checkForUpdates
+    //==============================================================================================
 
     //==============================================================================================
     private void requestGeoFenceUpdate(){
@@ -321,8 +394,8 @@ public class MainActivity extends AppCompatActivity {
             _insideGeoFence = false;
         }
 
-    }// end of checkGpsEnabled
-    //=============================================================================================
+    }// end of requestGeoFenceUpdate
+    //==============================================================================================
 
     //==============================================================================================
     private void checkGpsEnabled(){
