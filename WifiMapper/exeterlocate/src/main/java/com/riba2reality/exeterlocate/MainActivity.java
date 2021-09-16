@@ -33,11 +33,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.riba2reality.exeterlocate.messages.BluetoothMessageActivity;
 import com.riba2reality.exeterlocate.messages.GpsMessageActivity;
 import com.riba2reality.exeterlocate.messages.InternetMessageActivity;
 import com.riba2reality.exeterlocate.messages.WifiMessageActivity;
+import com.riba2reality.exeterlocatecore.DataStores.Constants;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import java.util.UUID;
@@ -101,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
     // UUID
     private String _deviceID;
 
+    // assume false until we have data to say otherwise
+    private boolean _insideGeoFence = false;
+
 
     //##############################################################################################
 
@@ -123,8 +128,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-
 
         //startStopButton = findViewById(R.id.startStopButton);
         //startStopButton.setOnClickListener(startStopButtonPressed);
@@ -158,16 +161,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // set versions
-//        versionTextView = findViewById(R.id.version_textView);
-//
-//        //versionTextView.setEnabled(false);
-//        versionTextView.setText(
-//                "Version: " + BuildConfig.VERSION_NAME + "\n"
-//                //+ "Core Version: " + versionName
-//                + "Core Version: " + TrackerScanner.libraryVersion
-//                );
-
         // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
@@ -190,6 +183,9 @@ public class MainActivity extends AppCompatActivity {
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
 
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiverGeoFenceUpdates),
+                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
+        );
 
 
 
@@ -212,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         checkWifiEnabled();
         checkForInternetConnection();
         checkGpsEnabled();
+        requestGeoFenceUpdate();
         // add broadcast receivers for ble, wifi turned off
         this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         this.registerReceiver(receiverWifi,
@@ -240,23 +237,27 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+    BroadcastReceiver receiverGeoFenceUpdates = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "receiverGeoFenceUpdates.onReceive");
+
+            _insideGeoFence = intent.getBooleanExtra(TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE,
+                    false);
+
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //==============================================================================================
     BroadcastReceiver receiverBle = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d("mgdev", "receiver.onReceive");
+            Log.d("mgdev", "receiverBle.onReceive");
 
-//            // check if bluetooth is turned off.
-//            if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
-//                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-//                        == BluetoothAdapter.STATE_OFF) {
-//                    // Bluetooth was disconnected
-//                    Log.d("mgdev", "receiver.onReceive.BluetoothAdapter.STATE_OFF");
-//
-//                    startMessageActivityBluetoothOff();
-//
-//                }
-//            }
             checkBluetoothEnabled();
 
         }// end of onReceive
@@ -294,6 +295,34 @@ public class MainActivity extends AppCompatActivity {
         }// end of onReceive
     };
     //==============================================================================================
+
+    //##############################################################################################
+    //###########################       Check Functions     ########################################
+    //##############################################################################################
+
+
+    //==============================================================================================
+    private void requestGeoFenceUpdate(){
+
+        // if location service is not running, we assume don't know and are therefore outside
+        // geoFence
+        if( isLocationServiceRunning() ){
+
+            Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
+            intent.setAction(
+                    Constants.ACTION_REQUEST_GEOFENCE_UPDATE
+            );
+
+            startService(intent);
+
+
+        }// end of location service is running
+        else{
+            _insideGeoFence = false;
+        }
+
+    }// end of checkGpsEnabled
+    //=============================================================================================
 
     //==============================================================================================
     private void checkGpsEnabled(){
@@ -382,7 +411,13 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.tick_round);
 
-            status_textView.setText("App is active and scanning.\n Please tap the tick to stop.");
+            if(_insideGeoFence) {
+                status_textView.setText(
+                        "App is active and scanning.\n Please tap the tick to stop.");
+            }else{
+                status_textView.setText(
+                        "App is active.\nDevice is outside the geofence area.\n Please tap the tick to stop.");
+            }
 
 
             startDisplayIconAnimation();
@@ -685,7 +720,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "3.9.100.243";
 
-        String dataBase = "beta";
+        String dataBase = "dev";
 
         String deviceID = _deviceID;
 

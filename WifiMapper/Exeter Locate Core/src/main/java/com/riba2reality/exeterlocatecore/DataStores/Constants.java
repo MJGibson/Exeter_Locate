@@ -14,6 +14,8 @@ public class Constants {
     public static final String ACTION_SINGLE_SCAN = "performSingleScan";
     public static final String ACTION_POST_ALL = "postALL";
     public static final String ACTION_REQUEST_UPDATE = "requestUpdate";
+    public static final String ACTION_REQUEST_GEOFENCE_UPDATE = "geoFenceUpdate";
+
 
 
     public static final String database = "alpha";

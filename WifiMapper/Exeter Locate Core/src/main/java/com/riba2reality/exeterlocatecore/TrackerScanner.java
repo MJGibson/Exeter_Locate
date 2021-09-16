@@ -93,7 +93,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.4.2";
+    public static final String libraryVersion = "1.4.3";
 
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues
@@ -133,6 +133,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     // tags
     static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MSG";
+    static final public String TRACKERSCANNER_GEOFENCE_UPDATE = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE";
 
     static final public String TRACKERSCANNER_COMBINED_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT";
     static final public String TRACKERSCANNER_RESEND_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT";
@@ -364,6 +365,11 @@ public class TrackerScanner extends Service implements LocationListener {
         Intent intent = new Intent(TRACKERSCANNER_RESULT);
         if (message != null)
             intent.putExtra(TRACKERSCANNER_MESSAGE, message);
+
+        if(_mode){
+            intent.putExtra(TRACKERSCANNER_GEOFENCE_UPDATE, this.insideGeoFence);
+        }
+
         broadcaster.sendBroadcast(intent);
     }
     //==============================================================================================
@@ -2387,7 +2393,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         stopScanning = false;
 
-                    return START_STICKY;
+
+                        return START_STICKY;
 
                     //} else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
                     case Constants.ACTION_STOP_LOCATION_SERVICE:
@@ -2396,7 +2403,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         stopScanning();
 
-                    break;
+
+                        break;
 
                     case Constants.ACTION_SINGLE_SCAN: // shouldn't need single scan any more deprecated...
 
@@ -2437,7 +2445,8 @@ public class TrackerScanner extends Service implements LocationListener {
                         handler.postDelayed(updateManualScanCounts, 1000 );
 
 
-                    break;
+
+                        break;
                     case Constants.ACTION_POST_ALL:
 
                         Log.d("Trace", "TrackerScanner.onStartCommand().ACTION_POST_ALL");
@@ -2447,13 +2456,23 @@ public class TrackerScanner extends Service implements LocationListener {
                         //this.sendSingleScanResult();
 
 
-                    break;
+
+                        break;
 
                     case Constants.ACTION_REQUEST_UPDATE:
 
                         //this.sendSingleScanResult();
 
-                    break;
+
+                        break;
+
+                    case Constants.ACTION_REQUEST_GEOFENCE_UPDATE:
+
+                        this.sendResult(Constants.ACTION_REQUEST_GEOFENCE_UPDATE);
+
+
+                        break;
+
                 }// end of switch case for action type
 
 
