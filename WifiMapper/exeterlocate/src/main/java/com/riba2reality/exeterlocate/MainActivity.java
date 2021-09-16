@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         checkButtons();
         checkBluetoothEnabled();
         checkWifiEnabled();
-        checkForInternetConnection();
+        //checkForInternetConnection();
         checkGpsEnabled();
         requestGeoFenceUpdate();
         // add broadcast receivers for ble, wifi turned off
@@ -830,7 +830,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 // would be better to have broadcast receive for this too, but
                                 // otherwise this will check every time there is a pulse
-                                checkForInternetConnection();
+                                //checkForInternetConnection();
 
 
                             }// end of run function
