@@ -32,7 +32,6 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -617,9 +616,8 @@ public class TrackerScanner extends Service implements LocationListener {
     };
     //==============================================================================================
 
-
     //==============================================================================================
-    private final Runnable periodicUpdate_ble = new Runnable() {
+    private final Runnable periodicUpdate_ble_start = new Runnable() {
         @Override
         public void run() {
             if (running) {
@@ -628,10 +626,32 @@ public class TrackerScanner extends Service implements LocationListener {
                 if(_mode){
                     interval = TrackerScanner.getPoisson(ble_lambda);
                 }else {
-                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    interval = SP.getInt("interval_ble", bleInterval);
+                    SharedPreferences SP =
+                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_ble", bleInterval); // todo
                 }
-                handler.postDelayed(periodicUpdate_ble, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+                handler.postDelayed(periodicUpdate_ble_start,
+                        interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+
+            } else {
+                return;
+            }
+
+            //Log.d("mgdev", "periodicUpdate_ble_start[" + currentResult.bluetoothLEResults.size() + "]");
+
+            startBLEScan();
+
+        }// end of run function
+    };// end of runable periodicUpdate_ble_start
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private final Runnable periodicUpdate_ble = new Runnable() {
+        @Override
+        public void run() {
+            if (running) {
+
 
             } else {
                 return;
@@ -1347,6 +1367,12 @@ public class TrackerScanner extends Service implements LocationListener {
             sendResult("Ble: Scan complete.");
         }
 
+        if(_mode){
+
+            stopBLEScanning(false);
+
+        }
+
 
     }// end of completeBLEScan
     //==============================================================================================
@@ -1372,13 +1398,17 @@ public class TrackerScanner extends Service implements LocationListener {
 
             _bluetooth_scanning = true;
             bluetoothLeScanner.startScan(leScanCallback);
+
+            // post the handler to stop this these scans, with the required delay
+            int bleInterval = getResources().getInteger(R.integer.defaultVal_ble_duration);
+            int interval = bleInterval;
+
+            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            interval = SP.getInt("duration_ble", bleInterval);
+
+            handler.postDelayed(periodicUpdate_ble, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+
         }
-//            else {
-//                //_bluetooth_scanning = false;
-//                //bluetoothLeScanner.stopScan(leScanCallback);
-//                //_bluetooth_scan_queued = true;
-//                Log.d("mgdev", "startBLEScan._bluetooth_scan_queued");
-//            }
 
 
     }// end of startBLEScan
@@ -2268,15 +2298,29 @@ public class TrackerScanner extends Service implements LocationListener {
 
         handler.removeCallbacks(periodicUpdate_scan);
 
+        stopBLEScanning(true);
+
+
+
+    }// end of stopOthers
+    //==============================================================================================
+
+    //==============================================================================================
+    private void stopBLEScanning(boolean stopStartingBLEScans){
+
+        Log.d("mgdev", "TrackerScanner.stopBLEScanning()");
+
         handler.removeCallbacks(periodicUpdate_ble);
+        if(stopStartingBLEScans){
+            handler.removeCallbacks(periodicUpdate_ble_start);
+        }
+
         _bluetooth_scanning = false;
 
         if(bluetoothLeScanner != null)
             bluetoothLeScanner.stopScan(leScanCallback);
 
-
-
-    }// end of stopOthers
+    }// end of stopBLEScanning
     //==============================================================================================
 
 
@@ -2390,10 +2434,11 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     private void scanOthers(){
 
-        if (!wifiManager.isWifiEnabled()) {
-            Toast.makeText(this, "WiFi is disabled ... We need to enable it", Toast.LENGTH_LONG).show();
-            wifiManager.setWifiEnabled(true);
-        }
+//        if (!wifiManager.isWifiEnabled()) {
+//            Toast.makeText(this, "WiFi is disabled ... We need to enable it",
+//                    Toast.LENGTH_LONG).show();
+//            wifiManager.setWifiEnabled(true);
+//        }
 
         handler.post(periodicUpdate_wifi);
 
@@ -2407,13 +2452,13 @@ public class TrackerScanner extends Service implements LocationListener {
 
         handler.post(periodicUpdate_scan); // combined
 
-        if (!bluetoothAdapter.isEnabled()) {
-            // not alot we can do at this point, UI has to of already asked for this
-        } else {
-            startBLEScan();
-        }
+//        if (!bluetoothAdapter.isEnabled()) {
+//            // not alot we can do at this point, UI has to of already asked for this
+//        } else {
+//            startBLEScan();
+//        }
 
-        handler.post(periodicUpdate_ble);
+        handler.post(periodicUpdate_ble_start);
 
     }//end of scanOthers
     //==============================================================================================
