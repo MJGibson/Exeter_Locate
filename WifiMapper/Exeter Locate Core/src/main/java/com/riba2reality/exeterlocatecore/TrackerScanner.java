@@ -168,6 +168,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private boolean _bluetooth_scanning = false;
     private boolean _bluetooth_scan_queued = false;
 
+    private boolean _locationScanning = false;
+
     private int manualScanCount_loction = 0;
     private int manualScanCount_wifi = 0;
     private int manualScanCount_mag = 0;
@@ -212,6 +214,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private boolean stopScanning = false;
 
     private long stopManualScanTime;
+    private long stopGPSScanTime;
 
     private String manualScanMessage = "None";
 
@@ -225,6 +228,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     private int gPS_lambda = 600;   // gps and combined
+    private int gPS_duration = 60;
+    private int gPS_scan_interval = 5;
+
     private int wifi_lambda = 60;
     private int post_lambda = 300;
     private int ble_lambda = 60;
@@ -556,6 +562,35 @@ public class TrackerScanner extends Service implements LocationListener {
     };
     //==============================================================================================
 
+    //==============================================================================================
+    private final Runnable periodicUpdate_gps = new Runnable() {
+        @Override
+        public void run() {
+
+
+
+            if (running) {
+                int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
+                int interval = gpsInterval;
+                if(_mode){
+                    interval = TrackerScanner.getPoisson(gPS_lambda);
+                }else {
+                    SharedPreferences SP =
+                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    interval = SP.getInt("interval_gps", gpsInterval);
+
+                }
+                handler.postDelayed(periodicUpdate_gps, interval * 1000
+                        - SystemClock.elapsedRealtime() % 1000);
+            } else {
+                return;
+            }
+
+            requestlocation();
+
+        }// end of run
+    };
+    //==============================================================================================
 
     //==============================================================================================
     private final Runnable periodicUpdate_wifi = new Runnable() {
@@ -766,36 +801,49 @@ public class TrackerScanner extends Service implements LocationListener {
     // location functions
 
     //==============================================================================================
-    private void requestlocation(boolean singleUpdate) {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setPowerRequirement(Criteria.POWER_HIGH);
-        String provider = locationManager.getBestProvider(criteria, true);
+    /**
+     * Start GPS scanning, with an interval parameter (in seconds), taken from SharedPreferences.
+     * Also notes the times these GPS
+     * scans are started and calculates the times they should stop if in citizen science mode.
+     */
+    private void requestlocation() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
+        if(!_locationScanning) {
 
-        if (singleUpdate) {
+            Log.d("mgdev", "TrackerScanner.requestlocation()");
 
-            locationManager.requestSingleUpdate(provider, this, Looper.getMainLooper());
-        }else {
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            criteria.setPowerRequirement(Criteria.POWER_HIGH);
+            String provider = locationManager.getBestProvider(criteria, true);
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+
 
             SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
             // interval needs to be in milliseconds -- scale accordingly
             long interval = SP.getInt("interval_gps", gpsInterval) * 1000;
+
+
+
+
+            // only used in citizen science mode
+            this.stopGPSScanTime = SystemClock.elapsedRealtime() + (gPS_duration * 1000);
+
 
             // TODO: Check if permission available
             locationManager.requestLocationUpdates(
@@ -804,9 +852,10 @@ public class TrackerScanner extends Service implements LocationListener {
                     0,
                     this
             );
-        }
 
 
+            _locationScanning = true;
+        }//end of if LocationScanning not true
 
 
     }//end of requestlocation
@@ -866,7 +915,20 @@ public class TrackerScanner extends Service implements LocationListener {
             this.sendResult("GPS: Location updated.");
         }
 
+        //-------------------------------------------------------------
 
+
+        if(_mode) {
+            durationRemaining = stopGPSScanTime - SystemClock.elapsedRealtime();
+
+            Log.d("mgdev", "TrackerScanner.onLocationChanged(),durationRemaining: "+durationRemaining);
+
+            if (durationRemaining <= 0) {
+
+                stopLocationServices();
+
+            } // end of if over gps scan time
+        }// end of if citizen science mode
 
     }// end of onLocationChanged
     //==============================================================================================
@@ -926,6 +988,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     }// end of checkGeoFence
     //==============================================================================================
+
+
 
 
 
@@ -2154,7 +2218,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     private void stopService() {
 
-        locationManager.removeUpdates(this);
+        stopLocationServices();
 
         handler.removeCallbacks(periodicUpdate);
 
@@ -2171,6 +2235,16 @@ public class TrackerScanner extends Service implements LocationListener {
         }
 
     }// end of stop service
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void stopLocationServices(){
+
+        locationManager.removeUpdates(this);
+        _locationScanning = false;
+
+    }// end of stopLocationServices
     //==============================================================================================
 
 
@@ -2270,8 +2344,6 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of if API 26 or greater
 
 
-        // request on going locations
-        //requestlocation(false);
 
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 
@@ -2290,8 +2362,12 @@ public class TrackerScanner extends Service implements LocationListener {
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wifiScanner:TrackerScanner");
         wl.acquire();
 
-        // always activate the location service
-        requestlocation(false);
+        // activate the location service
+        if(_mode){
+            handler.post(periodicUpdate_gps);
+        }else {
+            requestlocation();
+        }
 
         // always activate the posting
         handler.post(periodicUpdate);
