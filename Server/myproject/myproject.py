@@ -113,15 +113,23 @@ def format_message(message):
     bleLambda = df['bleLambda'].values[0]
     accelLambda = df['accelLambda'].values[0]
     magLambda = df['magLambda'].values[0]
+    
+    gpsDuration = df['gpsDuration'].values[0]
+    gpsInterval = df['gpsInterval'].values[0]
+    bleDuration = df['bleDuration'].values[0]
+    
 
-    return '{};{};{};{};{};{};{}'.format(
+    return '{};{};{};{};{};{};{};{};{};{}'.format(
         message, 
         gpsLamda, 
         wifiLamda,
         postLambda,
         bleLambda,
         accelLambda,
-        magLambda
+        magLambda,
+        gpsDuration,
+        gpsInterval,
+        bleDuration
         )
 
 #-------------------------------------------------------------------------------------

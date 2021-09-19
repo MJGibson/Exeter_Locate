@@ -165,7 +165,7 @@ public class TrackerScanner extends Service implements LocationListener {
     BluetoothLEScanResult currentResult;
 
     private boolean _bluetooth_scanning = false;
-    private boolean _bluetooth_scan_queued = false;
+    //private boolean _bluetooth_scan_queued = false;
 
     private boolean _locationScanning = false;
 
@@ -233,6 +233,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private int wifi_lambda = 60;
     private int post_lambda = 300;
     private int ble_lambda = 60;
+    private int ble_duration = 10;
     private int mag_lambda = 60;
     private int accel_lambda = 60;
 
@@ -285,6 +286,24 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     public void setaccel_lambda(int lambda){
         this.accel_lambda = lambda;
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    public void setgPS_duration(int duration){
+        this.gPS_duration = duration;
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    public void setgPS_scan_interval(int interval){
+        this.gPS_scan_interval = interval;
+    }
+    //==============================================================================================
+
+    //==============================================================================================
+    public void setBle_duration(int duration){
+        this.ble_duration = duration;
     }
     //==============================================================================================
 
@@ -856,8 +875,13 @@ public class TrackerScanner extends Service implements LocationListener {
             SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
             // interval needs to be in milliseconds -- scale accordingly
-            long interval = SP.getInt("interval_gps", gpsInterval) * 1000;
+            long interval = gpsInterval;
 
+            if(_mode){
+                interval = gPS_scan_interval;
+            }else {
+                interval = SP.getInt("interval_gps", gpsInterval) * 1000;
+            }
 
 
 
@@ -1384,7 +1408,8 @@ public class TrackerScanner extends Service implements LocationListener {
         Log.d("mgdev", "startBLEScan");
 
 
-        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+                Locale.getDefault()).format(new Date());
         BluetoothLEScanResult result = new BluetoothLEScanResult();
         result.dateTime = currentTime;
 
@@ -1403,12 +1428,19 @@ public class TrackerScanner extends Service implements LocationListener {
             int bleInterval = getResources().getInteger(R.integer.defaultVal_ble_duration);
             int interval = bleInterval;
 
-            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            interval = SP.getInt("duration_ble", bleInterval);
+            SharedPreferences SP =
+                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            if(_mode){
+                interval = ble_duration;
+            }else {
+                interval = SP.getInt("duration_ble", bleInterval);
+            }
 
-            handler.postDelayed(periodicUpdate_ble, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+            // post the handler that will complete the scan with duration
+            handler.postDelayed(periodicUpdate_ble,
+                    interval * 1000 - SystemClock.elapsedRealtime() % 1000);
 
-        }
+        }//end of if not scanning bluetooth
 
 
     }// end of startBLEScan

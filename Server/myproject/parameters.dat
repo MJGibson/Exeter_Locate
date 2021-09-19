@@ -1,2 +1,2 @@
-gpsLambda,wifiLambda,postLambda,bleLambda,accelLambda,magLambda
-600,60,300,60,60,60
+gpsLambda,wifiLambda,postLambda,bleLambda,accelLambda,magLambda,gpsDuration,gpsInterval,bleDuration
+600,60,300,60,60,60,60,10,10
