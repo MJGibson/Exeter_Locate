@@ -3,35 +3,71 @@ server {
     server_name 3.9.100.243 www.3.9.100.243;
     ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
     ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+	
+	# client certificate
+	#ssl_client_certificate /etc/ssl/certs/user.crt;
+	# make verification optional, so we can display a 403 message to those
+	# who fail authentication
+	#ssl_verify_client optional;
 
     location / {
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		#if ($ssl_client_verify != SUCCESS) {
+		#	return 403;
+		#}
         include uwsgi_params;
         uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
     
     location /gps/ { 
-	include uwsgi_params;
-	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		#if ($ssl_client_verify != SUCCESS) {
+		#	return 403;
+		#}
+		include uwsgi_params;
+		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
 
     location /wifi/ { 
-	include uwsgi_params;
-	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		#if ($ssl_client_verify != SUCCESS) {
+		#	return 403;
+		#}
+		include uwsgi_params;
+		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
     
     location /mag/ { 
-	include uwsgi_params;
-	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		#if ($ssl_client_verify != SUCCESS) {
+		#	return 403;
+		#}
+		include uwsgi_params;
+		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
 
     location /accel/ { 
-	include uwsgi_params;
-	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		#if ($ssl_client_verify != SUCCESS) {
+		#	return 403;
+		#}
+		include uwsgi_params;
+		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
 	
 	location /ble/ { 
-	include uwsgi_params;
-	uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		if ($ssl_client_verify != SUCCESS) {
+			return 403;
+		}
+		include uwsgi_params;
+		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
 
 }
