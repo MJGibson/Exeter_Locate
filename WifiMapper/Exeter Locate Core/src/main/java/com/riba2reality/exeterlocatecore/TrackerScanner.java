@@ -1542,7 +1542,7 @@ public class TrackerScanner extends Service implements LocationListener {
         HashMap<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM", Constants.verificationCode);
+//        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
         parameters.put("UUID", _deviceID);
 
@@ -1648,7 +1648,7 @@ public class TrackerScanner extends Service implements LocationListener {
         HashMap<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM", Constants.verificationCode);
+//        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
         parameters.put("UUID", _deviceID);
 
@@ -1754,7 +1754,7 @@ public class TrackerScanner extends Service implements LocationListener {
         HashMap<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM", Constants.verificationCode);
+//        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
         parameters.put("UUID", _deviceID);
 
@@ -1853,7 +1853,7 @@ public class TrackerScanner extends Service implements LocationListener {
         HashMap<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM", Constants.verificationCode);
+//        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
         parameters.put("UUID", _deviceID);
 
@@ -1953,7 +1953,7 @@ public class TrackerScanner extends Service implements LocationListener {
         HashMap<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM", Constants.verificationCode);
+//        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
         parameters.put("UUID", _deviceID);
 
@@ -2096,7 +2096,7 @@ public class TrackerScanner extends Service implements LocationListener {
         HashMap<String, String> parameters = new HashMap<>();
 
 
-        parameters.put("MAGIC_NUM", Constants.verificationCode);
+//        parameters.put("MAGIC_NUM", Constants.verificationCode);
 
         parameters.put("UUID", _deviceID);
 

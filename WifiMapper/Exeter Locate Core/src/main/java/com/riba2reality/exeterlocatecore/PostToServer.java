@@ -200,12 +200,14 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
             //------------------------------------------------------------------
 
-            // Create a KeyStore containing our trusted CAs
+            // Create a KeyStore containing our trusted public server certificate
             String keyStoreType = KeyStore.getDefaultType();
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
 
+
+            // client authentication for server
             String keyPassphrase = "";
             KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
             keyStoreClient.load(_userPFX, keyPassphrase.toCharArray());

@@ -6,7 +6,6 @@ import pandas as pd
 
 app = Flask(__name__)
 
-magicNum = "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9"
 dataBase = "phoneTest_home"
 
 wifiCollection = "wifi"
@@ -21,7 +20,6 @@ DEFAULT_GET_RESPONSE = (
 )
 
 KEYS_REQUIRED_FOR_GPS = [
-    "MAGIC_NUM",
     "UUID",
     "GPS_TIME",
     "X",
@@ -32,7 +30,6 @@ KEYS_REQUIRED_FOR_GPS = [
 ]
 
 KEYS_REQUIRED_FOR_WIFI = [
-    "MAGIC_NUM",
     "UUID",
     "WIFI_TIME",
     "MacAddressesJson",
@@ -41,7 +38,6 @@ KEYS_REQUIRED_FOR_WIFI = [
 ]
 
 KEYS_REQUIRED_FOR_BLE = [
-    "MAGIC_NUM",
     "UUID",
     "BLE_TIME",
     "MacAddressesJson",
@@ -50,7 +46,6 @@ KEYS_REQUIRED_FOR_BLE = [
 ]
 
 KEYS_REQUIRED_FOR_MAG = [
-    "MAGIC_NUM",
     "UUID",
     "MAG_TIME",
     "MAG_X",
@@ -60,7 +55,6 @@ KEYS_REQUIRED_FOR_MAG = [
 ]
 
 KEYS_REQUIRED_FOR_ACCEL = [
-    "MAGIC_NUM",
     "UUID",
     "ACCEL_TIME",
     "ACCEL_X",
@@ -178,8 +172,8 @@ def combined():
                 return print_and_jsonify(msg)
 
         # check the magic number matches
-        if jsonData["MAGIC_NUM"] != magicNum:
-            return print_and_jsonify("magic number mismatch")
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
 
         # ---- connect to the db
         client = MongoClient("localhost", 27017)
@@ -329,8 +323,8 @@ def gps():
                 return print_and_jsonify(msg)
 
         # check the magic number matches
-        if jsonData["MAGIC_NUM"] != magicNum:
-            return print_and_jsonify("magic number mismatch")
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
 
         # ---- connect to the db
         client = MongoClient("localhost", 27017)
@@ -377,8 +371,8 @@ def wifi():
                 return print_and_jsonify(msg)
 
         # check the magic number matches
-        if jsonData["MAGIC_NUM"] != magicNum:
-            return print_and_jsonify("magic number mismatch")
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
 
         # ---- connect to the db
         client = MongoClient("localhost", 27017)
@@ -437,8 +431,8 @@ def ble():
                 return print_and_jsonify(msg)
 
         # check the magic number matches
-        if jsonData["MAGIC_NUM"] != magicNum:
-            return print_and_jsonify("magic number mismatch")
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
 
         # ---- connect to the db
         client = MongoClient("localhost", 27017)
@@ -497,8 +491,8 @@ def mag():
                 return print_and_jsonify(msg)
 
         # check the magic number matches
-        if jsonData["MAGIC_NUM"] != magicNum:
-            return print_and_jsonify("magic number mismatch")
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
 
         # ---- connect to the db
         client = MongoClient("localhost", 27017)
@@ -548,8 +542,8 @@ def accel():
                 return print_and_jsonify(msg)
 
         # check the magic number matches
-        if jsonData["MAGIC_NUM"] != magicNum:
-            return print_and_jsonify("magic number mismatch")
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
 
         # ---- connect to the db
         client = MongoClient("localhost", 27017)
