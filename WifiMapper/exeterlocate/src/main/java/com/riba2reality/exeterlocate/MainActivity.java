@@ -791,9 +791,9 @@ public class MainActivity extends AppCompatActivity {
         );
         intent.putExtra("MODE", true); // engage citizen mode
 
-        String address = "3.9.100.243";
+        String address = "riba2reality.com";
 
-        String dataBase = "dev";
+        String dataBase = "beta";
 
         String deviceID = _deviceID;
 
