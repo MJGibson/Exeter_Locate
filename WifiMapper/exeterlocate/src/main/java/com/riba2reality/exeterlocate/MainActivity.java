@@ -117,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
     // assume false until we have data to say otherwise
     private boolean _insideGeoFence = false;
 
+    Activity _MainActivity;
+
 
     //##############################################################################################
 
@@ -198,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
         );
 
+        _MainActivity = this;
 
 
     }// end of onCreate
@@ -326,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
         // Returns an intent object that you use to check for an update.
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
-        Activity MainActivity = this;
+
 
         // Checks that the platform will allow the specified type of update.
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
@@ -352,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                                             // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
                                             AppUpdateType.IMMEDIATE,
                                             // The current activity making the update request.
-                                            MainActivity,
+                                            _MainActivity,
                                             // Include a request code to later monitor this update request.
                                             UPDATE_REQUEST_CODE);
                                 } catch (IntentSender.SendIntentException e) {
