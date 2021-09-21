@@ -2,18 +2,20 @@
     <!-- Server Preference -->
     <string-array name="server_names">
         <item>Custom</item>
-        <item>Amazon</item>
+        <item>riba2reality.com</item>
         <item>Google</item>
         <item>Azure</item>
         <item>emps-gibson3</item>
+        <item>Amazon</item>
     </string-array>
 
     <string-array name="server_values">
         <item>Custom</item>
-        <item>3.9.100.243</item>
+        <item>www.riba2reality.com</item>
         <item>34.105.172.80</item>
         <item>51.11.144.99</item>
         <item>144.173.33.81</item>
+        <item>3.9.100.243</item>
     </string-array>
 
     <!-- Database disallowed names -->

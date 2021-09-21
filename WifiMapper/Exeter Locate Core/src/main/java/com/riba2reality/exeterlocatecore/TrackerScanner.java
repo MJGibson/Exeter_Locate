@@ -1583,11 +1583,11 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = encodeLocationResult(locationResultQueue.poll());
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
             //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
             thisPost.execute();
@@ -1689,11 +1689,11 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = encodeWifiResult(wifiScanResultQueue.poll());
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
                     );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
             //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
             thisPost.execute();
@@ -1794,11 +1794,11 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = encodeBLEResult(bluetoothLEScanResultQueue.poll());
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
             //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
             thisPost.execute();
@@ -1894,11 +1894,11 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = encodeMagResult(magSensorResultQueue.poll());
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
             //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
             thisPost.execute();
@@ -1993,11 +1993,11 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = encodeAccelResult(accelSensorResultQueue.poll());
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
             //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
             thisPost.execute();
@@ -2198,7 +2198,7 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = encodeCombinedResult(combinedScanResultQueue.poll());
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
             );
 
@@ -2222,11 +2222,11 @@ public class TrackerScanner extends Service implements LocationListener {
             ServerMessage serverMessage = resendQueue.poll();
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.nginxselfsigned),
+                    getResources().openRawResource(R.raw.fullchain),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-            //thisPost.is = getResources().openRawResource(R.raw.nginxselfsigned);
+            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
             //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
 
             thisPost.execute();

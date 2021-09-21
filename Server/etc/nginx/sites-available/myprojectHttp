@@ -15,10 +15,10 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 	
 	# client certificate
-	ssl_client_certificate /etc/ssl/certs/ca.crt;
+	#ssl_client_certificate /etc/ssl/certs/ca.crt;
 	# make verification optional, so we can display a 403 message to those
 	# who fail authentication
-	ssl_verify_client optional;
+	#ssl_verify_client optional;
 	
 	if ($host = 3.9.100.243) {
         return 301 https://www.riba2reality.com$request_uri;
@@ -35,9 +35,9 @@ server {
 	location / {
 		# if the client-side certificate failed to authenticate, show a 403
         # message to the client
-		if ($ssl_client_verify != SUCCESS) {
-			return 403;
-		}
+		#if ($ssl_client_verify != SUCCESS) {
+		#	return 403;
+		#}
         include uwsgi_params;
         uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
