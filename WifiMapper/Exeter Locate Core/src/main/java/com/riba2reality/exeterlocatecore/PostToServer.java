@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
@@ -33,6 +34,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
     //public InputStream is;
     //private final WeakReference<InputStream> inputSteamContrainer;
     private InputStream is;
+
+    private InputStream _userPFX;
 
     //private final WeakReference<ServerMessage> serverMessageContrainer;
     private final ServerMessage serverMessage;
@@ -48,11 +51,14 @@ public class PostToServer extends AsyncTask<String, String, String> {
      *
      * @param trackerScanner If the message fails to be sent correctly, it is returned to the queue
      *                       of this TrackerScanner reference
-     * @param is             InputStream containing the necessary certificate
+     * @param is             InputStream containing the necessary server public certificate
+     * @param userPFX        InputStream containing the necessary Client certificate/pfx file
+     *
      * @param serverMessage  The ServerMessage object to be posted
      */
     public PostToServer(TrackerScanner trackerScanner,
                         InputStream is,
+                        InputStream userPFX,
                         ServerMessage serverMessage
                         ) {
 
@@ -60,6 +66,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
         //this.inputSteamContrainer = new WeakReference<>(is);
         this.is = is;
 
+        this._userPFX = userPFX;
 
         //this.serverMessageContrainer = new WeakReference<>(serverMessage);
         this.serverMessage = serverMessage;
@@ -199,6 +206,14 @@ public class PostToServer extends AsyncTask<String, String, String> {
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
 
+            String keyPassphrase = "";
+            KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
+            keyStoreClient.load(_userPFX, keyPassphrase.toCharArray());
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStoreClient, keyPassphrase.toCharArray());
+
+
             // Create a TrustManager that trusts the CAs in our KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
@@ -206,7 +221,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
             // Create an SSLContext that uses our TrustManager
             SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, tmf.getTrustManagers(), null);
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+
+
 
             //------------------------------------------------------------------
 

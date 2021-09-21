@@ -53,6 +53,7 @@ import com.riba2reality.exeterlocatecore.DataStores.ServerMessage;
 import com.riba2reality.exeterlocatecore.DataStores.WifiResult;
 import com.riba2reality.exeterlocatecore.DataStores.WifiScanResult;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -248,6 +249,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private boolean insideGeoFence = false;
 
+    private InputStream _userPFX;
+
     //----------------------------------------------------------------------------------------------
 
     //##############################################################################################
@@ -366,6 +369,8 @@ public class TrackerScanner extends Service implements LocationListener {
             // ble stuff
             bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
+
+        // set up user pfx
 
 
     }// end of onCreate
@@ -1584,6 +1589,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
@@ -1690,6 +1696,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
                     );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
@@ -1795,6 +1802,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
@@ -1895,6 +1903,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
@@ -1994,6 +2003,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
@@ -2199,6 +2209,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
             );
 
@@ -2223,6 +2234,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             PostToServer thisPost = new PostToServer(this,
                     getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.user),
                     serverMessage
             );
             //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
