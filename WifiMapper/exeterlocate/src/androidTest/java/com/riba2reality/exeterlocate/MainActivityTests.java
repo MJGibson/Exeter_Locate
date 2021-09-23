@@ -135,11 +135,11 @@ public class MainActivityTests extends TestCase {
 
 
         // click start-stop button
-        onView(withId(R.id.startStopButton)).perform(click());
+        onView(withId(R.id.circleIcon)).perform(click());
         try {
             sleep(400);
 
-            onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
+            onView(withId(R.id.circleIcon)).check(matches(withText(R.string.start_button_stop_text)));
 
 //        assertTrue("Failed to deny permissions",denyPermission());
 

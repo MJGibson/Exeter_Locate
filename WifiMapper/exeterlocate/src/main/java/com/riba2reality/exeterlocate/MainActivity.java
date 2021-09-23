@@ -4,12 +4,10 @@ package com.riba2reality.exeterlocate;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -44,6 +42,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.OnSuccessListener;
 import com.google.android.play.core.tasks.Task;
 import com.riba2reality.exeterlocate.messages.BluetoothMessageActivity;
 import com.riba2reality.exeterlocate.messages.GpsMessageActivity;
@@ -118,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean _insideGeoFence = false;
 
     Activity _MainActivity;
+    AppUpdateManager appUpdateManager;
 
 
     //##############################################################################################
@@ -324,58 +324,100 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     private void checkForUpdates(){
 
-        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(getBaseContext());
+        appUpdateManager = AppUpdateManagerFactory.create(this);
 
         // Returns an intent object that you use to check for an update.
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
 
+        Log.d("mgdev", "MainActivity.checkForUpdates");
 
         // Checks that the platform will allow the specified type of update.
-        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+        //appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+
+        appUpdateInfoTask.addOnSuccessListener(updateListener);
+
+
+//            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+//                    // This example applies an immediate update. To apply a flexible update
+//                    // instead, pass in AppUpdateType.FLEXIBLE
+//                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+//                // Request the update.
+//
+//                Log.d("mgdev", "MainActivity.checkForUpdates.available");
+//
+////                new AlertDialog.Builder(getBaseContext())
+////                        .setTitle("Update Available")
+////                        .setMessage("An update is available, please click OK to update now.")
+////
+////                        // Specifying a listener allows you to take an action before dismissing the dialog.
+////                        // The dialog is automatically dismissed when a dialog button is clicked.
+////                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+////                            public void onClick(DialogInterface dialog, int which) {
+//                                // operation
+////                                try {
+//                                    appUpdateManager.startUpdateFlowForResult(
+//                                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+//                                            appUpdateInfo,
+//                                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+//                                            AppUpdateType.IMMEDIATE,
+//                                            // The current activity making the update request.
+//                                            this,
+//                                            // Include a request code to later monitor this update request.
+//                                            UPDATE_REQUEST_CODE);
+////                                } catch (IntentSender.SendIntentException e) {
+////                                    e.printStackTrace();
+////                                }
+//
+//
+////                            }// end of onClick
+////                        })
+////
+////                        // A null listener allows the button to dismiss the dialog and take no further action.
+//////                        .setNegativeButton(android.R.string.no, null)
+////                        .setIcon(android.R.drawable.ic_dialog_alert)
+////                        .show();
+
+//            }// end of if update available
+//        });// end of update info listener
+
+    }// end of checkForUpdates
+    //==============================================================================================
+
+    //==============================================================================================
+    OnSuccessListener<AppUpdateInfo> updateListener = new OnSuccessListener<AppUpdateInfo>() {
+        @Override
+        public void onSuccess(AppUpdateInfo appUpdateInfo) {
+
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                     // This example applies an immediate update. To apply a flexible update
                     // instead, pass in AppUpdateType.FLEXIBLE
                     && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                // Request the update.
-
-                new AlertDialog.Builder(getBaseContext())
-                        .setTitle("Update Available")
-                        .setMessage("An update is available, please click OK to update now.")
-
-                        // Specifying a listener allows you to take an action before dismissing the dialog.
-                        // The dialog is automatically dismissed when a dialog button is clicked.
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // operation
-                                try {
-                                    appUpdateManager.startUpdateFlowForResult(
-                                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
-                                            appUpdateInfo,
-                                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
-                                            AppUpdateType.IMMEDIATE,
-                                            // The current activity making the update request.
-                                            _MainActivity,
-                                            // Include a request code to later monitor this update request.
-                                            UPDATE_REQUEST_CODE);
-                                } catch (IntentSender.SendIntentException e) {
-                                    e.printStackTrace();
-                                }
 
 
-                            }// end of onClick
-                        })
+                Log.d("mgdev", "MainActivity.updateListener.available");
 
-                        // A null listener allows the button to dismiss the dialog and take no further action.
-//                        .setNegativeButton(android.R.string.no, null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                            appUpdateInfo,
+                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                            AppUpdateType.IMMEDIATE,
+                            // The current activity making the update request.
+                            _MainActivity,
+                            // Include a request code to later monitor this update request.
+                            UPDATE_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
 
-            }// end of if update available
-        });// end of update info listener
 
-    }// end of checkForUpdates
+            }// end of if update available and immediate
+
+        }// end of onSuccess
+    };// end of updateListener
     //==============================================================================================
+
 
     //==============================================================================================
     private void requestGeoFenceUpdate(){
