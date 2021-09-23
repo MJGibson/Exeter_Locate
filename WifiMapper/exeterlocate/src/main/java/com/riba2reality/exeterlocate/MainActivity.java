@@ -394,9 +394,7 @@ public class MainActivity extends AppCompatActivity {
                     // instead, pass in AppUpdateType.FLEXIBLE
                     && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
 
-                Toast.makeText(MainActivity.this,
-                        "Immediate update available",
-                        Toast.LENGTH_SHORT).show();
+
 
                 Log.d("mgdev", "MainActivity.updateListener.available");
 
@@ -422,9 +420,7 @@ public class MainActivity extends AppCompatActivity {
                     // instead, pass in AppUpdateType.FLEXIBLE
                     && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
 
-                Toast.makeText(MainActivity.this,
-                        "FLEXIBLE update available",
-                        Toast.LENGTH_SHORT).show();
+
 
                 Log.d("mgdev", "MainActivity.updateListener.available");
 
