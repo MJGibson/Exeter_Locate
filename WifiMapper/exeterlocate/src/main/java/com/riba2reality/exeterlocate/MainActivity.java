@@ -394,6 +394,9 @@ public class MainActivity extends AppCompatActivity {
                     // instead, pass in AppUpdateType.FLEXIBLE
                     && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
 
+                Toast.makeText(MainActivity.this,
+                        "Immediate update available",
+                        Toast.LENGTH_SHORT).show();
 
                 Log.d("mgdev", "MainActivity.updateListener.available");
 
@@ -403,6 +406,34 @@ public class MainActivity extends AppCompatActivity {
                             appUpdateInfo,
                             // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
                             AppUpdateType.IMMEDIATE,
+                            // The current activity making the update request.
+                            _MainActivity,
+                            // Include a request code to later monitor this update request.
+                            UPDATE_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+
+
+            }// end of if update available and immediate
+
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+
+                Toast.makeText(MainActivity.this,
+                        "FLEXIBLE update available",
+                        Toast.LENGTH_SHORT).show();
+
+                Log.d("mgdev", "MainActivity.updateListener.available");
+
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                            appUpdateInfo,
+                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+                            AppUpdateType.FLEXIBLE,
                             // The current activity making the update request.
                             _MainActivity,
                             // Include a request code to later monitor this update request.
