@@ -923,14 +923,30 @@ public class TrackerScanner extends Service implements LocationListener {
         Log.d("mgdev", "TrackerScanner.onLocationChanged()");
         //-------------------------------------------------------------
 
+        long durationRemaining;
+
         if(_mode){
 
             checkGeoFence(location);
 
-            if(insideGeoFence){
+
+
+            durationRemaining = stopGPSScanTime - SystemClock.elapsedRealtime();
+
+            Log.d("mgdev", "TrackerScanner.onLocationChanged(),durationRemaining: "+durationRemaining);
+
+            if (durationRemaining <= 0) {
+
+                stopLocationServices();
+
+            } // end of if over gps scan time
+            else {
                 // only add the location result, if inside geo fence
-                addLocationResult(location);
+                if(insideGeoFence) {
+                    addLocationResult(location);
+                }
             }
+
 
 
         }// end of if citizen mode
@@ -946,7 +962,7 @@ public class TrackerScanner extends Service implements LocationListener {
         manualScanCount_loction += 1;
 
 
-        long durationRemaining = this.stopManualScanTime - SystemClock.elapsedRealtime();
+        durationRemaining = this.stopManualScanTime - SystemClock.elapsedRealtime();
 
         if(durationRemaining > 0){
             //if(!running){
@@ -966,20 +982,6 @@ public class TrackerScanner extends Service implements LocationListener {
             this.sendResult("GPS: Location updated.");
         }
 
-        //-------------------------------------------------------------
-
-
-        if(_mode) {
-            durationRemaining = stopGPSScanTime - SystemClock.elapsedRealtime();
-
-            Log.d("mgdev", "TrackerScanner.onLocationChanged(),durationRemaining: "+durationRemaining);
-
-            if (durationRemaining <= 0) {
-
-                stopLocationServices();
-
-            } // end of if over gps scan time
-        }// end of if citizen science mode
 
     }// end of onLocationChanged
     //==============================================================================================
