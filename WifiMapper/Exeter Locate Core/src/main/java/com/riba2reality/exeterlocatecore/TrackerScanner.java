@@ -1,6 +1,7 @@
 package com.riba2reality.exeterlocatecore;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -1420,40 +1421,49 @@ public class TrackerScanner extends Service implements LocationListener {
 
         Log.d("mgdev", "startBLEScan");
 
+        if( bluetoothAdapter.isEnabled() ) {
 
-        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
-                Locale.getDefault()).format(new Date());
-        BluetoothLEScanResult result = new BluetoothLEScanResult();
-        result.dateTime = currentTime;
+            if (!_bluetooth_scanning) {
 
-        result.message = MANUAL_SCAN_MESSAGE;
+                String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+                        Locale.getDefault()).format(new Date());
+                BluetoothLEScanResult result = new BluetoothLEScanResult();
+                result.dateTime = currentTime;
 
-        if (!_bluetooth_scanning  && bluetoothAdapter.isEnabled()) {
-            // Stops scanning after a predefined scan period.
-            //handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
+                result.message = MANUAL_SCAN_MESSAGE;
 
-            currentResult = result;
 
-            _bluetooth_scanning = true;
-            bluetoothLeScanner.startScan(leScanCallback);
+                // Stops scanning after a predefined scan period.
+                //handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
 
-            // post the handler to stop this these scans, with the required delay
-            int bleInterval = getResources().getInteger(R.integer.defaultVal_ble_duration);
-            int interval = bleInterval;
+                currentResult = result;
 
-            SharedPreferences SP =
-                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            if(_mode){
-                interval = ble_duration;
-            }else {
-                interval = SP.getInt("duration_ble", bleInterval);
-            }
+                _bluetooth_scanning = true;
+                bluetoothLeScanner.startScan(leScanCallback);
 
-            // post the handler that will complete the scan with duration
-            handler.postDelayed(periodicUpdate_ble,
-                    interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+                // post the handler to stop this these scans, with the required delay
+                int bleInterval = getResources().getInteger(R.integer.defaultVal_ble_duration);
+                int interval = bleInterval;
 
-        }//end of if not scanning bluetooth
+                SharedPreferences SP =
+                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                if (_mode) {
+                    interval = ble_duration;
+                } else {
+                    interval = SP.getInt("duration_ble", bleInterval);
+                }
+
+                // post the handler that will complete the scan with duration
+                handler.postDelayed(periodicUpdate_ble,
+                        interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+
+            }//end of if not scanning bluetooth
+
+        }else{
+
+            startBLENotification();
+
+        }
 
 
     }// end of startBLEScan
@@ -2376,7 +2386,67 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
+    //==============================================================================================
+    private void startBLENotification() {
 
+        String channelId = "bluetooth_notification_channel";
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent resultIntent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                0,
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getApplicationContext(),
+                channelId
+        );
+
+        builder.setSmallIcon(R.mipmap.exeter_locate_icon);
+        builder.setContentTitle("Exeter Locate");
+        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        builder.setContentIntent(pendingIntent);
+        builder.setContentText("Bluetooth is turned off");
+        builder.setAutoCancel(true);
+        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            if (notificationManager != null &&
+                    notificationManager.getNotificationChannel(channelId) == null
+            ) {
+                NotificationChannel notificationChannel = new NotificationChannel(
+                        channelId,
+                        "Exeter Locate - ble",
+                        NotificationManager.IMPORTANCE_HIGH
+                );
+                notificationChannel.setDescription("This channel is used by Exeter Locate");
+                notificationManager.createNotificationChannel(notificationChannel);
+
+            }// end of if notificationManager not null
+        }// end of if API 26 or greater
+
+
+        Notification notification = builder.build();
+
+        notification.defaults |= Notification.DEFAULT_SOUND;
+        notification.defaults |= Notification.DEFAULT_VIBRATE;
+        notification.defaults |= Notification.DEFAULT_LIGHTS;
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+
+        notificationManager.notify(Constants.BLE_CHANNEL_ID, notification);
+
+        //startForeground(Constants.BLE_CHANNEL_ID, notification);
+
+    }//end of startBLENotification
+    //==============================================================================================
 
     //==============================================================================================
     private void startNotificationService() {
@@ -2402,8 +2472,10 @@ public class TrackerScanner extends Service implements LocationListener {
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setContentIntent(pendingIntent);
         builder.setContentText("Scanning");
-        builder.setAutoCancel(false);
+        builder.setAutoCancel(true);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
+        //builder.setOngoing(false);
 
         Class<?> clazz = null;
 
@@ -2440,8 +2512,16 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of if API 26 or greater
 
 
+        Notification notification = builder.build();
 
-        startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
+        notification.defaults |= Notification.DEFAULT_SOUND;
+        notification.defaults |= Notification.DEFAULT_VIBRATE;
+        notification.defaults |= Notification.DEFAULT_LIGHTS;
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+
+
+        startForeground(Constants.LOCATION_SERVICE_ID, notification);
 
     }//end of startNotificationService
     //==============================================================================================
