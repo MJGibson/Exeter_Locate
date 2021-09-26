@@ -1420,7 +1420,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         result.message = MANUAL_SCAN_MESSAGE;
 
-        if (!_bluetooth_scanning) {
+        if (!_bluetooth_scanning  && bluetoothAdapter.isEnabled()) {
             // Stops scanning after a predefined scan period.
             //handler.postDelayed(periodicUpdate_finaliseBleScan, _bluetooth_scan_period);
 
@@ -2361,7 +2361,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         _bluetooth_scanning = false;
 
-        if(bluetoothLeScanner != null)
+        if(bluetoothLeScanner != null && bluetoothAdapter.isEnabled())
             bluetoothLeScanner.stopScan(leScanCallback);
 
     }// end of stopBLEScanning

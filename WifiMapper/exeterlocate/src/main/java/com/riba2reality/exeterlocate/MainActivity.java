@@ -865,7 +865,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
 
         String deviceID = _deviceID;
 
