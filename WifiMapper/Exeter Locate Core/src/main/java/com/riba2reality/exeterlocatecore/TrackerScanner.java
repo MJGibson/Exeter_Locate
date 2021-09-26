@@ -885,9 +885,11 @@ public class TrackerScanner extends Service implements LocationListener {
             if(_mode){
                 interval = gPS_scan_interval;
             }else {
-                interval = SP.getInt("interval_gps", gpsInterval) * 1000;
+                interval = SP.getInt("interval_gps", gpsInterval);
             }
 
+            // dont forget to make milliseconds
+            interval += 1000;
 
 
             // only used in citizen science mode
@@ -1049,6 +1051,9 @@ public class TrackerScanner extends Service implements LocationListener {
     final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "TrackerScanner.BroadcastReceiver.onReceive()");
+
             List<ScanResult> results = wifiManager.getScanResults();
             unregisterReceiver(wifiReceiver);
 
@@ -1131,6 +1136,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //==============================================================================================
     public void scanWifi() {
+        Log.d("mgdev", "TrackerScanner.scanWifi()");
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiManager.startScan();
     }
