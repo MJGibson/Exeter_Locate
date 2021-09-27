@@ -22,9 +22,6 @@ public class Constants {
 
     public static final String database = "alpha";
 
-    //public static final String verificationCode =
-    // "aaz0p3DuHxgxqNOk40XA4csgjeEgJzC7AUEb40gTZXgtAM5TtpleDwdGkbXQICmKwCxuO2WXawQQiobWd3nggGH9plwgJHyERBF9";
-
     //public static final String port = ":5000";
     public static final String port = "";
 

@@ -96,6 +96,8 @@ public class TrackerScanner extends Service implements LocationListener {
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
     public static final String libraryVersion = "1.4.3";
 
+    public static final int REQUEST_ENABLE_BT = 11;
+
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues
 
@@ -152,6 +154,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     final public String MANUAL_SCAN_MESSAGE = "Manual Scan: ";
 
+    final String channelId = "location_notification_channel";
+
     //----------------------------------------------------------------------------------------------
     // class variables
 
@@ -177,6 +181,9 @@ public class TrackerScanner extends Service implements LocationListener {
     private int manualScanCount_accel = 0;
     private int manualScanCount_ble = 0;
 
+    NotificationManager _notificationManager;
+    NotificationCompat.Builder _builder;
+
     private SensorManager sensorManager;
     //private Sensor sensorMag;
 
@@ -187,7 +194,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private BluetoothAdapter bluetoothAdapter;
 
 
-    public static final int REQUEST_ENABLE_BT = 11;
+
 
     ////private PostToServer post;
 
@@ -252,6 +259,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private InputStream _userPFX;
 
+    private boolean bluetoothIsOn = false;
+
     //----------------------------------------------------------------------------------------------
 
     //##############################################################################################
@@ -277,7 +286,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //==============================================================================================
     public void setble_lambda(int lambda){
-        this.ble_lambda = lambda;
+
+        //this.ble_lambda = lambda;
     }
     //==============================================================================================
 
@@ -372,6 +382,16 @@ public class TrackerScanner extends Service implements LocationListener {
         }
 
         // set up user pfx
+
+
+        //---------------------------------
+
+        _notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        _builder = new NotificationCompat.Builder(
+                getApplicationContext(), channelId
+        );
+
+        this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 
 
     }// end of onCreate
@@ -739,6 +759,47 @@ public class TrackerScanner extends Service implements LocationListener {
 
         }
     };
+    //==============================================================================================
+
+    //##############################################################################################
+    // recievers
+
+    //==============================================================================================
+    BroadcastReceiver receiverBle = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "receiverBle.onReceive");
+
+            checkBluetoothEnabled();
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //##############################################################################################
+    // check functions
+
+    //==============================================================================================
+    private void checkBluetoothEnabled(){
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth ???
+        } else {
+            if (!mBluetoothAdapter.isEnabled()) {
+                // Bluetooth is not enable :)
+                bluetoothIsOn = false;
+                updateNotification();
+            }else{
+//                if(bluetoothIsOn != true) {
+                    bluetoothIsOn = true;
+                    updateNotification();
+//                }
+            }
+        }
+
+    }// end of checkBluetoothEnabled
     //==============================================================================================
 
     //##############################################################################################
@@ -1423,6 +1484,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if( bluetoothAdapter.isEnabled() ) {
 
+//            if(bluetoothIsOn!= true){
+//                bluetoothIsOn = true;
+//                updateNotification();
+//            }
+
             if (!_bluetooth_scanning) {
 
                 String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
@@ -1459,11 +1525,16 @@ public class TrackerScanner extends Service implements LocationListener {
 
             }//end of if not scanning bluetooth
 
-        }else{
-
-            startBLENotification();
-
         }
+//        else{
+//
+//            if(bluetoothIsOn!= false){
+//                bluetoothIsOn = false;
+//                updateNotification();
+//            }
+//
+//
+//        }
 
 
     }// end of startBLEScan
@@ -2303,6 +2374,8 @@ public class TrackerScanner extends Service implements LocationListener {
         stopForeground(true);
         stopSelf();
 
+        this.unregisterReceiver(receiverBle);
+
     }// end of stopNotificationService
     //==============================================================================================
 
@@ -2387,72 +2460,33 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     //==============================================================================================
-    private void startBLENotification() {
+    private void updateNotification() {
 
-        String channelId = "bluetooth_notification_channel";
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Log.d("mgdev", "TrackerScanner.updateNotification");
 
-        Intent resultIntent = new Intent();
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                resultIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        );
+        String message = "Scanning...";
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                getApplicationContext(),
-                channelId
-        );
 
-        builder.setSmallIcon(R.mipmap.exeter_locate_icon);
-        builder.setContentTitle("Exeter Locate");
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setContentIntent(pendingIntent);
-        builder.setContentText("Bluetooth is turned off");
-        builder.setAutoCancel(true);
-        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+        if(!bluetoothIsOn)
+            message += "\nBluetooth is turned off";
 
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            if (notificationManager != null &&
-                    notificationManager.getNotificationChannel(channelId) == null
-            ) {
-                NotificationChannel notificationChannel = new NotificationChannel(
-                        channelId,
-                        "Exeter Locate - ble",
-                        NotificationManager.IMPORTANCE_HIGH
-                );
-                notificationChannel.setDescription("This channel is used by Exeter Locate");
-                notificationManager.createNotificationChannel(notificationChannel);
-
-            }// end of if notificationManager not null
-        }// end of if API 26 or greater
+        _builder.setContentText(message);
 
 
-        Notification notification = builder.build();
-
-        notification.defaults |= Notification.DEFAULT_SOUND;
-        notification.defaults |= Notification.DEFAULT_VIBRATE;
-        notification.defaults |= Notification.DEFAULT_LIGHTS;
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        _notificationManager.notify(Constants.LOCATION_SERVICE_ID, _builder.build());
 
 
-        notificationManager.notify(Constants.BLE_CHANNEL_ID, notification);
-
-        //startForeground(Constants.BLE_CHANNEL_ID, notification);
-
-    }//end of startBLENotification
+    }//end of updateNotification
     //==============================================================================================
 
     //==============================================================================================
     private void startNotificationService() {
 
-        String channelId = "location_notification_channel";
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        String channelId = "location_notification_channel";
+//        NotificationManager notificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent resultIntent = new Intent();
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -2462,18 +2496,19 @@ public class TrackerScanner extends Service implements LocationListener {
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                getApplicationContext(),
-                channelId
-        );
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+//                getApplicationContext(),
+//                channelId
+//        );
 
-        builder.setSmallIcon(R.mipmap.exeter_locate_icon);
-        builder.setContentTitle("Exeter Locate");
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setContentIntent(pendingIntent);
-        builder.setContentText("Scanning");
-        builder.setAutoCancel(true);
-        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+        _builder.setSmallIcon(R.mipmap.exeter_locate_icon);
+        _builder.setContentTitle("Exeter Locate");
+        _builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        _builder.setContentIntent(pendingIntent);
+        _builder.setContentText("Scanning");
+        _builder.setAutoCancel(true);
+        //_builder.setOnlyAlertOnce(true);
+        _builder.setPriority(NotificationCompat.PRIORITY_MAX);
 
         //builder.setOngoing(false);
 
@@ -2487,7 +2522,7 @@ public class TrackerScanner extends Service implements LocationListener {
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             PendingIntent pendingIntentNotifPressed = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-            builder.setContentIntent(pendingIntentNotifPressed);
+            _builder.setContentIntent(pendingIntentNotifPressed);
 
             Log.d("mgdev", "TrackerScanner.startNotificationService()._callingPackage: "+_callingPackage);
 
@@ -2497,8 +2532,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            if (notificationManager != null &&
-                    notificationManager.getNotificationChannel(channelId) == null
+            if (_notificationManager != null &&
+                    _notificationManager.getNotificationChannel(channelId) == null
             ) {
                 NotificationChannel notificationChannel = new NotificationChannel(
                         channelId,
@@ -2506,13 +2541,13 @@ public class TrackerScanner extends Service implements LocationListener {
                         NotificationManager.IMPORTANCE_HIGH
                 );
                 notificationChannel.setDescription("This channel is used by Exeter Locate");
-                notificationManager.createNotificationChannel(notificationChannel);
+                _notificationManager.createNotificationChannel(notificationChannel);
 
             }// end of if notificationManager not null
         }// end of if API 26 or greater
 
 
-        Notification notification = builder.build();
+        Notification notification = _builder.build();
 
         notification.defaults |= Notification.DEFAULT_SOUND;
         notification.defaults |= Notification.DEFAULT_VIBRATE;
