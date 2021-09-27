@@ -94,7 +94,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.4.3";
+    public static final String libraryVersion = "1.4.4";
 
     public static final int REQUEST_ENABLE_BT = 11;
 
@@ -260,6 +260,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private InputStream _userPFX;
 
     private boolean bluetoothIsOn = false;
+    private boolean wifiIsOn = false;
+    private boolean gpsIsOn = false;
 
     //----------------------------------------------------------------------------------------------
 
@@ -391,7 +393,15 @@ public class TrackerScanner extends Service implements LocationListener {
                 getApplicationContext(), channelId
         );
 
+        checkBluetoothEnabled();
+        checkWifiEnabled();
+        checkGpsEnabled();
+
+
         this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        this.registerReceiver(receiverWifi,
+                new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
+        this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
 
     }// end of onCreate
@@ -769,9 +779,39 @@ public class TrackerScanner extends Service implements LocationListener {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d("mgdev", "receiverBle.onReceive");
+            Log.d("mgdev", "TrackerScanner.receiverBle.onReceive");
 
             checkBluetoothEnabled();
+            updateNotification();
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverWifi = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "TrackerScanner.receiverWifi.onReceive");
+
+            checkWifiEnabled();
+            updateNotification();
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverGPS = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "TrackerScanner.receiverGPS.onReceive");
+
+
+            checkGpsEnabled();
+            updateNotification();
 
         }// end of onReceive
     };
@@ -790,16 +830,52 @@ public class TrackerScanner extends Service implements LocationListener {
             if (!mBluetoothAdapter.isEnabled()) {
                 // Bluetooth is not enable :)
                 bluetoothIsOn = false;
-                updateNotification();
+
             }else{
 //                if(bluetoothIsOn != true) {
                     bluetoothIsOn = true;
-                    updateNotification();
+
 //                }
             }
         }
 
     }// end of checkBluetoothEnabled
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private void checkWifiEnabled(){
+
+        Log.d("mgdev", "MainActivity.checkWifiEnabled");
+
+        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()){
+            wifiIsOn = false;
+
+        }else{
+            wifiIsOn = true;
+
+        }
+
+    }// end of checkWifiEnabled
+    //==============================================================================================
+
+    //==============================================================================================
+    private void checkGpsEnabled(){
+
+        Log.d("mgdev", "MainActivity.checkGpsEnabled. GPS disabled");
+
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            gpsIsOn=false;
+
+        }// end of if gps not enabled
+        else{
+            gpsIsOn=true;
+
+        }
+
+    }// end of checkGpsEnabled
     //==============================================================================================
 
     //##############################################################################################
@@ -2375,6 +2451,8 @@ public class TrackerScanner extends Service implements LocationListener {
         stopSelf();
 
         this.unregisterReceiver(receiverBle);
+        this.unregisterReceiver(receiverWifi);
+        this.unregisterReceiver(receiverGPS);
 
     }// end of stopNotificationService
     //==============================================================================================
@@ -2467,12 +2545,26 @@ public class TrackerScanner extends Service implements LocationListener {
         String message = "Scanning...";
 
 
+
         if(!bluetoothIsOn)
             message += "\nBluetooth is turned off";
 
+        if(!wifiIsOn)
+            message += "\nWi-Fi is turned off";
+
+        if(!gpsIsOn)
+            message += "\nGPS is turned off";
 
 
-        _builder.setContentText(message);
+        if(!
+                (bluetoothIsOn && wifiIsOn && gpsIsOn)
+        )
+            _builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+        else{
+            _builder.setStyle(null);
+        }
+
+        //_builder.setContentText(message);
 
 
         _notificationManager.notify(Constants.LOCATION_SERVICE_ID, _builder.build());
