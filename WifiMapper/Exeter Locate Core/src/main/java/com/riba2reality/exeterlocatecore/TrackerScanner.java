@@ -32,6 +32,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -2649,9 +2650,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
             Log.d("mgdev", "TrackerScanner.receiverTurnOnGPS");
 
-            Intent intentTurnGPSOn=new Intent("android.location.GPS_ENABLED_CHANGE");
-            intentTurnGPSOn.putExtra("enabled", true);
-            sendBroadcast(intentTurnGPSOn);
+            Intent intentOpenGPSSettings = new Intent();
+            intentOpenGPSSettings.setAction(
+                    Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            intentOpenGPSSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intentOpenGPSSettings);
 
         }// end of onReceive
     };
@@ -2665,7 +2668,18 @@ public class TrackerScanner extends Service implements LocationListener {
             Log.d("mgdev", "TrackerScanner.receiverTurnOnWifi");
 
             WifiManager wManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            wManager.setWifiEnabled(true);
+            if (Build.VERSION.SDK_INT<Build.VERSION_CODES.Q)
+                wManager.setWifiEnabled(true); // deprecated by google...
+            else
+            {
+                //Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
+
+                Intent intentOpenWifiSettings = new Intent();
+                intentOpenWifiSettings.setAction(
+                        android.provider.Settings.ACTION_WIFI_SETTINGS);
+                intentOpenWifiSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intentOpenWifiSettings);
+            }
 
         }// end of onReceive
     };
