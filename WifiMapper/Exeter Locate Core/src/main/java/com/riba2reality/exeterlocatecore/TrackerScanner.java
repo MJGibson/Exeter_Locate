@@ -288,10 +288,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    public void setble_lambda(int lambda){
-
-        //this.ble_lambda = lambda;
-    }
+    public void setble_lambda(int lambda){this.ble_lambda = lambda;}
     //==============================================================================================
 
     //==============================================================================================
@@ -1032,7 +1029,7 @@ public class TrackerScanner extends Service implements LocationListener {
             }
 
             // dont forget to make milliseconds
-            interval += 1000;
+            interval *= 1000;
 
 
             // only used in citizen science mode
