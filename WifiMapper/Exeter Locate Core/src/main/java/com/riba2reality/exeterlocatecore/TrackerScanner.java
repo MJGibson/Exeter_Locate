@@ -404,6 +404,8 @@ public class TrackerScanner extends Service implements LocationListener {
         this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
         this.registerReceiver(receiverTurnOnBle,new IntentFilter("TurnOnBluetooth"));
+        this.registerReceiver(receiverTurnOnGPS,new IntentFilter("TurnOnGPS"));
+        this.registerReceiver(receiverTurnOnWifi,new IntentFilter("TurnOnWifi"));
 
 
     }// end of onCreate
@@ -2456,6 +2458,8 @@ public class TrackerScanner extends Service implements LocationListener {
         this.unregisterReceiver(receiverWifi);
         this.unregisterReceiver(receiverGPS);
         this.unregisterReceiver(receiverTurnOnBle);
+        this.unregisterReceiver(receiverTurnOnGPS);
+        this.unregisterReceiver(receiverTurnOnWifi);
 
 
     }// end of stopNotificationService
@@ -2579,7 +2583,28 @@ public class TrackerScanner extends Service implements LocationListener {
                         , enableBtPendingIntent);
             }
 
-        }
+            if(!gpsIsOn){
+
+                Intent enableGPSIntent = new Intent("TurnOnGPS");
+                PendingIntent enableGPSPendingIntent =
+                        PendingIntent.getBroadcast(this, 0, enableGPSIntent, 0);
+                _builder.addAction(R.drawable.bluetoot_disconnected_foreground, "Turn on GPS"
+                        , enableGPSPendingIntent);
+
+            }// end of if gps is not on
+
+            if(!wifiIsOn){
+
+                Intent enableWifiIntent = new Intent("TurnOnWifi");
+                PendingIntent enableWifiPendingIntent =
+                        PendingIntent.getBroadcast(this, 0, enableWifiIntent, 0);
+                _builder.addAction(R.drawable.bluetoot_disconnected_foreground, "Turn on Wi-Fi"
+                        , enableWifiPendingIntent);
+
+
+            }// end of if wifi is not on
+
+        }// end of any of bluetooth,wifi, gps are off
         else{
             _builder.setStyle(null);
             _builder.clearActions();
@@ -2616,6 +2641,36 @@ public class TrackerScanner extends Service implements LocationListener {
         }// end of onReceive
     };
     //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverTurnOnGPS = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "TrackerScanner.receiverTurnOnGPS");
+
+            Intent intentTurnGPSOn=new Intent("android.location.GPS_ENABLED_CHANGE");
+            intentTurnGPSOn.putExtra("enabled", true);
+            sendBroadcast(intentTurnGPSOn);
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverTurnOnWifi = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "TrackerScanner.receiverTurnOnWifi");
+
+            WifiManager wManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            wManager.setWifiEnabled(true);
+
+        }// end of onReceive
+    };
+    //==============================================================================================
+
 
     //==============================================================================================
     private void startNotificationService() {
