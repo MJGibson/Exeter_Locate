@@ -403,6 +403,8 @@ public class TrackerScanner extends Service implements LocationListener {
                 new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
         this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
+        this.registerReceiver(receiverTurnOnBle,new IntentFilter("TurnOnBluetooth"));
+
 
     }// end of onCreate
     //==============================================================================================
@@ -2453,6 +2455,8 @@ public class TrackerScanner extends Service implements LocationListener {
         this.unregisterReceiver(receiverBle);
         this.unregisterReceiver(receiverWifi);
         this.unregisterReceiver(receiverGPS);
+        this.unregisterReceiver(receiverTurnOnBle);
+
 
     }// end of stopNotificationService
     //==============================================================================================
@@ -2558,10 +2562,28 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if(!
                 (bluetoothIsOn && wifiIsOn && gpsIsOn)
-        )
+        ) {
             _builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+
+            _builder.clearActions();
+
+
+            if(!bluetoothIsOn) {
+                Intent enableBtIntent = new Intent("TurnOnBluetooth");
+                //Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                //snoozeIntent.setAction(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                //snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
+                PendingIntent enableBtPendingIntent =
+                        PendingIntent.getBroadcast(this, 0, enableBtIntent, 0);
+                _builder.addAction(R.drawable.bluetoot_disconnected_foreground, "Turn on Bluetooth"
+                        , enableBtPendingIntent);
+            }
+
+        }
         else{
             _builder.setStyle(null);
+            _builder.clearActions();
+
         }
 
         //_builder.setContentText(message);
@@ -2571,6 +2593,28 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     }//end of updateNotification
+    //==============================================================================================
+
+    //==============================================================================================
+    BroadcastReceiver receiverTurnOnBle = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "TrackerScanner.receiverTurnOnBle");
+
+            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                // Device does not support Bluetooth ???
+            } else {
+                if (!mBluetoothAdapter.isEnabled()) {
+                    // Bluetooth is not enable :)
+                    mBluetoothAdapter.enable();
+
+                }
+            }
+
+        }// end of onReceive
+    };
     //==============================================================================================
 
     //==============================================================================================
