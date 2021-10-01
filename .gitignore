@@ -1,0 +1,6 @@
+# SSL key file
+key.pem
+
+# vscode
+.vscode
+*.pfx
