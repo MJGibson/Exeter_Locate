@@ -1,4 +1,4 @@
-<img src="WifiMapper/exeterlocate/src/main/exeter_locate_icon-playstore.png" alt="Exeter Locate logo"/>
+<img src="WifiMapper/exeterlocate/src/main/exeter_locate_icon-playstore.png" width="200" alt="Exeter Locate logo"/>
 
 # Exeter Locate Application/Server
 Exeter locate application and associated server are designed to facilitate the collection of Location (GPS), Wi-Fi/Bluetooth acess-points and their strength, aswell as accelerometer and magnetometer data, for research initially by University of Exeter Researchers. After our project we will further anonymise the data before making it publically available.
