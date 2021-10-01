@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Exeter Locate</string>
+    <string name="start_button_initial_text">START</string>
+    <string name="start_button_stop_text">STOP</string>
+    <string name="PermissionDeniedToastText">Permission denied!</string>
+    <string name="BluetoothRequired">Bluetooth is required</string>
+    <string name="information_t_c_s"><![CDATA[Information/T&C\'s]]></string>
+    <string name="versionInfoText">versions: <br /> ID:</string>
+</resources>

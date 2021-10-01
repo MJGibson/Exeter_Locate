@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+
+
+    <LinearLayout
+        android:id="@+id/linearLayoutPics"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/spinner1"
+
+        >
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_margin="0dp"
+                android:layout_width="160pt"
+                android:layout_height="wrap_content"
+
+
+                android:layout_gravity="center"
+
+                app:layout_constraintBottom_toTopOf="@+id/imageViewPic"
+                app:layout_constraintEnd_toStartOf="@+id/imageViewPic"
+
+                app:layout_constraintStart_toEndOf="@+id/spinner1"
+                app:layout_constraintTop_toBottomOf="@+id/spinner1"
+                app:srcCompat="@drawable/example_image"
+                android:adjustViewBounds="true"
+                android:scaleType="center"
+            />
+
+
+            <ImageView
+                android:id="@+id/imageViewPic"
+                android:layout_margin="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                app:srcCompat="@drawable/a_pic"
+
+
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+
+                app:layout_constraintStart_toEndOf="@+id/imageViewPic"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewPic"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+            />
+
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        >
+
+
+
+        <Button
+            android:id="@+id/manualScanButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/perform_scan" />
+
+<!--        <Button-->
+<!--            android:id="@+id/manualPostButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Post Data - (0)" />-->
+    </LinearLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

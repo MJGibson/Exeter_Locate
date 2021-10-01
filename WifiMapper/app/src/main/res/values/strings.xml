@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">WifiMapper</string>
+    <string name="HomeScreen">Home</string>
+    <string name="ManualScan">Manual Scan</string>
+    <string name="QRscan">QR Scanner</string>
+    <string name="BLEScanner">BLE Scanner</string>
+
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <!-- Preference Titles -->
+
+    <!-- Messages Preferences -->
+    <string name="server_select">Select Server</string>
+
+    <!-- Sync Preferences -->
+    <string name="Settings">Settings</string>
+
+    <string name="perform_scan">Perform Scan</string>
+
+
+    <string name="qr_code_found_scan">QR Code Found - Scan</string>
+    <string name="qr_code_found_none_riba">QR Code Found - None RIBA</string>
+    <string name="qr_code_not_found">No QR Code Found</string>
+
+    <string name="qr_check_message">https://www.datacentricengineering.co.uk/from-riba-to-reality.html?qr=</string>
+
+
+</resources>

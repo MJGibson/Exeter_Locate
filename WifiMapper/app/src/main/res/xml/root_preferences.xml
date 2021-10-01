@@ -1,0 +1,147 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    >
+
+
+    <EditTextPreference
+        app:key="DeviceID"
+        app:title="Device/User ID"
+        app:useSimpleSummaryProvider="true"
+
+        />
+
+    <PreferenceCategory app:title="Server">
+
+        <EditTextPreference
+            app:key="ServerAddress"
+            app:title="Server IP Address"
+            app:useSimpleSummaryProvider="true"
+
+            />
+
+        <ListPreference
+            app:defaultValue="Server"
+            app:entries="@array/server_names"
+            app:entryValues="@array/server_values"
+            app:key="ServerList"
+            app:title="@string/server_select"
+            app:useSimpleSummaryProvider="true"
+
+            />
+
+
+        <SwitchPreference
+            android:defaultValue="True"
+            app:key="SSL_switch"
+            app:title="Use HTTPS (SSL)?"
+
+            />
+
+        <EditTextPreference
+            app:key="database"
+            app:title="Database:"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Time settings">
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_manual_scan"
+            app:isPreferenceVisible="true"
+            app:key="duration_manual_scan"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Duration of manual scan (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_post"
+            app:isPreferenceVisible="true"
+            app:key="interval_posts"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between posts (seconds)" />
+
+        <SeekBarPreference
+                    android:max="@integer/max"
+                    app:adjustable="true"
+                    app:defaultValue="@integer/defaultVal_gps"
+                    app:isPreferenceVisible="true"
+                    app:key="interval_scan"
+                    app:min="@integer/min"
+                    app:showSeekBarValue="true"
+                    app:title="Time interval between scans (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_gps"
+            app:isPreferenceVisible="true"
+            app:key="interval_gps"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between GPS scans (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_wifi"
+            app:isPreferenceVisible="true"
+            app:key="interval_wifi"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between Wifi Scans (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_ble"
+            app:isPreferenceVisible="true"
+            app:key="interval_ble"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between BLE Scans (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_mag"
+            app:isPreferenceVisible="true"
+            app:key="interval_mag"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between Magnetic Scans (seconds)" />
+
+        <SeekBarPreference
+            android:max="@integer/max"
+            app:adjustable="true"
+            app:defaultValue="@integer/defaultVal_accel"
+            app:isPreferenceVisible="true"
+            app:key="interval_accel"
+            app:min="@integer/min"
+            app:showSeekBarValue="true"
+            app:title="Time interval between Accelerometer Scans (seconds)" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Information">
+
+        <EditTextPreference
+            app:key="versionNum"
+            app:title="Version:"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="coreVersionNum"
+            app:title="Core Version:"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="locations1">
+
+        <item>A	Corner of Stocker and NPR</item>
+        <item>B	Path to Geoffrey Pope</item>
+        <item>C	Opposite car park C entrance</item>
+        <item>D	Opposite path</item>
+        <item>E	Road corner by pond</item>
+        <item>F	Road up to back of Laver, corner near Laver</item>
+        <item>G	Opposite path</item>
+        <item>H	Opposite path</item>
+        <item>I	Opposite service road to Amory</item>
+        <item>J	Path down from back of Harrison</item>
+        <item>K	Opposite service road to Amory</item>
+        <item>L	Opposite car park exit</item>
+        <item>M	SW corner of Harrison carpark road</item>
+        <item>O	NW corner of junction</item>
+
+    </string-array>
+</resources>

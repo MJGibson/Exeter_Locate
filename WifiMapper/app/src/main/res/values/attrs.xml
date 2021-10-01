@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FloatSeekBarPreference">
+        <attr name="minValue" format="string" />
+        <attr name="maxValue" format="string" />
+        <attr name="valueSpacing" format="string" />
+        <attr name="format" format="string" />
+    </declare-styleable>
+</resources>
