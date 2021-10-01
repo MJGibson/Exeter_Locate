@@ -5,7 +5,7 @@ Exeter locate application and associated server are designed to facilitate the c
 
 
 ## Installation
-Clone this repository and import into **Android Studio**
+Clone this repository and import [```WifiMapper/``` folder](WifiMapper/) into **Android Studio**
 ```bash
 git clone git@github.com:MJGibson/Exeter_Locate.git
 ```
