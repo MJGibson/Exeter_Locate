@@ -14,6 +14,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:id="@+id/scroll"
         app:layout_constraintBottom_toTopOf="@+id/textViewVersion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,21 +56,19 @@
     </ScrollView>
 
 
-
-
-
     <TextView
         android:id="@+id/textViewVersion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lines="2"
+        android:lines="1"
         android:paddingVertical="5dp"
         android:text="ver"
         android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@+id/page"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scroll" />
 
 
 
