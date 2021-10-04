@@ -95,7 +95,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.4.4";
+    public static final String libraryVersion = "1.4.5";
 
     public static final int REQUEST_ENABLE_BT = 11;
 
@@ -138,6 +138,7 @@ public class TrackerScanner extends Service implements LocationListener {
     // tags
     static final public String TRACKERSCANNER_MESSAGE = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MSG";
     static final public String TRACKERSCANNER_GEOFENCE_UPDATE = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE";
+    static final public String TRACKERSCANNER_GEOFENCE_UPDATE_FIRST = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE_FIRST";
 
     static final public String TRACKERSCANNER_COMBINED_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT";
     static final public String TRACKERSCANNER_RESEND_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT";
@@ -257,6 +258,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private String _callingPackage;
 
     private boolean insideGeoFence = false;
+    private boolean geoFenceChecked = false;
 
     private InputStream _userPFX;
 
@@ -430,6 +432,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if(_mode){
             intent.putExtra(TRACKERSCANNER_GEOFENCE_UPDATE, this.insideGeoFence);
+            intent.putExtra(TRACKERSCANNER_GEOFENCE_UPDATE_FIRST, this.geoFenceChecked);
         }
 
         broadcaster.sendBroadcast(intent);
@@ -1178,6 +1181,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         // finally update class attribute
         insideGeoFence = inside;
+
+        geoFenceChecked = true;
 
     }// end of checkGeoFence
     //==============================================================================================

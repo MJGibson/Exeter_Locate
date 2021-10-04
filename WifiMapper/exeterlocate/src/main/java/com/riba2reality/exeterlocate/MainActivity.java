@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     // assume false until we have data to say otherwise
     private boolean _insideGeoFence = false;
+    private boolean _geoFenceChecked = false;
 
     Activity _MainActivity;
     AppUpdateManager appUpdateManager;
@@ -280,6 +281,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d("mgdev", "receiverGeoFenceUpdates.onReceive");
 
             _insideGeoFence = intent.getBooleanExtra(TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE,
+                    false);
+            _geoFenceChecked =  intent.getBooleanExtra(
+                    TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE_FIRST,
                     false);
 
 
@@ -550,8 +554,13 @@ public class MainActivity extends AppCompatActivity {
                 status_textView.setText(
                         "App is active and scanning.\n Please tap the tick to stop.");
             }else{
-                status_textView.setText(
-                        "App is active.\nDevice is outside the geofence area.\n Please tap the tick to stop.");
+                if(!_geoFenceChecked){
+                    status_textView.setText(
+                            "App is active.\nDevice waiting for location data.\n Please tap the tick to stop.");
+                }else {
+                    status_textView.setText(
+                            "App is active.\nDevice is outside the geofence area.\n Please tap the tick to stop.");
+                }
             }
 
 
