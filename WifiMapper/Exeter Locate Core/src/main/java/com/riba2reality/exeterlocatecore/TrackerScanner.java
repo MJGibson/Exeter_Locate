@@ -237,12 +237,12 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
 
-    private int gPS_lambda = 600;   // gps and combined
+    private int gPS_lambda = 300;   // gps and combined
     private int gPS_duration = 60;
     private int gPS_scan_interval = 5;
 
-    private int wifi_lambda = 60;
-    private int post_lambda = 10; // short time so we pickup times from server early in the process
+    private int wifi_lambda = 30;
+    private int post_lambda = 60; 
     private int ble_lambda = 60;
     private int ble_duration = 10;
     private int mag_lambda = 60;

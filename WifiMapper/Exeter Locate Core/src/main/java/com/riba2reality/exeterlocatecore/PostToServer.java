@@ -104,33 +104,33 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
             String message = splitResult[0];
 
-            // note here collect parameter data attached and digest
-            if(splitResult.length == 10) {
-                int index = 1; // as main message is on zero
-                int gpsLamda = Integer.parseInt(splitResult[index++].trim());
-                int wifiLamda = Integer.parseInt(splitResult[index++].trim());
-                int postLamda = Integer.parseInt(splitResult[index++].trim());
-                int bleLamda = Integer.parseInt(splitResult[index++].trim());
-                int accelLamda = Integer.parseInt(splitResult[index++].trim());
-                int magLamda = Integer.parseInt(splitResult[index++].trim());
-
-                int gpsDuration = Integer.parseInt(splitResult[index++].trim());
-                int gpsInterval = Integer.parseInt(splitResult[index++].trim());
-                int bleDuration = Integer.parseInt(splitResult[index++].trim());
-
-                _trackerScanner.setgPS_lambda(gpsLamda);
-                _trackerScanner.setwifi_lambda(wifiLamda);
-                _trackerScanner.setpost_lambda(postLamda);
-                _trackerScanner.setble_lambda(bleLamda);
-                _trackerScanner.setaccel_lambda(accelLamda);
-                _trackerScanner.setmag_lambda(magLamda);
-
-                _trackerScanner.setgPS_duration(gpsDuration);
-                _trackerScanner.setgPS_scan_interval(gpsInterval);
-                _trackerScanner.setBle_duration(bleDuration);
-
-
-            }// end of if correct number of return elements
+//            // note here collect parameter data attached and digest
+//            if(splitResult.length == 10) {
+//                int index = 1; // as main message is on zero
+//                int gpsLamda = Integer.parseInt(splitResult[index++].trim());
+//                int wifiLamda = Integer.parseInt(splitResult[index++].trim());
+//                int postLamda = Integer.parseInt(splitResult[index++].trim());
+//                int bleLamda = Integer.parseInt(splitResult[index++].trim());
+//                int accelLamda = Integer.parseInt(splitResult[index++].trim());
+//                int magLamda = Integer.parseInt(splitResult[index++].trim());
+//
+//                int gpsDuration = Integer.parseInt(splitResult[index++].trim());
+//                int gpsInterval = Integer.parseInt(splitResult[index++].trim());
+//                int bleDuration = Integer.parseInt(splitResult[index++].trim());
+//
+//                _trackerScanner.setgPS_lambda(gpsLamda);
+//                _trackerScanner.setwifi_lambda(wifiLamda);
+//                _trackerScanner.setpost_lambda(postLamda);
+//                _trackerScanner.setble_lambda(bleLamda);
+//                _trackerScanner.setaccel_lambda(accelLamda);
+//                _trackerScanner.setmag_lambda(magLamda);
+//
+//                _trackerScanner.setgPS_duration(gpsDuration);
+//                _trackerScanner.setgPS_scan_interval(gpsInterval);
+//                _trackerScanner.setBle_duration(bleDuration);
+//
+//
+//            }// end of if correct number of return elements
 
             _trackerScanner.sendResult(message);
 
