@@ -4,10 +4,12 @@ package com.riba2reality.exeterlocate;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -24,6 +26,9 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -119,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
     Activity _MainActivity;
     AppUpdateManager appUpdateManager;
 
+    //
+    private boolean _termsAccepted = false;
+//    com.riba2reality.exeterlocate.databinding.ActivityMainBinding _binding;
+
 
     //##############################################################################################
 
@@ -139,6 +148,10 @@ public class MainActivity extends AppCompatActivity {
 
         // set up UI
         setContentView(R.layout.activity_main);
+//        _binding= com.riba2reality.exeterlocate.databinding.ActivityMainBinding.inflate(getLayoutInflater());
+//        setContentView(_binding.getRoot());
+
+
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -216,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         active = true;
         super.onStart();
+
+        checkTermsAcceptance();
         checkForUpdates();
         runThread();
         checkButtons();
@@ -322,6 +337,23 @@ public class MainActivity extends AppCompatActivity {
     //##############################################################################################
 
     //==============================================================================================
+    private void checkTermsAcceptance(){
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+
+        if(!_termsAccepted){
+
+            startTermsAcceptance();
+
+        }
+
+    }// end of checkTermsAcceptance
+    //==============================================================================================
+
+    //==============================================================================================
     private void checkForUpdates(){
 
         appUpdateManager = AppUpdateManagerFactory.create(this);
@@ -338,48 +370,6 @@ public class MainActivity extends AppCompatActivity {
         appUpdateInfoTask.addOnSuccessListener(updateListener);
 
 
-//            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-//                    // This example applies an immediate update. To apply a flexible update
-//                    // instead, pass in AppUpdateType.FLEXIBLE
-//                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-//                // Request the update.
-//
-//                Log.d("mgdev", "MainActivity.checkForUpdates.available");
-//
-////                new AlertDialog.Builder(getBaseContext())
-////                        .setTitle("Update Available")
-////                        .setMessage("An update is available, please click OK to update now.")
-////
-////                        // Specifying a listener allows you to take an action before dismissing the dialog.
-////                        // The dialog is automatically dismissed when a dialog button is clicked.
-////                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-////                            public void onClick(DialogInterface dialog, int which) {
-//                                // operation
-////                                try {
-//                                    appUpdateManager.startUpdateFlowForResult(
-//                                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
-//                                            appUpdateInfo,
-//                                            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
-//                                            AppUpdateType.IMMEDIATE,
-//                                            // The current activity making the update request.
-//                                            this,
-//                                            // Include a request code to later monitor this update request.
-//                                            UPDATE_REQUEST_CODE);
-////                                } catch (IntentSender.SendIntentException e) {
-////                                    e.printStackTrace();
-////                                }
-//
-//
-////                            }// end of onClick
-////                        })
-////
-////                        // A null listener allows the button to dismiss the dialog and take no further action.
-//////                        .setNegativeButton(android.R.string.no, null)
-////                        .setIcon(android.R.drawable.ic_dialog_alert)
-////                        .show();
-
-//            }// end of if update available
-//        });// end of update info listener
 
     }// end of checkForUpdates
     //==============================================================================================
@@ -610,6 +600,90 @@ public class MainActivity extends AppCompatActivity {
 
         }// end of onClick
     };// end of infoButtonPressed
+    //==============================================================================================
+
+    //##############################################################################################
+    //#############################     Start others things        #################################
+    //##############################################################################################
+
+
+    //==============================================================================================
+    public void startTermsAcceptance(){
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        WebView webView = new WebView(this);
+        webView.loadUrl("file:///android_asset/ExeterLocateInformationpage.html");
+        webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url){
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        alert.setView(webView);
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+        alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                _termsAccepted = true;
+                SPeditor.putBoolean("termsAcceptance", _termsAccepted);
+                SPeditor.apply();
+                dialog.dismiss();
+            }
+        });
+
+        alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+                System.exit(0);
+            }
+        });
+
+        alert.setCancelable(false);
+
+        AlertDialog dialog = alert.create();
+        dialog.show();
+
+        // Access the button and set it to invisible
+        final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        button.setVisibility(View.INVISIBLE);
+
+        webView.getViewTreeObserver().addOnScrollChangedListener(
+                new ViewTreeObserver.OnScrollChangedListener() {
+                    @Override
+                    public void onScrollChanged() {
+
+                        //Log.v("mgdev", "+++ scrollchanged "+webView.getScrollY());
+
+                        int maxScrollExtent =
+                                (int) ((webView.getContentHeight() *
+                                getResources().getDisplayMetrics().density)
+                                        - webView.getHeight())-1;
+
+                        int diff = maxScrollExtent - webView.getScrollY();
+
+                        //Log.v("mgdev", "-----------------------"+diff);
+
+                            // if diff is zero, then the bottom has been reached
+                            if (diff == 0) {
+
+                                //Log.v("mgdev", "Accept?!?!");
+
+                                button.setVisibility(View.VISIBLE);
+
+                            }// end of if diff = 0
+                    }// end of onScrollChanged
+                }// end of ViewTreeObserver.OnScrollChangedListener
+        );// end of addOnScrollChangedListener
+
+
+
+    }// end of startTermsAcceptance
     //==============================================================================================
 
     //==============================================================================================

@@ -44,8 +44,8 @@ android {
         applicationId "com.riba2reality.exeterlocate"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 13
-        versionName "1.0.12"
+        versionCode 14
+        versionName "1.0.13"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -61,6 +61,12 @@ android {
             testCoverageEnabled true
         }
     }
+
+//    viewBinding {
+//        enabled=true
+//    }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

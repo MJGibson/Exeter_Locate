@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -83,6 +84,7 @@ public class WifiMessageActivity extends AppCompatActivity {
         // set up UI
         setContentView(R.layout.message_layout);
 
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // setup pointers to UI elements
         messageIcon = findViewById(R.id.imageView_message_icon);

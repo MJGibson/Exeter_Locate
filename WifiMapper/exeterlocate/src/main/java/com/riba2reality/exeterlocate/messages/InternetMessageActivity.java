@@ -2,6 +2,7 @@ package com.riba2reality.exeterlocate.messages;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -108,6 +109,7 @@ public class InternetMessageActivity extends AppCompatActivity {
         // set up UI
         setContentView(R.layout.message_layout);
 
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // setup pointers to UI elements
         messageIcon = findViewById(R.id.imageView_message_icon);
