@@ -431,6 +431,9 @@ public class TrackerScanner extends Service implements LocationListener {
             intent.putExtra(TRACKERSCANNER_MESSAGE, message);
 
         if(_mode){
+
+            Log.d("test1", "Tracker.sendResult.ACTION_REQUEST_GEOFENCE_UPDATE()");
+
             intent.putExtra(TRACKERSCANNER_GEOFENCE_UPDATE, this.insideGeoFence);
             intent.putExtra(TRACKERSCANNER_GEOFENCE_UPDATE_FIRST, this.geoFenceChecked);
         }
@@ -2964,6 +2967,8 @@ public class TrackerScanner extends Service implements LocationListener {
                     case Constants.ACTION_REQUEST_GEOFENCE_UPDATE:
 
                         this.sendResult(Constants.ACTION_REQUEST_GEOFENCE_UPDATE);
+
+                        Log.d("test1", "Tracker.ACTION_REQUEST_GEOFENCE_UPDATE()");
 
 
                         break;

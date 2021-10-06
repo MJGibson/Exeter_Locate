@@ -4,7 +4,6 @@ package com.riba2reality.exeterlocate;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
@@ -36,6 +35,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -111,8 +111,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private final int pulseDuration = 2000;
-    private final int pulseDuration2 = 1000;
-    private final int pulseInterval = 3500; // note must be bigger than pulseDuration
+    private final int pulseInterval = 3500;// note must be bigger than pulseDuration
+    private final int checkButtonsinterval = 200;
+
 
 
     // UUID
@@ -232,14 +233,22 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         checkTermsAcceptance();
+
+        requestGeoFenceUpdate();
+
         checkForUpdates();
-        runThread();
+
+        runButtonsThread();
+        runPulseThread();
+
+
+
         checkButtons();
         checkBluetoothEnabled();
         checkWifiEnabled();
         //checkForInternetConnection();
         checkGpsEnabled();
-        requestGeoFenceUpdate();
+
         // add broadcast receivers for ble, wifi turned off
         this.registerReceiver(receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         this.registerReceiver(receiverWifi,
@@ -454,6 +463,8 @@ public class MainActivity extends AppCompatActivity {
 
             startService(intent);
 
+            Log.d("test1", "MainActivty.requestGeoFenceUpdate()");
+
 
         }// end of location service is running
         else{
@@ -552,19 +563,28 @@ public class MainActivity extends AppCompatActivity {
 
             if(_insideGeoFence) {
                 status_textView.setText(
-                        "App is active and scanning.\n Please tap the tick to stop.");
+                        R.string.AppActive);
             }else{
                 if(!_geoFenceChecked){
                     status_textView.setText(
-                            "App is active.\nDevice waiting for location data.\n Please tap the tick to stop.");
+                            R.string.AppActive_NotCheckedGeoFence);
                 }else {
                     status_textView.setText(
-                            "App is active.\nDevice is outside the geofence area.\n Please tap the tick to stop.");
+                            R.string.AppActive_OutsideGeoFence);
                 }
             }
 
 
-            startDisplayIconAnimation();
+            //startDisplayIconAnimation();
+
+            //
+            if(!_geoFenceChecked){
+
+                // request an update from back end..
+
+
+
+            }//end of if geo fence not checked
 
         }else{
             //startStopButton.setText(R.string.start_button_initial_text);
@@ -582,7 +602,7 @@ public class MainActivity extends AppCompatActivity {
             circleIcon.setImageResource(R.mipmap.cross_round);
             //circleIcon.image
 
-            status_textView.setText("App is inactive.\n Please tap the cross to start.");
+            status_textView.setText(R.string.AppNotactive);
 
         }// end of if/else isLocationServiceRunning
 
@@ -619,7 +639,14 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     public void startTermsAcceptance(){
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+//        ConsentDialog dialog = new ConsentDialog(this);
+
+        //dialog.show();
+
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this,
+                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
 
         WebView webView = new WebView(this);
         webView.loadUrl("file:///android_asset/ExeterLocateInformationpage.html");
@@ -656,6 +683,9 @@ public class MainActivity extends AppCompatActivity {
         alert.setCancelable(false);
 
         AlertDialog dialog = alert.create();
+
+        //dialog.getWindow().setBackgroundDrawable(getDrawable(R.color.white));
+
         dialog.show();
 
         // Access the button and set it to invisible
@@ -671,15 +701,17 @@ public class MainActivity extends AppCompatActivity {
 
                         int maxScrollExtent =
                                 (int) ((webView.getContentHeight() *
-                                getResources().getDisplayMetrics().density)
+                                        webView.getResources().getDisplayMetrics().density)
                                         - webView.getHeight())-1;
 
-                        int diff = maxScrollExtent - webView.getScrollY();
+                        int diff = ((int)(maxScrollExtent * 0.9)) - webView.getScrollY();
 
-                        //Log.v("mgdev", "-----------------------"+diff);
+                        //Log.v("mgdev", "-----------------------::"+diff);
+                        //Log.v("mgdev", "maxScrollExtent"+maxScrollExtent);
+                        //Log.v("mgdev", "webView.getScrollY()"+webView.getScrollY());
 
-                            // if diff is zero, then the bottom has been reached
-                            if (diff == 0) {
+                        // if diff is zero, then the bottom has been reached
+                        if (diff <= 0 && maxScrollExtent != 0) {
 
                                 //Log.v("mgdev", "Accept?!?!");
 
@@ -1036,14 +1068,14 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     /**
-     * runThread method
+     * runButtonsThread method
      *
      * Creates a new monitor thread which will run while the activity is shown, and changes the
      * background colour every 300 milliseconds to either green or red if the TrackerScanner is
      * running or not respectively.
      *
      */
-    private void runThread() {
+    private void runButtonsThread() {
 
         new Thread() {
             public void run() {
@@ -1063,7 +1095,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }// end of run function
                         });
-                        Thread.sleep(pulseInterval);
+                        Thread.sleep(checkButtonsinterval);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1073,6 +1105,42 @@ public class MainActivity extends AppCompatActivity {
     }
     //==============================================================================================
 
+
+    //==============================================================================================
+    /**
+     * runPulseThread method
+     *
+     * Creates a new monitor thread which will run while the activity is shown, activates the
+     * pulsing animation if the backend service is running
+     *
+     */
+    private void runPulseThread() {
+
+        new Thread() {
+            public void run() {
+                while (active) {
+                    try {
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                if(isLocationServiceRunning()){
+                                    startDisplayIconAnimation();
+                                }
+
+
+                            }// end of run function
+                        });
+                        Thread.sleep(pulseInterval);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }// end of runPulseThread
+    //==============================================================================================
 
 
     //==============================================================================================

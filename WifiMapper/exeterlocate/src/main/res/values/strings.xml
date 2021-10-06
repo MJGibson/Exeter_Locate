@@ -6,4 +6,17 @@
     <string name="BluetoothRequired">Bluetooth is required</string>
     <string name="information_t_c_s"><![CDATA[Information/T&C\'s]]></string>
     <string name="versionInfoText">versions: <br /> ID:</string>
+
+    <string name="AppNotactive">App is inactive.
+        \n Please tap the cross to start.</string>
+    <string name="AppActive">App is active and recording.
+        \n Please tap the tick to stop.</string>
+    <string name="AppActive_NotCheckedGeoFence">App is active.
+        \nLocation not determined yet.
+        \nNo data is being recorded.
+        \n Recording will begin when your phone is on-campus.</string>
+    <string name="AppActive_OutsideGeoFence">App is active.
+        \nYour phone is off-campus and not recording any data.
+        \nPlease tap the tick to stop.</string>
+
 </resources>
