@@ -649,7 +649,7 @@ public class MainActivity extends AppCompatActivity {
                 R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
 
         WebView webView = new WebView(this);
-        webView.loadUrl("file:///android_asset/ExeterLocateInformationpage.html");
+        webView.loadUrl("file:///android_asset/ExeterLocateConcentPage.html");
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url){
