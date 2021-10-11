@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -208,7 +209,9 @@ public class MainActivity extends AppCompatActivity {
         }else {
 
             // ble stuff
-            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            }
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver((receiverGeoFenceUpdates),
