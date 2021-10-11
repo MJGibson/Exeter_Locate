@@ -380,7 +380,9 @@ public class TrackerScanner extends Service implements LocationListener {
         }else {
 
             // ble stuff
-            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            }
         }
 
         // set up user pfx
@@ -1568,7 +1570,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
         Log.d("mgdev", "startBLEScan");
 
-        if( bluetoothAdapter.isEnabled() ) {
+        if( bluetoothAdapter.isEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
 //            if(bluetoothIsOn!= true){
 //                bluetoothIsOn = true;
@@ -1627,34 +1629,38 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    private ScanCallback leScanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, android.bluetooth.le.ScanResult result) {
-            super.onScanResult(callbackType, result);
+    private ScanCallback leScanCallback;
+    {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            leScanCallback = new ScanCallback() {
+                @Override
+                public void onScanResult(int callbackType, android.bluetooth.le.ScanResult result) {
+                    super.onScanResult(callbackType, result);
 
-            Log.d("mgdev", "BluetoothTabFragment.onScanResult");
+                    Log.d("mgdev", "BluetoothTabFragment.onScanResult");
 
-            BluetoothLEResult bleResult = new BluetoothLEResult();
-            bleResult.macAddress = result.getDevice().getAddress();
-            //bleResult.signalStrength = result.getRssi();
+                    BluetoothLEResult bleResult = new BluetoothLEResult();
+                    bleResult.macAddress = result.getDevice().getAddress();
+                    //bleResult.signalStrength = result.getRssi();
 
 //            String message;
 //            String device = result.getDevice().getAddress();
 //            String name = result.getDevice().getName();
 //            message = "" + device + "---"+ name;
 
-            //result.wifiResult.add(wifiResult);
+                    //result.wifiResult.add(wifiResult);
 
 
-            if(!currentResult.bluetoothLEResults.keySet().contains(bleResult))
-            {
-                //arrayList.add(message);
-                currentResult.bluetoothLEResults.put(bleResult,result.getRssi());
+                    if (!currentResult.bluetoothLEResults.keySet().contains(bleResult)) {
+                        //arrayList.add(message);
+                        currentResult.bluetoothLEResults.put(bleResult, result.getRssi());
 
-            }
+                    }
 
-        }// end of onScanResult
-    }; // end of ScanCallback
+                }// end of onScanResult
+            };
+        }
+    }// end of ScanCallback
     //==============================================================================================
 
 
@@ -2544,7 +2550,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         _bluetooth_scanning = false;
 
-        if(bluetoothLeScanner != null && bluetoothAdapter.isEnabled())
+        if(bluetoothLeScanner != null && bluetoothAdapter.isEnabled()
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+        )
             bluetoothLeScanner.stopScan(leScanCallback);
 
     }// end of stopBLEScanning
