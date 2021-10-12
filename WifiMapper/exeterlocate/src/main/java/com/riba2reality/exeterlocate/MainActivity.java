@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        String _deviceID = SP.getString("DeviceID", "");
+        _deviceID = SP.getString("DeviceID", "");
         if(_deviceID.isEmpty()){
             _deviceID = UUID.randomUUID().toString();
             SPeditor.putString("DeviceID", _deviceID);
@@ -983,7 +983,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
 
         String deviceID = _deviceID;
 
