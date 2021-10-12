@@ -675,7 +675,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
