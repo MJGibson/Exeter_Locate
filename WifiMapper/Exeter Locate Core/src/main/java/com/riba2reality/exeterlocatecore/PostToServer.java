@@ -40,6 +40,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
     //private final WeakReference<ServerMessage> serverMessageContrainer;
     private final ServerMessage serverMessage;
 
+    private boolean _useSSL;
+    private String _address;
+    private String _urlString;
+
 
     //##############################################################################################
     // functions
@@ -59,7 +63,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
     public PostToServer(TrackerScanner trackerScanner,
                         InputStream is,
                         InputStream userPFX,
-                        ServerMessage serverMessage
+                        ServerMessage serverMessage,
+                        boolean useSSL,
+                        String address,
+                        String urlString
                         ) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
@@ -70,6 +77,12 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         //this.serverMessageContrainer = new WeakReference<>(serverMessage);
         this.serverMessage = serverMessage;
+
+        this._useSSL = useSSL;
+
+        this._address = address;
+        this._urlString = urlString;
+
 
     }// end of PostToServer Constructor
     //==============================================================================================
@@ -154,9 +167,9 @@ public class PostToServer extends AsyncTask<String, String, String> {
         // Extract the data from the message object
 
         String message = this.serverMessage.message;
-        String urlString = this.serverMessage.urlString;
-        boolean useSSL = this.serverMessage.useSSL;
-        final String address = this.serverMessage.address;
+        String urlString = this._urlString;
+        boolean useSSL = this._useSSL;
+        final String address = this._address;
 
         final String method = "POST";
         final int timeOut = 5000;
@@ -301,7 +314,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
         } catch (Exception e) {
 
             // put it back in the queue
-            this.trackerscannerContainer.get().resendQueue.add( serverMessage );
+            this.trackerscannerContainer.get().messageResendQueue.add( serverMessage );
 
             e.printStackTrace();
             System.out.println(e.getMessage());
