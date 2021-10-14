@@ -101,6 +101,17 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private final int queueByteLimit = 1024 * 1024 * 10; // 10 MB
 
+    private int gPS_lambda = 900;   // gps and combined
+    private int gPS_duration = 60;
+    private int gPS_scan_interval = 5;
+
+    private int wifi_lambda = 30;
+    private int post_lambda = 60;
+    private int ble_lambda = 60;
+    private int ble_duration = 10;
+    private int mag_lambda = 60;
+    private int accel_lambda = 60;
+
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues
 
@@ -231,16 +242,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
 
-    private int gPS_lambda = 300;   // gps and combined
-    private int gPS_duration = 60;
-    private int gPS_scan_interval = 5;
 
-    private int wifi_lambda = 30;
-    private int post_lambda = 60; 
-    private int ble_lambda = 60;
-    private int ble_duration = 10;
-    private int mag_lambda = 60;
-    private int accel_lambda = 60;
 
     // citizen science mode (true), or development mode (false)
     private boolean _mode = false;
@@ -2474,6 +2476,15 @@ public class TrackerScanner extends Service implements LocationListener {
         }
 
         //_builder.setContentText(message);
+        // these should already be set, but seems some phones need re-directing, particularlly
+        // huawei
+        _builder.setSmallIcon(R.mipmap.exeter_locate_icon);
+        _builder.setContentTitle("Exeter Locate");
+        _builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        _builder.setContentText("Scanning");
+        _builder.setAutoCancel(true);
+        //_builder.setOnlyAlertOnce(true);
+        _builder.setPriority(NotificationCompat.PRIORITY_MAX);
 
 
         _notificationManager.notify(Constants.LOCATION_SERVICE_ID, _builder.build());
