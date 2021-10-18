@@ -95,7 +95,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.5.0";
+    public static final String libraryVersion = "1.5.1";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -104,6 +104,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private int gPS_lambda = 900;   // gps and combined
     private int gPS_duration = 60;
     private int gPS_scan_interval = 5;
+
+    private int cell_location_interval = 30;
 
     private int wifi_lambda = 30;
     private int post_lambda = 60;
@@ -261,6 +263,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private boolean bluetoothIsOn = false;
     private boolean wifiIsOn = false;
     private boolean gpsIsOn = false;
+
+    private boolean has_periodicUpdate_gps = false;
 
     //----------------------------------------------------------------------------------------------
 
@@ -630,6 +634,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             if (running) {
+
+                has_periodicUpdate_gps = true;
+
                 int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
                 int interval = gpsInterval;
                 if(_mode){
@@ -993,6 +1000,125 @@ public class TrackerScanner extends Service implements LocationListener {
     // location functions
 
     //==============================================================================================
+    private boolean runningOnEmulator(){
+
+        // Android SDK emulator
+        boolean result = (Build.FINGERPRINT.startsWith("google/sdk_gphone_")
+                //&& Build.FINGERPRINT.endsWith(":user/release-keys")
+                && Build.MANUFACTURER.equalsIgnoreCase("Google")
+                && Build.PRODUCT.startsWith("sdk_gphone_")
+                & Build.BRAND.equalsIgnoreCase("google")
+                && Build.MODEL.startsWith("sdk_gphone_"))
+                //
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                //bluestacks
+                || "QC_Reference_Phone" == Build.BOARD
+                && !"Xiaomi".equalsIgnoreCase(Build.MANUFACTURER) //bluestacks
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.HOST=="Build2" //MSI App Player
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT == "google_sdk";
+        return result;
+
+    }// end of runningOnEmulator
+    //==============================================================================================
+
+
+    //==============================================================================================
+    /**
+     * Start scanning Cell based location
+     *
+     */
+    private void requestCelllocation() {
+
+
+        boolean runningOnEmulator = runningOnEmulator();
+
+
+        Log.d("mgdev", "TrackerScanner.requestCelllocation()"+runningOnEmulator);
+
+//            Criteria criteria = new Criteria();
+//            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+//            criteria.setPowerRequirement(Criteria.POWER_HIGH);
+//            String provider = locationManager.getBestProvider(criteria, true);
+        String provider = LocationManager.NETWORK_PROVIDER;
+
+        if(runningOnEmulator){
+            provider = LocationManager.GPS_PROVIDER;
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int gpsInterval = getResources().getInteger(R.integer.defaultVal_gps);
+        // interval needs to be in milliseconds -- scale accordingly
+        long interval = gpsInterval;
+
+        if(_mode){
+            interval = cell_location_interval;
+        }else {
+            interval = SP.getInt("interval_gps", gpsInterval);
+        }
+
+        // dont forget to make milliseconds
+        interval *= 1000;
+
+
+        // only used in citizen science mode
+//        this.stopGPSScanTime = SystemClock.elapsedRealtime() + (gPS_duration * 1000);
+
+
+        // TODO: Check if permission available
+        locationManager.requestLocationUpdates(
+                provider,
+                interval,
+                0,
+                cellLocationListener
+        );
+
+
+
+
+
+    }//end of requestCelllocation
+    //==============================================================================================
+
+
+    //==============================================================================================
+    private LocationListener cellLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+
+            checkGeoFence(location);
+
+
+
+        }// end of onLocationChanged
+    };// end of cellLocationListener
+    //==============================================================================================
+
+
+
+
+    //==============================================================================================
     /**
      * Start GPS scanning, with an interval parameter (in seconds), taken from SharedPreferences.
      * Also notes the times these GPS
@@ -1165,6 +1291,46 @@ public class TrackerScanner extends Service implements LocationListener {
 
         // check if inide polygon
         LatLng locationCords = new LatLng(location.getLatitude(), location.getLongitude());
+
+
+        if( location.getProvider().equals(LocationManager.NETWORK_PROVIDER)){
+
+
+
+            Location strethamCenterPoint = new Location("strethamCenterPoint");
+            strethamCenterPoint.setLatitude(Constants.stethamCampusCenterPoint.latitude);
+            strethamCenterPoint.setLongitude(Constants.stethamCampusCenterPoint.longitude);
+
+            float distance = location.distanceTo(strethamCenterPoint);
+
+
+            Log.d("mgdev", "TrackerScanner.checkGeoFence.distance= "+distance+
+                    "     Provider: "+location.getProvider());
+
+            if(distance > 1500){
+
+                // turn off gps updates
+                if(has_periodicUpdate_gps){
+                    handler.removeCallbacks(periodicUpdate_gps);
+                }
+
+
+            }else{
+
+                if(!has_periodicUpdate_gps){
+                    handler.post(periodicUpdate_gps);
+                }
+
+
+            }
+
+            if(_locationScanning){
+                return; // if we're scanning gps, use that to check geo fence.
+            }
+
+
+        }// end of if network/cell based location
+
 
         boolean inside =
                 PolyUtil.containsLocation(
@@ -1660,7 +1826,8 @@ public class TrackerScanner extends Service implements LocationListener {
         double altitude = 0.0;
         double accuracy = 0.0;
         String gpsTime = "";
-        // String provider = "";
+//        String provider = "";
+
         if (locationResult.location != null) {
             latitude = locationResult.location.getLatitude();
             longitude = locationResult.location.getLongitude();
@@ -1669,6 +1836,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
             gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
                     Locale.getDefault()).format(new Date(locationResult.location.getTime()));
+
+//            provider = locationResult.location.getProvider();
 
         }
         //------------------------------------------------------------------
@@ -1689,6 +1858,8 @@ public class TrackerScanner extends Service implements LocationListener {
         parameters.put("Y", Double.toString(longitude));
         parameters.put("ALTITUDE", Double.toString(altitude));
         parameters.put("ACC", Double.toString(accuracy));
+
+//        parameters.put("PROVIDER", provider);
 
         try {
             message = getPostDataString(parameters);
@@ -2333,6 +2504,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         stopLocationServices();
 
+        locationManager.removeUpdates(cellLocationListener);
+
         handler.removeCallbacks(periodicUpdate);
 
         running = false;
@@ -2354,8 +2527,14 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     private void stopLocationServices(){
 
+        handler.removeCallbacks(periodicUpdate_gps);
+
+        has_periodicUpdate_gps = false;
+
         locationManager.removeUpdates(this);
         _locationScanning = false;
+
+
 
     }// end of stopLocationServices
     //==============================================================================================
@@ -2363,6 +2542,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //==============================================================================================
     private void stopOthers(){
+
+
 
         handler.removeCallbacks(periodicUpdate_wifi);
         // if service stopped when scanned wifi, the receiver already unregistered
@@ -2653,8 +2834,14 @@ public class TrackerScanner extends Service implements LocationListener {
         // activate the location service
         if(_mode){
             handler.post(periodicUpdate_gps);
+
+            requestCelllocation();
+
         }else {
             requestlocation();
+
+
+
         }
 
         // always activate the posting

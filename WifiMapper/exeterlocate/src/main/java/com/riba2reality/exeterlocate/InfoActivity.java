@@ -80,7 +80,8 @@ public class InfoActivity extends AppCompatActivity {
         // set versions
         //versionTextView.setEnabled(false);
         versionTextView.setText(
-                "Version: " + BuildConfig.VERSION_NAME + "    "
+                "Version: " + BuildConfig.VERSION_NAME
+                + "("+Integer.toString(BuildConfig.VERSION_CODE)+")    "
                 //+ "Core Version: " + versionName
                 + "Core Version: " + TrackerScanner.libraryVersion
                 //+ "\n" + "Device ID: " + _deviceID

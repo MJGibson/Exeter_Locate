@@ -26,6 +26,7 @@ KEYS_REQUIRED_FOR_GPS = [
     "Y",
     "ALTITUDE",
     "ACC",
+    #"PROVIDER",
     "MESSAGE",
 ]
 
@@ -233,6 +234,7 @@ def combined():
                         "y": float(jsonData["Y"]),
                         "z": float(jsonData["ALTITUDE"]),
                         "acc": float(jsonData["ACC"]),
+                        #"provider": jsonData["PROVIDER"],
                         "MAG_TIME": jsonData["MAG_TIME"],
                         "MAG_x": float(jsonData["MAG_X"]),
                         "MAG_y": float(jsonData["MAG_Y"]),
@@ -270,6 +272,7 @@ def combined():
                         "y": float(jsonData["Y"]),
                         "z": float(jsonData["ALTITUDE"]),
                         "acc": float(jsonData["ACC"]),
+                        #"provider": jsonData["PROVIDER"],
                         "MAG_TIME": jsonData["MAG_TIME"],
                         "MAG_x": float(jsonData["MAG_X"]),
                         "MAG_y": float(jsonData["MAG_Y"]),
@@ -344,6 +347,7 @@ def gps():
                 "y": float(jsonData["Y"]),
                 "z": float(jsonData["ALTITUDE"]),
                 "acc": float(jsonData["ACC"]),
+                #"provider": jsonData["PROVIDER"],
                 "message": jsonData["MESSAGE"],
             }
         )

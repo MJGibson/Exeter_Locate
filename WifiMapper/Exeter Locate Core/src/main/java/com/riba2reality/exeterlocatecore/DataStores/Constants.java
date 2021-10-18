@@ -62,6 +62,9 @@ public class Constants {
             new LatLng(50.7312680719997,-3.53966720088312)
     );
 
+    public static final LatLng stethamCampusCenterPoint =
+            new LatLng(50.73627862858465,-3.536197682802033);
+
 
 
 }// end of class
