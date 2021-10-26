@@ -95,7 +95,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.5.1";
+    public static final String libraryVersion = "1.5.2";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -1353,10 +1353,19 @@ public class TrackerScanner extends Service implements LocationListener {
             }// end of leaving
         }// end of entering or leaving
 
+        boolean update = false;
+        if(insideGeoFence != inside || !geoFenceChecked)
+            update = true;
+
+
         // finally update class attribute
         insideGeoFence = inside;
 
         geoFenceChecked = true;
+
+        if(update)
+            updateNotification();
+
 
     }// end of checkGeoFence
     //==============================================================================================
@@ -2598,6 +2607,16 @@ public class TrackerScanner extends Service implements LocationListener {
         String message = "Scanning...";
 
 
+        if(!geoFenceChecked)
+            message += "Location not determined...";
+        else{
+            if(insideGeoFence){
+                message = "On-campus Scanning...";
+            }else{
+                message = "Off-campus, Not recording data...";
+            }
+        }
+
 
         if(!bluetoothIsOn)
             message += "\nBluetooth is turned off";
@@ -2607,6 +2626,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if(!gpsIsOn)
             message += "\nGPS is turned off";
+
+
 
 
         if(!
@@ -2656,13 +2677,13 @@ public class TrackerScanner extends Service implements LocationListener {
 
         }
 
-        //_builder.setContentText(message);
+        _builder.setContentText(message);
         // these should already be set, but seems some phones need re-directing, particularlly
         // huawei
         _builder.setSmallIcon(R.mipmap.exeter_locate_icon);
         _builder.setContentTitle("Exeter Locate");
         _builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        _builder.setContentText("Scanning");
+        _builder.setContentText(message);
         _builder.setAutoCancel(true);
         //_builder.setOnlyAlertOnce(true);
         _builder.setPriority(NotificationCompat.PRIORITY_MAX);
@@ -2763,10 +2784,11 @@ public class TrackerScanner extends Service implements LocationListener {
         _builder.setContentTitle("Exeter Locate");
         _builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         _builder.setContentIntent(pendingIntent);
-        _builder.setContentText("Scanning");
+        _builder.setContentText("Scanning, Location not determined...");
         _builder.setAutoCancel(true);
         //_builder.setOnlyAlertOnce(true);
         _builder.setPriority(NotificationCompat.PRIORITY_MAX);
+        _builder.setSilent(true);
 
         //builder.setOngoing(false);
 
@@ -2799,15 +2821,16 @@ public class TrackerScanner extends Service implements LocationListener {
                         NotificationManager.IMPORTANCE_HIGH
                 );
                 notificationChannel.setDescription("This channel is used by Exeter Locate");
-                _notificationManager.createNotificationChannel(notificationChannel);
+                notificationChannel.setSound(null,null);
 
+                _notificationManager.createNotificationChannel(notificationChannel);
             }// end of if notificationManager not null
         }// end of if API 26 or greater
 
 
         Notification notification = _builder.build();
 
-        notification.defaults |= Notification.DEFAULT_SOUND;
+        //notification.defaults |= Notification.DEFAULT_SOUND;
         notification.defaults |= Notification.DEFAULT_VIBRATE;
         notification.defaults |= Notification.DEFAULT_LIGHTS;
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
