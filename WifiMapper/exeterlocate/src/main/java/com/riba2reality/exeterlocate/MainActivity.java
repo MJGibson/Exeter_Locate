@@ -726,6 +726,26 @@ public class MainActivity extends AppCompatActivity {
         );// end of addOnScrollChangedListener
 
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            webView.getViewTreeObserver().addOnWindowFocusChangeListener(
+                    new ViewTreeObserver.OnWindowFocusChangeListener() {
+                        @Override
+                        public void onWindowFocusChanged(boolean hasFocus) {
+
+                            Log.v("mgdev", "dialog.onWindowFocusChanged");
+
+                            if(hasFocus && _termsAccepted){
+                                dialog.hide();
+                            }
+
+
+                        }// end of onWindowFocusChanged
+                    }//end of OnWindowFocusChangeListener
+            );// end of addOnWindowFocusChangeListener
+        }
+
+
+
 
     }// end of startTermsAcceptance
     //==============================================================================================
