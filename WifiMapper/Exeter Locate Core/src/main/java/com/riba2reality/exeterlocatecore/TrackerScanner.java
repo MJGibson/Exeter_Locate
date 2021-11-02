@@ -95,7 +95,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.5.3";
+    public static final String libraryVersion = "1.6.0";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -254,6 +254,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private String _deviceID;
     private boolean _useSSL;
     private String _callingPackage;
+
+    private String _postType;
 
     private boolean insideGeoFence = false;
     private boolean geoFenceChecked = false;
@@ -2362,8 +2364,11 @@ public class TrackerScanner extends Service implements LocationListener {
         String message = "";
 
 
+
         // empty the queue
         while (queueRef.size() > 0) {
+
+            PostToServer.TYPE postType = PostToServer.TYPE.POST;
 
             ServerMessage serverMessage = queueRef.poll();
 
@@ -2378,6 +2383,7 @@ public class TrackerScanner extends Service implements LocationListener {
                 case WIFI:
                     endpoint = "/wifi/";
                     message = "Wi-Fi";
+                    postType = PostToServer.TYPE.valueOf(_postType);
                     break;
                 case ACCEL:
                     endpoint = "/accel/";
@@ -2409,6 +2415,8 @@ public class TrackerScanner extends Service implements LocationListener {
                     urlString
 
             );
+
+            thisPost.setPostType(postType);
 
             thisPost.execute();
 
@@ -2960,6 +2968,8 @@ public class TrackerScanner extends Service implements LocationListener {
                         _useSSL = intent.getBooleanExtra("SSL_switch", true);
 
                         _callingPackage = intent.getStringExtra("PACKAGE");
+
+                        _postType = intent.getStringExtra("post_type");
 
 
                         startScanning();

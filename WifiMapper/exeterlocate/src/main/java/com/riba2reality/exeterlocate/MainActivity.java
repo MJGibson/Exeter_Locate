@@ -1003,7 +1003,9 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
+
+        String postType = "POST";
 
         String deviceID = _deviceID;
 
@@ -1015,6 +1017,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("SSL_switch", useSSL);
 
         intent.putExtra("PACKAGE", packageName);
+
+        intent.putExtra("post_type", postType);
 
 
         startService(intent);

@@ -8,6 +8,8 @@ app = Flask(__name__)
 
 dataBase = "phoneTest_home"
 
+wifiMacCollection = "wifiMacs"
+
 wifiCollection = "wifi"
 combinedCollection = "combiColl"
 gpsCollection = "gpsColl"
@@ -357,9 +359,9 @@ def gps():
 
 #-------------------------------------------------------------------------------------
 
-@app.route("/wifi/", methods=["GET", "POST"])
+@app.route("/wifi/", methods=["GET", "POST", "PUT"])
 def wifi():
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "PUT" :
         # ---- Error checking
 
         # check we can parse the request
@@ -398,20 +400,56 @@ def wifi():
         else:
             # combine each record into a list to update the db in one go
             records = []
-            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
-                records.append(
-                    {
-                        "UUID": jsonData["UUID"],
-                        "WIFI_TIME": jsonData["WIFI_TIME"],
-                        "Macs": mac,
-                        "level": int(strength),
-                        "message": jsonData["MESSAGE"],
-                    }
-                )
+            if request.method == "POST":
+                for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
+                    records.append(
+                        {
+                            "UUID": jsonData["UUID"],
+                            "WIFI_TIME": jsonData["WIFI_TIME"],
+                            "Macs": mac,
+                            "level": int(strength),
+                            "message": jsonData["MESSAGE"],
+                        }
+                    )
+                collection = db[wifiCollection]
+            if request.method == "PUT":
+                #blah
+                collection = db[wifiMacCollection]
+                idnum = 0
+                ## find those macs we've already recorded
+                documents = collection.find({"Macs":{"$in" : MacAddressesJSON}});
+                
+                for doc in documents:
+                    MacAddressesJSON.remove(doc["Macs"])
+                
+                ## get last id
+                
+                documents = collection.find().sort("_id",-1).limit(1)
+                for doc in documents:
+                    idnum = doc["_id"]
+                if(documents.count() > 0):
+                    idnum += 1
+                
+                for mac in MacAddressesJSON:
+                
+                    records.append(
+                        {
+                            #"UUID": jsonData["UUID"],
+                            #"WIFI_TIME": jsonData["WIFI_TIME"],
+                            "_id": idnum,
+                            "Macs": mac,
+                            #"level": int(strength),
+                            #"message": jsonData["MESSAGE"],
+                        }
+                    )
+                
+                
+                
 
             # select the collection and post the data
-            collection = db[wifiCollection]
-            collection.insert_many(records)
+            
+            if(len(records)>0):
+                collection.insert_many(records)
             return format_message("Server: WiFi data stored successfully.")
 
     return DEFAULT_GET_RESPONSE

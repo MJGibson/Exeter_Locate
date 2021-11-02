@@ -27,6 +27,14 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostToServer extends AsyncTask<String, String, String> {
 
+
+    enum TYPE {
+        GET,
+        POST,
+        PUT,
+        DEL
+    }
+
     // class variables
 
     private final WeakReference<TrackerScanner> trackerscannerContainer;
@@ -43,6 +51,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
     private boolean _useSSL;
     private String _address;
     private String _urlString;
+
+    private TYPE _postType = TYPE.POST;
 
 
     //##############################################################################################
@@ -85,6 +95,15 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
 
     }// end of PostToServer Constructor
+    //==============================================================================================
+
+
+    //==============================================================================================
+    public void setPostType(TYPE postType){
+
+        this._postType = postType;
+
+    }// end of setPostType
     //==============================================================================================
 
     //==============================================================================================
@@ -171,7 +190,11 @@ public class PostToServer extends AsyncTask<String, String, String> {
         boolean useSSL = this._useSSL;
         final String address = this._address;
 
-        final String method = "POST";
+
+        //final String method = "POST";
+        final String method = _postType.name().toString();
+
+
         final int timeOut = 5000;
 
         BufferedReader reader = null;
@@ -287,7 +310,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             //------------------------------------------------------------------
             // post the message
 
-            if (method.equals("POST")) {
+            if (method.equals("POST") || method.equals("PUT")  ) {
                 con.setDoOutput(true);
                 OutputStreamWriter writer =
                         new OutputStreamWriter(con.getOutputStream());
