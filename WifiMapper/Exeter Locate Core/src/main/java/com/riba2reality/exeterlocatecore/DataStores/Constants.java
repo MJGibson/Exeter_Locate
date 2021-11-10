@@ -22,8 +22,8 @@ public class Constants {
 
     public static final String database = "alpha";
 
-    public static final String port = ":5000";
-    //public static final String port = "";
+    //public static final String port = ":5000";
+    public static final String port = "";
 
 
     public static final List<LatLng> stethamCampusPolygon = Arrays.asList(
