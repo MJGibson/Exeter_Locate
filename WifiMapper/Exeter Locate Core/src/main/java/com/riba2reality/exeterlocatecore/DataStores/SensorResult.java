@@ -2,7 +2,9 @@ package com.riba2reality.exeterlocatecore.DataStores;
 
 public class SensorResult {
 
-    public String dateTime;
+    public Long dateTime;
+
+//    public String dateTime_old;
 
     public float X;
     public float Y;

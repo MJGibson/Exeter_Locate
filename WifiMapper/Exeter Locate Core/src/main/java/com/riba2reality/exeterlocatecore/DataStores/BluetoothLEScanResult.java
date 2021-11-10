@@ -4,7 +4,9 @@ import java.util.HashMap;
 
 public class BluetoothLEScanResult {
 
-    public String dateTime;
+    public Long dateTime;
+
+//    public String dateTime_old;
 
     public final HashMap<BluetoothLEResult, Integer> bluetoothLEResults = new HashMap<>();
 

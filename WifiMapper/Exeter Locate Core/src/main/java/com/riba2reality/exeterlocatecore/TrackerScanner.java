@@ -62,6 +62,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1271,8 +1272,13 @@ public class TrackerScanner extends Service implements LocationListener {
                 "\nLat:" + location.getLatitude() +
                 "\nLong:" + location.getLongitude();
 
+
         LocationResult result = new LocationResult();
-        result.dateTime = currentTime;
+
+        result.dateTimeOld = currentTime;
+
+        result.dateTime = location.getTime();
+
         result.location = location;
 
         result.message = this.MANUAL_SCAN_MESSAGE;
@@ -1389,9 +1395,15 @@ public class TrackerScanner extends Service implements LocationListener {
             List<ScanResult> results = wifiManager.getScanResults();
             unregisterReceiver(wifiReceiver);
 
-            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
             WifiScanResult result = new WifiScanResult();
-            result.dateTime = currentTime;
+
+//            String currentTime = new SimpleDateFormat
+//                    ("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+//
+//            result.dateTime = currentTime;
+
+            result.dateTime = Calendar.getInstance().getTimeInMillis();
+
 
             result.message = MANUAL_SCAN_MESSAGE;
 
@@ -1479,9 +1491,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
             Log.d("Trace", "TrackerScanner.magSensorListener.event()");
 
-            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+//            String currentTime =
+//                    new SimpleDateFormat(
+//                            "yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+
             SensorResult result = new SensorResult();
-            result.dateTime = currentTime;
+
+            result.dateTime = Calendar.getInstance().getTimeInMillis();
+
+//            result.dateTime_old = currentTime;
 
             result.X = event.values[0];
             result.Y = event.values[1];
@@ -1556,9 +1574,13 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //sensorMag
 
-        // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a second)
+        // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a
+        // second)
         Log.d("MAGscan", "Initiated");
-        sensorManager.registerListener(magSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(
+                magSensorListener,
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_FASTEST);
 
     }// end of startSensor
     //==============================================================================================
@@ -1578,9 +1600,16 @@ public class TrackerScanner extends Service implements LocationListener {
 
             Log.d("Trace", "TrackerScanner.accelSensorListener.event()");
 
-            String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+//            String currentTime =
+//                    new SimpleDateFormat(
+//                            "yyyy-MM-dd:HH:mm:ss",
+//                            Locale.getDefault()).format(new Date());
+
             SensorResult result = new SensorResult();
-            result.dateTime = currentTime;
+
+            result.dateTime = Calendar.getInstance().getTimeInMillis();
+
+//            result.dateTime_old = currentTime;
 
             result.X = event.values[0];
             result.Y = event.values[1];
@@ -1671,9 +1700,16 @@ public class TrackerScanner extends Service implements LocationListener {
         ServerMessage serverMessage = encodeBLEResult(currentResult);
         messageQueue.add(serverMessage);
 
-        String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+//        String currentTime =
+//                new SimpleDateFormat
+//                        ("yyyy-MM-dd:HH:mm:ss", Locale.getDefault()).format(new Date());
+
+
         BluetoothLEScanResult result = new BluetoothLEScanResult();
-        result.dateTime = currentTime;
+
+        result.dateTime = Calendar.getInstance().getTimeInMillis();
+
+//        result.dateTime_old = currentTime;
 
         result.message = MANUAL_SCAN_MESSAGE;
 
@@ -1722,10 +1758,11 @@ public class TrackerScanner extends Service implements LocationListener {
 
             if (!_bluetooth_scanning) {
 
-                String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
-                        Locale.getDefault()).format(new Date());
+//                String currentTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+//                        Locale.getDefault()).format(new Date());
                 BluetoothLEScanResult result = new BluetoothLEScanResult();
-                result.dateTime = currentTime;
+//                result.dateTime_old = currentTime;
+                result.dateTime = Calendar.getInstance().getTimeInMillis();
 
                 result.message = MANUAL_SCAN_MESSAGE;
 
@@ -1818,26 +1855,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
         ServerMessage serverMessage = new ServerMessage();
 
-//
-//        String protocol = "http";
-//        if (_useSSL) {
-//            protocol += "s";
-//        }
-//
-//        String port = Constants.port;
-//
-//        String endpoint = "/gps/";
-//
-//        String urlString = protocol + "://" + _serverAddress + port + endpoint;
-
         //------------------------------------------------------------------
 
         double latitude = 0.0;
         double longitude = 0.0;
         double altitude = 0.0;
         double accuracy = 0.0;
-        String gpsTime = "";
+//        String gpsTime = "";
 //        String provider = "";
+        long time = -1;
 
         if (locationResult.location != null) {
             latitude = locationResult.location.getLatitude();
@@ -1845,10 +1871,12 @@ public class TrackerScanner extends Service implements LocationListener {
             altitude = locationResult.location.getAltitude();
             accuracy = locationResult.location.getAccuracy();
 
-            gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
-                    Locale.getDefault()).format(new Date(locationResult.location.getTime()));
+//            gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+//                    Locale.getDefault()).format(new Date(locationResult.location.getTime()));
 
 //            provider = locationResult.location.getProvider();
+
+            time = locationResult.location.getTime();
 
         }
         //------------------------------------------------------------------
@@ -1864,7 +1892,13 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //------------
         // GPS
-        parameters.put("GPS_TIME", gpsTime);
+
+        parameters.put("GPS_TIME", Long.toString(time));
+
+        //parameters.put("GPS_TIME_OLD", gpsTime);
+
+
+
         parameters.put("X", Double.toString(latitude));
         parameters.put("Y", Double.toString(longitude));
         parameters.put("ALTITUDE", Double.toString(altitude));
@@ -1944,7 +1978,10 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
-        parameters.put("WIFI_TIME", wifiScanResult.dateTime);
+//        parameters.put("WIFI_TIME", wifiScanResult.dateTime);
+
+        parameters.put("WIFI_TIME",
+                Long.toString(wifiScanResult.dateTime));
 
         String macAddressJson = new Gson().toJson(macAddressList);
 
@@ -2021,7 +2058,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
-        parameters.put("BLE_TIME", bleScanResult.dateTime);
+        parameters.put("BLE_TIME", Long.toString(bleScanResult.dateTime));
+
+//        parameters.put("BLE_TIME_OLD", bleScanResult.dateTime_old);
 
         String macAddressJson = new Gson().toJson(macAddressList);
 
@@ -2091,7 +2130,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
-        parameters.put("MAG_TIME", magSensorResult.dateTime);
+        parameters.put("MAG_TIME", Long.toString(magSensorResult.dateTime));
+
+//        parameters.put("MAG_TIME_OLD", magSensorResult.dateTime_old);
         //-----
 
         parameters.put("MAG_X",Double.toString(magSensorResult.X));
@@ -2162,7 +2203,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("MESSAGE", this.manualScanMessage);
 
-        parameters.put("ACCEL_TIME", sensorResult.dateTime);
+        parameters.put("ACCEL_TIME", Long.toString(sensorResult.dateTime));
+
+//        parameters.put("ACCEL_TIME_OLD", sensorResult.dateTime_old);
         //-----
 
         parameters.put("ACCEL_X",Double.toString(sensorResult.X));
@@ -2231,7 +2274,8 @@ public class TrackerScanner extends Service implements LocationListener {
         double longitude = 0.0;
         double altitude = 0.0;
         double accuracy = 0.0;
-        String gpsTime = "";
+//        String gpsTime = "";
+        long gpsTime = -1;
 
         if (combinedScanResult.location != null) {
             latitude = combinedScanResult.location.getLatitude();
@@ -2239,8 +2283,10 @@ public class TrackerScanner extends Service implements LocationListener {
             altitude = combinedScanResult.location.getAltitude();
             accuracy = combinedScanResult.location.getAccuracy();
 
-            gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
-                    Locale.getDefault()).format(new Date(combinedScanResult.location.getTime()));
+//            gpsTime = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss",
+//                    Locale.getDefault()).format(new Date(combinedScanResult.location.getTime()));
+
+            gpsTime = Calendar.getInstance().getTimeInMillis();
 
         }
 
@@ -2274,7 +2320,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------
         //------------
         // GPS
-        parameters.put("GPS_TIME", gpsTime);
+        parameters.put("GPS_TIME", Long.toString(gpsTime));
+
         parameters.put("X", Double.toString(latitude));
         parameters.put("Y", Double.toString(longitude));
         parameters.put("ALTITUDE", Double.toString(altitude));
@@ -2283,7 +2330,7 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------
         // magnetic
         //if(combinedScanResult.magSensorResult!=null) {
-            parameters.put("MAG_TIME", combinedScanResult.magSensorResult.dateTime);
+            parameters.put("MAG_TIME", Long.toString(combinedScanResult.magSensorResult.dateTime));
             parameters.put("MAG_X", String.valueOf(combinedScanResult.magSensorResult.X));
             parameters.put("MAG_Y", String.valueOf(combinedScanResult.magSensorResult.Y));
             parameters.put("MAG_Z", String.valueOf(combinedScanResult.magSensorResult.Z));
@@ -2292,7 +2339,7 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------
         // accelerometer
 
-        parameters.put("ACCEL_TIME", combinedScanResult.accelSensorResult.dateTime);
+        parameters.put("ACCEL_TIME", Long.toString(combinedScanResult.accelSensorResult.dateTime));
         parameters.put("ACCEL_X", String.valueOf(combinedScanResult.accelSensorResult.X));
         parameters.put("ACCEL_Y", String.valueOf(combinedScanResult.accelSensorResult.Y));
         parameters.put("ACCEL_Z", String.valueOf(combinedScanResult.accelSensorResult.Z));
@@ -2300,7 +2347,8 @@ public class TrackerScanner extends Service implements LocationListener {
         //------------
         // wifi
 
-        parameters.put("WIFI_TIME", combinedScanResult.wifiScanResult.dateTime);
+        parameters.put("WIFI_TIME",
+                Long.toString(combinedScanResult.wifiScanResult.dateTime));
         String macAddressJson = new Gson().toJson(macAddressList);
 
         parameters.put("MacAddressesJson", macAddressJson);

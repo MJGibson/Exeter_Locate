@@ -4,7 +4,7 @@ import android.location.Location;
 
 public class CombinedScanResult {
 
-    public String dateTime;
+    public long dateTime;
 
     //public ArrayList<WifiResult> wifiResult = new ArrayList<>();
     public WifiScanResult wifiScanResult;
