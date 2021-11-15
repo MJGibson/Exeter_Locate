@@ -1,11 +1,13 @@
 package com.riba2reality.exeterlocate;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
+import android.webkit.WebView;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.uiautomator.UiDevice;
@@ -17,12 +19,18 @@ import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import junit.framework.TestCase;
 
-import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static androidx.core.content.ContextCompat.startActivity;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeUp;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 //@RunWith(MockitoJUnitRunner.class)
@@ -121,7 +129,73 @@ public class MainActivityTests extends TestCase {
     //###################################      TESTS       #########################################
     //##############################################################################################
 
+    //==============================================================================================
+    @Test
+    public void test_disagree_button_exits() {
 
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+        //startActivity(getInstrumentation().getTargetContext(),new Intent(), null);
+
+
+        onView(withText("Disagree"))
+//                .inRoot(isDialog()) // <---
+                .check(matches(isDisplayed()));
+        //.perform(click());
+
+        onView(withText("Disagree")).perform(click());
+
+//        // Initialize UiDevice instance
+//        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+//
+//        // Search for correct button in the dialog.
+//        UiObject button = uiDevice.findObject(new UiSelector().text("Disagree"));
+//
+//        try {
+//            if (button.exists() && button.isEnabled()) {
+//                button.click();
+//            }else{
+//                fail("Button doesn't exist");
+//            }
+//
+//        } catch (UiObjectNotFoundException e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+
+
+        //System.out.println(scenario.getResult().getResultCode());
+
+
+        // note time out after 45 seconds
+        assertThat(scenario.getResult().getResultCode()).isEqualTo(Activity.RESULT_CANCELED);
+
+
+    }// end of test_disagree_button_exits
+    //==============================================================================================
+
+
+    //==============================================================================================
+    @Test
+    public void test_agree_button_exits() {
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+
+        for(int i = 0; i < 5; ++i)
+            onView(isAssignableFrom(WebView.class)).perform(swipeUp());
+
+
+        onView(withText("Accept"))
+//                .inRoot(isDialog()) // <---
+                .check(matches(isDisplayed()));
+
+//        onView(withText("Accept")).perform(click());
+
+    }// end of test_agree_button_exits
+    //==============================================================================================
 
 
 //    //==============================================================================================
@@ -185,14 +259,14 @@ public class MainActivityTests extends TestCase {
 //        assertTrue ("Service should have been started", serviceStarted.get());
 //    }
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        Intent mLaunchIntent = new Intent(getInstrumentation()
-                .getTargetContext(), MainActivity.class);
-        mLaunchIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-        startActivity(getInstrumentation().getTargetContext(),mLaunchIntent,null );
-    }
+//    @Before
+//    public void setUp() throws Exception {
+//        super.setUp();
+//        Intent mLaunchIntent = new Intent(getInstrumentation()
+//                .getTargetContext(), MainActivity.class);
+//        mLaunchIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(getInstrumentation().getTargetContext(),mLaunchIntent,null );
+//    }
 
 
 //    @After
