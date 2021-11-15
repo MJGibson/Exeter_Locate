@@ -726,6 +726,26 @@ public class MainActivity extends AppCompatActivity {
         );// end of addOnScrollChangedListener
 
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            webView.getViewTreeObserver().addOnWindowFocusChangeListener(
+                    new ViewTreeObserver.OnWindowFocusChangeListener() {
+                        @Override
+                        public void onWindowFocusChanged(boolean hasFocus) {
+
+                            Log.v("mgdev", "dialog.onWindowFocusChanged");
+
+                            if(hasFocus && _termsAccepted){
+                                dialog.hide();
+                            }
+
+
+                        }// end of onWindowFocusChanged
+                    }//end of OnWindowFocusChangeListener
+            );// end of addOnWindowFocusChangeListener
+        }
+
+
+
 
     }// end of startTermsAcceptance
     //==============================================================================================
@@ -985,6 +1005,8 @@ public class MainActivity extends AppCompatActivity {
 
         String dataBase = "beta";
 
+        String postType = "POST";
+
         String deviceID = _deviceID;
 
         boolean useSSL = true;
@@ -995,6 +1017,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("SSL_switch", useSSL);
 
         intent.putExtra("PACKAGE", packageName);
+
+        intent.putExtra("post_type", postType);
 
 
         startService(intent);

@@ -27,6 +27,14 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class PostToServer extends AsyncTask<String, String, String> {
 
+
+    enum TYPE {
+        GET,
+        POST,
+        PUT,
+        DEL
+    }
+
     // class variables
 
     private final WeakReference<TrackerScanner> trackerscannerContainer;
@@ -39,6 +47,12 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
     //private final WeakReference<ServerMessage> serverMessageContrainer;
     private final ServerMessage serverMessage;
+
+    private boolean _useSSL;
+    private String _address;
+    private String _urlString;
+
+    private TYPE _postType = TYPE.POST;
 
 
     //##############################################################################################
@@ -59,7 +73,10 @@ public class PostToServer extends AsyncTask<String, String, String> {
     public PostToServer(TrackerScanner trackerScanner,
                         InputStream is,
                         InputStream userPFX,
-                        ServerMessage serverMessage
+                        ServerMessage serverMessage,
+                        boolean useSSL,
+                        String address,
+                        String urlString
                         ) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
@@ -71,7 +88,22 @@ public class PostToServer extends AsyncTask<String, String, String> {
         //this.serverMessageContrainer = new WeakReference<>(serverMessage);
         this.serverMessage = serverMessage;
 
+        this._useSSL = useSSL;
+
+        this._address = address;
+        this._urlString = urlString;
+
+
     }// end of PostToServer Constructor
+    //==============================================================================================
+
+
+    //==============================================================================================
+    public void setPostType(TYPE postType){
+
+        this._postType = postType;
+
+    }// end of setPostType
     //==============================================================================================
 
     //==============================================================================================
@@ -154,11 +186,15 @@ public class PostToServer extends AsyncTask<String, String, String> {
         // Extract the data from the message object
 
         String message = this.serverMessage.message;
-        String urlString = this.serverMessage.urlString;
-        boolean useSSL = this.serverMessage.useSSL;
-        final String address = this.serverMessage.address;
+        String urlString = this._urlString;
+        boolean useSSL = this._useSSL;
+        final String address = this._address;
 
-        final String method = "POST";
+
+        //final String method = "POST";
+        final String method = _postType.name().toString();
+
+
         final int timeOut = 5000;
 
         BufferedReader reader = null;
@@ -274,7 +310,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
             //------------------------------------------------------------------
             // post the message
 
-            if (method.equals("POST")) {
+            if (method.equals("POST") || method.equals("PUT")  ) {
                 con.setDoOutput(true);
                 OutputStreamWriter writer =
                         new OutputStreamWriter(con.getOutputStream());
@@ -301,7 +337,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
         } catch (Exception e) {
 
             // put it back in the queue
-            this.trackerscannerContainer.get().resendQueue.add( serverMessage );
+            this.trackerscannerContainer.get().messageResendQueue.add( serverMessage );
 
             e.printStackTrace();
             System.out.println(e.getMessage());

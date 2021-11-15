@@ -394,6 +394,8 @@ public class HomescreenFragment extends Fragment {
 
         boolean useSSL = SP.getBoolean("SSL_switch", true);
 
+        String postType = SP.getString("post_type", "POST");
+
         // get the packagename of the main activity, note this is a fragment
         String packageName =  getActivity().getClass().getName();
 
@@ -403,6 +405,10 @@ public class HomescreenFragment extends Fragment {
         intent.putExtra("SSL_switch", useSSL);
 
         intent.putExtra("PACKAGE", packageName);
+
+
+        intent.putExtra("post_type", postType);
+
 
         getActivity().startService(intent);
         Toast.makeText(getActivity(), "Location service started", Toast.LENGTH_SHORT).show();

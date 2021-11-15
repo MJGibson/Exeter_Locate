@@ -8,12 +8,16 @@ app = Flask(__name__)
 
 dataBase = "phoneTest_home"
 
+wifiMacCollection = "wifiMacs"
+
 wifiCollection = "wifi"
 combinedCollection = "combiColl"
 gpsCollection = "gpsColl"
 magneticCollection = "mag"
 accelCollection = "accel"
 bleCollection = "ble"
+
+bleMacCollection = "bleMacs"
 
 DEFAULT_GET_RESPONSE = (
     "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
@@ -26,6 +30,7 @@ KEYS_REQUIRED_FOR_GPS = [
     "Y",
     "ALTITUDE",
     "ACC",
+    #"PROVIDER",
     "MESSAGE",
 ]
 
@@ -228,16 +233,17 @@ def combined():
                         "WIFI_TIME": None,
                         "Macs": None,
                         "level": None,
-                        "GPS_TIME": jsonData["GPS_TIME"],
+                        "GPS_TIME": int(jsonData["GPS_TIME"]),
                         "x": float(jsonData["X"]),
                         "y": float(jsonData["Y"]),
                         "z": float(jsonData["ALTITUDE"]),
                         "acc": float(jsonData["ACC"]),
-                        "MAG_TIME": jsonData["MAG_TIME"],
+                        #"provider": jsonData["PROVIDER"],
+                        "MAG_TIME": int(jsonData["MAG_TIME"]),
                         "MAG_x": float(jsonData["MAG_X"]),
                         "MAG_y": float(jsonData["MAG_Y"]),
                         "MAG_z": float(jsonData["MAG_Z"]),
-                        "ACCEL_TIME": jsonData["ACCEL_TIME"],
+                        "ACCEL_TIME": ibt(jsonData["ACCEL_TIME"]),
                         "ACCEL_X": float(jsonData["ACCEL_X"]),
                         "ACCEL_Y": float(jsonData["ACCEL_Y"]),
                         "ACCEL_Z": float(jsonData["ACCEL_Z"]),
@@ -248,56 +254,45 @@ def combined():
             
             # select the collection and post the data
             collection = db[combinedCollection]
-            collection.insert(record)
+            collection.insert_one(record)
         
         
             return format_message("Server: GPS data stored but no WiFi access points included in post.")
 
         else:
-            # combine each record into a list to update the db in one go
-            records = []
-            wifi_records = []
-            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
-                records.append(
-                    {
-                        "UUID": jsonData["UUID"],
-                        "MESSAGE": jsonData["MESSAGE"],
-                        "WIFI_TIME": jsonData["WIFI_TIME"],
-                        "Macs": mac,
-                        "level": int(strength),
-                        "GPS_TIME": jsonData["GPS_TIME"],
-                        "x": float(jsonData["X"]),
-                        "y": float(jsonData["Y"]),
-                        "z": float(jsonData["ALTITUDE"]),
-                        "acc": float(jsonData["ACC"]),
-                        "MAG_TIME": jsonData["MAG_TIME"],
-                        "MAG_x": float(jsonData["MAG_X"]),
-                        "MAG_y": float(jsonData["MAG_Y"]),
-                        "MAG_z": float(jsonData["MAG_Z"]),
-                        "ACCEL_TIME": jsonData["ACCEL_TIME"],
-                        "ACCEL_X": float(jsonData["ACCEL_X"]),
-                        "ACCEL_Y": float(jsonData["ACCEL_Y"]),
-                        "ACCEL_Z": float(jsonData["ACCEL_Z"]),
-                        "matrix_R": jsonData["matrix_R"],
-                        "matrix_I": jsonData["matrix_I"],
-                    }
-                )
-                # wifi_records.append(
-                    # {
-                        # "UUID": jsonData["UUID"],
-                        # "WIFI_TIME": jsonData["WIFI_TIME"],
-                        # "Macs": mac,
-                        # "level": int(strength),
-                    # }
-                # )
-
-            # select the collection and post the data
-            # collection = db[wifiCollection]
-            # collection.insert_many(wifi_records)
+            
 
             # select the collection and post the data
             collection = db[combinedCollection]
-            collection.insert_many(records)
+            
+            collection.insert_one(
+                {
+                    "UUID": jsonData["UUID"],
+                    #"MESSAGE": jsonData["MESSAGE"],
+                    "WIFI_TIME": jsonData["WIFI_TIME"],
+                    "Macs": list(MacAddressesJSON),
+                    "level": list(signalStregthsJSON),
+                    "GPS_TIME": int(jsonData["GPS_TIME"]),
+                    "x": float(jsonData["X"]),
+                    "y": float(jsonData["Y"]),
+                    "z": float(jsonData["ALTITUDE"]),
+                    "acc": float(jsonData["ACC"]),
+                    #"provider": jsonData["PROVIDER"],
+                    "MAG_TIME": int(jsonData["MAG_TIME"]),
+                    "MAG_x": float(jsonData["MAG_X"]),
+                    "MAG_y": float(jsonData["MAG_Y"]),
+                    "MAG_z": float(jsonData["MAG_Z"]),
+                    "ACCEL_TIME": int(jsonData["ACCEL_TIME"]),
+                    "ACCEL_X": float(jsonData["ACCEL_X"]),
+                    "ACCEL_Y": float(jsonData["ACCEL_Y"]),
+                    "ACCEL_Z": float(jsonData["ACCEL_Z"]),
+                    "matrix_R": jsonData["matrix_R"],
+                    "matrix_I": jsonData["matrix_I"],
+                }
+            )
+
+
+            
             
             return format_message("Server: Combined GPS and WiFi data stored successfully.")
 
@@ -339,12 +334,14 @@ def gps():
         collection.insert_one(
             {
                 "UUID": jsonData["UUID"],
-                "GPS_TIME": jsonData["GPS_TIME"],
+                "GPS_TIME": int(jsonData["GPS_TIME"]),
+                #"GPS_TIME_OLD": jsonData["GPS_TIME_OLD"],
                 "x": float(jsonData["X"]),
                 "y": float(jsonData["Y"]),
                 "z": float(jsonData["ALTITUDE"]),
                 "acc": float(jsonData["ACC"]),
-                "message": jsonData["MESSAGE"],
+                #"provider": jsonData["PROVIDER"],
+                #"message": jsonData["MESSAGE"],
             }
         )
         return format_message("Server: GPS data stored successfully.")
@@ -353,9 +350,9 @@ def gps():
 
 #-------------------------------------------------------------------------------------
 
-@app.route("/wifi/", methods=["GET", "POST"])
+@app.route("/wifi/", methods=["GET", "POST", "PUT"])
 def wifi():
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "PUT" :
         # ---- Error checking
 
         # check we can parse the request
@@ -394,28 +391,109 @@ def wifi():
         else:
             # combine each record into a list to update the db in one go
             records = []
-            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
-                records.append(
-                    {
-                        "UUID": jsonData["UUID"],
-                        "WIFI_TIME": jsonData["WIFI_TIME"],
-                        "Macs": mac,
-                        "level": int(strength),
-                        "message": jsonData["MESSAGE"],
-                    }
-                )
+            if request.method == "POST":
+                #
+                
+                # look up these macs id's 
+                #
+                collection = db[wifiMacCollection]
+                documents = collection.find({"Macs":{"$in" : MacAddressesJSON}});
+                
+                # loop existing macs we've found in the data building a dict from mac to 
+                MacAddressesJSONDict = {}
+                
+                for doc in documents:
+                    MacAddressesJSONDict[doc["Macs"]] = doc["_id"]
+                    
+                ## get last id
+                idnum = 0
+                documents = collection.find().sort("_id",-1).limit(1)
+                for doc in documents:
+                    idnum = doc["_id"]
+                if(documents.count() > 0):
+                    idnum += 1
+                
+                ## 
+                for mac in MacAddressesJSON:
+                
+                    if (mac not in MacAddressesJSONDict.keys()):
+                    
+                        
+                    
+                        MacAddressesJSONDict[mac] = idnum
+                        
+                        records.append(
+                            {
+                                
+                                "_id": idnum,
+                                "Macs": mac,
+                            }
+                        )
+                        
+                        idnum+=1
+                
+                if(len(records)>0):
+                    collection.insert_many(records)
+                
+                
+                records = []
+                for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
+                    records.append(
+                        {
+                            "UUID": jsonData["UUID"],
+                            "WIFI_TIME": int(jsonData["WIFI_TIME"]),
+                            "Macs_ID": MacAddressesJSONDict[mac],
+                            "level": int(strength),
+                            #"message": jsonData["MESSAGE"],
+                        }
+                    )
+                collection = db[wifiCollection]
+            if request.method == "PUT":
+                #### add wifi's macs to list of unique macs
+                collection = db[wifiMacCollection]
+                idnum = 0
+                ## find those macs we've already recorded
+                documents = collection.find({"Macs":{"$in" : MacAddressesJSON}});
+                
+                for doc in documents:
+                    MacAddressesJSON.remove(doc["Macs"])
+                
+                ## get last id
+                
+                documents = collection.find().sort("_id",-1).limit(1)
+                for doc in documents:
+                    idnum = doc["_id"]
+                if(documents.count() > 0):
+                    idnum += 1
+                
+                for mac in MacAddressesJSON:
+                
+                    records.append(
+                        {
+                            #"UUID": jsonData["UUID"],
+                            #"WIFI_TIME": jsonData["WIFI_TIME"],
+                            "_id": idnum,
+                            "Macs": mac,
+                            #"level": int(strength),
+                            #"message": jsonData["MESSAGE"],
+                        }
+                    )
+                
+                
+                
 
             # select the collection and post the data
-            collection = db[wifiCollection]
-            collection.insert_many(records)
+            
+            if(len(records)>0):
+                collection.insert_many(records)
             return format_message("Server: WiFi data stored successfully.")
 
     return DEFAULT_GET_RESPONSE
 
 #-------------------------------------------------------------------------------------
-@app.route("/ble/", methods=["GET", "POST"])
+@app.route("/ble/", methods=["GET", "POST", "PUT"])
 def ble():
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "PUT":
         # ---- Error checking
 
         # check we can parse the request
@@ -454,20 +532,101 @@ def ble():
         else:
             # combine each record into a list to update the db in one go
             records = []
-            for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
-                records.append(
-                    {
-                        "UUID": jsonData["UUID"],
-                        "BLE_TIME": jsonData["BLE_TIME"],
-                        "Macs": mac,
-                        "level": int(strength),
-                        "message": jsonData["MESSAGE"],
-                    }
-                )
+            if request.method == "POST":
+                #
+                # look up these macs id's 
+                #
+                collection = db[bleMacCollection]
+                documents = collection.find({"Macs":{"$in" : MacAddressesJSON}});
+                
+                # loop existing macs we've found in the data building a dict from mac to 
+                MacAddressesJSONDict = {}
+                
+                for doc in documents:
+                    MacAddressesJSONDict[doc["Macs"]] = doc["_id"]
+                    
+                ## get last id
+                idnum = 0
+                documents = collection.find().sort("_id",-1).limit(1)
+                for doc in documents:
+                    idnum = doc["_id"]
+                if(documents.count() > 0):
+                    idnum += 1
+                
+                ##
+                for mac in MacAddressesJSON:
+                
+                    if (mac not in MacAddressesJSONDict.keys()):
+                    
+                        
+                    
+                        MacAddressesJSONDict[mac] = idnum
+                        
+                        records.append(
+                            {
+                                
+                                "_id": idnum,
+                                "Macs": mac,
+                            }
+                        )
+                        
+                        idnum+=1
+                
+                if(len(records)>0):
+                    collection.insert_many(records)
+                
+                
+                records = []
+                for mac, strength in zip(MacAddressesJSON, signalStregthsJSON):
+                    records.append(
+                        {
+                            "UUID": jsonData["UUID"],
+                            "BLE_TIME": int(jsonData["BLE_TIME"]),
+                            #"BLE_TIME_OLD": jsonData["BLE_TIME_OLD"],
+                            "Macs_ID": MacAddressesJSONDict[mac],
+                            "level": int(strength),
+                            #"message": jsonData["MESSAGE"],
+                        }
+                    )
 
-            # select the collection and post the data
-            collection = db[bleCollection]
-            collection.insert_many(records)
+                # select the collection and post the data
+                collection = db[bleCollection]
+            if request.method == "PUT":
+                #### add wifi's macs to list of unique macs
+                collection = db[bleMacCollection]
+                idnum = 0
+                ## find those macs we've already recorded
+                documents = collection.find({"Macs":{"$in" : MacAddressesJSON}});
+                
+                for doc in documents:
+                    MacAddressesJSON.remove(doc["Macs"])
+                
+                ## get last id
+                
+                documents = collection.find().sort("_id",-1).limit(1)
+                for doc in documents:
+                    idnum = doc["_id"]
+                if(documents.count() > 0):
+                    idnum += 1
+                
+                for mac in MacAddressesJSON:
+                
+                    records.append(
+                        {
+                            #"UUID": jsonData["UUID"],
+                            #"WIFI_TIME": jsonData["WIFI_TIME"],
+                            "_id": idnum,
+                            "Macs": mac,
+                            #"level": int(strength),
+                            #"message": jsonData["MESSAGE"],
+                        }
+                    )
+                
+                
+                
+
+            if(len(records)>0):
+                collection.insert_many(records)
             return format_message("Server: BLE data stored successfully.")
 
     return DEFAULT_GET_RESPONSE
@@ -506,18 +665,19 @@ def mag():
         # combine each record into a list to update the db in one go
         record = {
             "UUID": jsonData["UUID"],
-            "MAG_TIME": jsonData["MAG_TIME"],
+            "MAG_TIME": int(jsonData["MAG_TIME"]),
+            #"MAG_TIME_OLD": jsonData["MAG_TIME_OLD"],
             "MAG_x": float(jsonData["MAG_X"]),
             "MAG_y": float(jsonData["MAG_Y"]),
             "MAG_z": float(jsonData["MAG_Z"]),
-            "message": jsonData["MESSAGE"],
+            #"message": jsonData["MESSAGE"],
             }
 
 
         # select the collection and post the data if there is any
         collection = db[magneticCollection]
         
-        collection.insert(record)
+        collection.insert_one(record)
 
         return format_message("Server: Magnetic data stored successfully.")
     return DEFAULT_GET_RESPONSE
@@ -557,18 +717,19 @@ def accel():
         # combine each record into a list to update the db in one go
         record = {
             "UUID": jsonData["UUID"],
-            "ACCEL_TIME": jsonData["ACCEL_TIME"],
+            "ACCEL_TIME": int(jsonData["ACCEL_TIME"]),
+            #"ACCEL_TIME_OLD": jsonData["ACCEL_TIME_OLD"],
             "ACCEL_X": float(jsonData["ACCEL_X"]),
             "ACCEL_Y": float(jsonData["ACCEL_Y"]),
             "ACCEL_Z": float(jsonData["ACCEL_Z"]),
-            "message": jsonData["MESSAGE"],
+            #"message": jsonData["MESSAGE"],
             }
 
 
         # select the collection and post the data if there is any
         collection = db[accelCollection]
         
-        collection.insert(record)
+        collection.insert_one(record)
 
         return format_message("Server: Accelerometer data stored successfully.")
     return DEFAULT_GET_RESPONSE

@@ -11,7 +11,7 @@
 
     <string-array name="server_values">
         <item>Custom</item>
-        <item>www.riba2reality.com</item>
+        <item>riba2reality.com</item>
         <item>34.105.172.80</item>
         <item>51.11.144.99</item>
         <item>144.173.33.81</item>
@@ -24,6 +24,14 @@
         <item>config</item>
         <item>local</item>
         <item>version</item>
+    </string-array>
+
+
+    <string-array name="post_type">
+        <item>POST</item>
+        <item>GET</item>
+        <item>PUT</item>
+        <item>DELETE</item>
     </string-array>
 
 </resources>

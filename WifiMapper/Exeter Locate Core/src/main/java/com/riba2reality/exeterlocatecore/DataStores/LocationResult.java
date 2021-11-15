@@ -4,7 +4,9 @@ import android.location.Location;
 
 public class LocationResult {
 
-    public String dateTime;
+    public long dateTime;
+
+    public String dateTimeOld;
 
     public Location location;
 

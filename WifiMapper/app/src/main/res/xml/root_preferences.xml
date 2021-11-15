@@ -11,7 +11,9 @@
 
         />
 
-    <PreferenceCategory app:title="Server">
+    <PreferenceCategory app:title="Server"
+
+        >
 
         <EditTextPreference
             app:key="ServerAddress"
@@ -46,6 +48,17 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Time settings">
+
+
+        <ListPreference
+            android:defaultValue="POST"
+            android:entries="@array/post_type"
+            android:entryValues="@array/post_type"
+            android:key="post_type"
+            android:title="Post Type"
+            app:useSimpleSummaryProvider="true"
+            />
+
 
         <SeekBarPreference
             android:max="@integer/max"

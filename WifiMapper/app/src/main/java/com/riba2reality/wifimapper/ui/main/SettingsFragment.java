@@ -120,6 +120,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 getResources().getStringArray(R.array.server_values)[ip_index]
         );
         serverAddressListPref.setValueIndex(1);
+        //----------------------------------------------------------------
+
+        final ListPreference postTypeListPref = findPreference("post_type");
+
+        postTypeListPref.setValueIndex(0); // default to POST
+
+
 
 
         //----------------------------------------------------------------
