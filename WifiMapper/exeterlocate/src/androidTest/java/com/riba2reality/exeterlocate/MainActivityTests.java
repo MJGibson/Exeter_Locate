@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
-import androidx.test.rule.GrantPermissionRule;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
@@ -20,19 +18,11 @@ import com.riba2reality.exeterlocatecore.TrackerScanner;
 import junit.framework.TestCase;
 
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static androidx.core.content.ContextCompat.startActivity;
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static java.lang.Thread.sleep;
 
 @RunWith(AndroidJUnit4.class)
 //@RunWith(MockitoJUnitRunner.class)
@@ -41,12 +31,17 @@ public class MainActivityTests extends TestCase {
 
 
 //    @Rule
-//    public ActivityScenarioRule<MainActivity> mActivityRule = new ActivityScenarioRule(MainActivity.class);
+//    public ActivityScenarioRule<MainActivity> mActivityRule =
+//            new ActivityScenarioRule(MainActivity.class);
 
-    @Rule
-    public GrantPermissionRule mGrantPermissionRule =
-            GrantPermissionRule.grant(
-                    "android.permission.ACCESS_FINE_LOCATION");
+
+
+
+
+//    @Rule
+//    public GrantPermissionRule mGrantPermissionRule =
+//            GrantPermissionRule.grant(
+//                    "android.permission.ACCESS_FINE_LOCATION");
 
     //==============================================================================================
     private boolean grantPermission() {
@@ -122,49 +117,54 @@ public class MainActivityTests extends TestCase {
     }// end of isLocationServiceRunning
     //==============================================================================================
 
-
-
-    //==============================================================================================
-    @Test
-    @FlakyTest
-    public void should_displayNoPermission_when_permissionAreDenied() {
-
-        //ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+    //##############################################################################################
+    //###################################      TESTS       #########################################
+    //##############################################################################################
 
 
 
 
-        // click start-stop button
-        onView(withId(R.id.circleIcon)).perform(click());
-        try {
-            sleep(400);
-
-            onView(withId(R.id.circleIcon)).check(matches(withText(R.string.start_button_stop_text)));
-
-//        assertTrue("Failed to deny permissions",denyPermission());
-
-            assertTrue("Failed to Start Service",isLocationServiceRunning());
-
-        }
-        catch ( InterruptedException ex){
-
-        }
-
-
-        //onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
-
-//        assertTrue("Failed to deny permissions",denyPermission());
-
-        //assertTrue("Failed to Start Service",isLocationServiceRunning());
-
-//        onView(withText(R.string.PermissionDeniedToastText))
-//                .inRoot(withDecorView(not(mActivityRule.getActivity().getWindow().getDecorView())))
-//                .check(matches(isDisplayed()));
-
-
-        //onView(withId(R.id.text)).check(matches(withText("Hello World!")));
-    }// end of shouldUpdateTextAfterButtonClick
-    //==============================================================================================
+//    //==============================================================================================
+////    @Test
+////    @FlakyTest
+//    public void should_displayNoPermission_when_permissionAreDenied() {
+//
+//        //ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+//
+//
+//
+//
+//        // click start-stop button
+//        onView(withId(R.id.circleIcon)).perform(click());
+//        try {
+//            sleep(400);
+//
+//            onView(withId(R.id.circleIcon)).check(matches(withText(R.string.start_button_stop_text)));
+//
+////        assertTrue("Failed to deny permissions",denyPermission());
+//
+//            assertTrue("Failed to Start Service",isLocationServiceRunning());
+//
+//        }
+//        catch ( InterruptedException ex){
+//
+//        }
+//
+//
+//        //onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
+//
+////        assertTrue("Failed to deny permissions",denyPermission());
+//
+//        //assertTrue("Failed to Start Service",isLocationServiceRunning());
+//
+////        onView(withText(R.string.PermissionDeniedToastText))
+////                .inRoot(withDecorView(not(mActivityRule.getActivity().getWindow().getDecorView())))
+////                .check(matches(isDisplayed()));
+//
+//
+//        //onView(withId(R.id.text)).check(matches(withText("Hello World!")));
+//    }// end of shouldUpdateTextAfterButtonClick
+//    //==============================================================================================
 
 
 //    public void testStartServiceOnInit () {

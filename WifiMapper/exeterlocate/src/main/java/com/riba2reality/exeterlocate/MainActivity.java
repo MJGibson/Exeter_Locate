@@ -652,6 +652,8 @@ public class MainActivity extends AppCompatActivity {
                 R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
 
         WebView webView = new WebView(this);
+        //webView.setId(R.id.);
+
         webView.loadUrl("file:///android_asset/ExeterLocateConcentPage.html");
         webView.setWebViewClient(new WebViewClient(){
             @Override
@@ -679,7 +681,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
-                System.exit(0);
+
+                //System.exit(0);
             }
         });
 
@@ -1003,7 +1006,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
 
         String postType = "POST";
 
