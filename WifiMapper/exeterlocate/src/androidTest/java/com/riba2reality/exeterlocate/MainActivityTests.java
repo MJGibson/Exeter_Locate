@@ -143,7 +143,7 @@ public class MainActivityTests {
         UiObject webView = uiDevice.findObject(new UiSelector().className(WebView.class));
 
         try {
-            if (webView.exists() && webView.isEnabled()) {
+            if (webView.exists() ) {
 
                 int height = webView.getBounds().height();
 
