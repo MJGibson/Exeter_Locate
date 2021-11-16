@@ -136,6 +136,8 @@ public class MainActivityTests {
 //        for(int i = 0; i < 5; ++i)
 //            onView(isAssignableFrom(WebView.class)).perform(swipeUp());
 
+
+
         // Initialize UiDevice instance
         UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
