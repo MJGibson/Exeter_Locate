@@ -18,8 +18,6 @@ import androidx.test.uiautomator.UiSelector;
 
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,7 +35,7 @@ import static com.google.common.truth.Truth.assertThat;
 @RunWith(AndroidJUnit4.class)
 //@RunWith(MockitoJUnitRunner.class)
 @LargeTest
-public class MainActivityTests extends TestCase {
+public class MainActivityTests {
 
 
 //    @Rule
@@ -131,6 +129,29 @@ public class MainActivityTests extends TestCase {
     //###################################      TESTS       #########################################
     //##############################################################################################
 
+
+    //==============================================================================================
+    @FlakyTest
+    @Test
+    public void test_agree_button_exits() {
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+
+        for(int i = 0; i < 5; ++i)
+            onView(isAssignableFrom(WebView.class)).perform(swipeUp());
+
+
+        onView(withText("Accept"))
+                .inRoot(isDialog()) // <---
+                .check(matches(isDisplayed()));
+
+        onView(withText("Accept")).perform(click());
+
+    }// end of test_agree_button_exits
+    //==============================================================================================
+
     //==============================================================================================
     @Test
     public void test_disagree_button_exits() {
@@ -178,27 +199,7 @@ public class MainActivityTests extends TestCase {
     //==============================================================================================
 
 
-    //==============================================================================================
-    @FlakyTest
-    @Test
-    public void test_agree_button_exits() {
 
-        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
-
-
-
-        for(int i = 0; i < 5; ++i)
-            onView(isAssignableFrom(WebView.class)).perform(swipeUp());
-
-
-        onView(withText("Accept"))
-                .inRoot(isDialog()) // <---
-                .check(matches(isDisplayed()));
-
-//        onView(withText("Accept")).perform(click());
-
-    }// end of test_agree_button_exits
-    //==============================================================================================
 
 
 //    //==============================================================================================
