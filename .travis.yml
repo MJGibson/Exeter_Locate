@@ -3,27 +3,37 @@ sudo: required
 
 language: android
 dist: trusty
+jdk: oraclejdk8
+
+env:
+    global:
+    - ANDROID_API_LEVEL=28
+    - ANDROID_BUILD_TOOLS_VERSION=28.0.3
+    - ANDROID_ABI=armebi-v7a
+
 android:
   components:
     - tools
-    - build-tools-30.0.2
-    - android-30
-    - android-22
+    #- build-tools-30.0.2
+    #- android-30
+    #- android-22
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-26
+    #- sys-img-armeabi-v7a-android-26
 licenses:
   - 'android-sdk-preview-license-.+'
   - 'android-sdk-license-.+'
   - 'google-gdk-license-.+'
  
 before_install:
+    - touch $HOME/.android/repositories.cfg
 #  - chmod +x gradlew
-  - yes | sdkmanager "platforms;android-30"
+    - yes | sdkmanager "platforms;android-28"
+    - yes | sdkmanager "build-tools;28.0.3"
     
 before_script:
-  - echo no | android create avd --force -n test -t android-26 --abi armeabi-v7a
+  #- echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
@@ -31,6 +41,7 @@ before_script:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  
 
 cache:
   directories:
