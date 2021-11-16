@@ -19,17 +19,18 @@ import androidx.test.uiautomator.UiSelector;
 
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 //@RunWith(MockitoJUnitRunner.class)
 @LargeTest
-public class MainActivityTests {
+public class MainActivityTests extends TestCase {
 
 
 //    @Rule
