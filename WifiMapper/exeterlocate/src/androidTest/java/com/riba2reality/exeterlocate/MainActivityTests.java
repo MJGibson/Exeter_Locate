@@ -26,6 +26,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -189,7 +190,7 @@ public class MainActivityTests extends TestCase {
 
 
         onView(withText("Accept"))
-//                .inRoot(isDialog()) // <---
+                .inRoot(isDialog()) // <---
                 .check(matches(isDisplayed()));
 
 //        onView(withText("Accept")).perform(click());
