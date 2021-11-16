@@ -9,6 +9,7 @@ import android.webkit.WebView;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
@@ -178,6 +179,7 @@ public class MainActivityTests extends TestCase {
 
 
     //==============================================================================================
+    @FlakyTest
     @Test
     public void test_agree_button_exits() {
 
