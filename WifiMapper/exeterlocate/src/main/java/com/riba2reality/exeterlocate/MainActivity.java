@@ -480,9 +480,12 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     private void checkGpsEnabled(){
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted) {
 
             Log.d("mgdev", "MainActivity.checkGpsEnabled. GPS disabled");
 
@@ -496,6 +499,10 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     private void checkForInternetConnection(){
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
@@ -505,7 +512,8 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             connected = false;
-            startMessageActivityInternetOff();
+            if(_termsAccepted)
+                startMessageActivityInternetOff();
         }
 
     }// end of checkForInternetConnection
@@ -514,11 +522,15 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     private void checkBluetoothEnabled(){
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth ???
         } else {
-            if (!mBluetoothAdapter.isEnabled()) {
+            if (!mBluetoothAdapter.isEnabled() && _termsAccepted) {
                 // Bluetooth is not enable :)
                 startMessageActivityBluetoothOff();
             }
@@ -532,8 +544,12 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("mgdev", "MainActivity.checkWifiEnabled");
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (!wifi.isWifiEnabled()){
+        if (!wifi.isWifiEnabled() && _termsAccepted){
             startMessageActivityWifiOff();
         }
 
