@@ -172,7 +172,7 @@ public class MainActivityTests extends TestCase {
 //        onView(withText("Accept")).perform(click());
 
         // Search for correct button in the dialog.
-        UiObject button = uiDevice.findObject(new UiSelector().text("Accept"));
+        UiObject button = uiDevice.findObject(new UiSelector().text("ACCEPT"));
 
         try {
             if (button.exists() && button.isEnabled()) {
@@ -211,7 +211,7 @@ public class MainActivityTests extends TestCase {
         UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
         // Search for correct button in the dialog.
-        UiObject button = uiDevice.findObject(new UiSelector().text("Disagree"));
+        UiObject button = uiDevice.findObject(new UiSelector().text("DISAGREE"));
 
         try {
             if (button.exists() && button.isEnabled()) {
