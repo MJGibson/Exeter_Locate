@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -26,9 +25,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,7 +32,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -131,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean _termsAccepted = false;
 //    com.riba2reality.exeterlocate.databinding.ActivityMainBinding _binding;
 
+    private MainActivity selfRef = this;
+
 
     //##############################################################################################
 
@@ -220,6 +217,9 @@ public class MainActivity extends AppCompatActivity {
 
         _MainActivity = this;
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverTermsAcceptance,
+                new IntentFilter(getResources().getString(R.string.terms_acceptance)));
+
 
     }// end of onCreate
     //==============================================================================================
@@ -258,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter("android.net.wifi.WIFI_STATE_CHANGED"));
         this.registerReceiver(receiverGPS, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
+
+
         Log.d("mgdev", "MainActivity.onStart");
     }
     //==============================================================================================
@@ -276,6 +278,8 @@ public class MainActivity extends AppCompatActivity {
         this.unregisterReceiver(receiverBle);
         this.unregisterReceiver(receiverWifi);
         this.unregisterReceiver(receiverGPS);
+
+        //this.unregisterReceiver(receiverTermsAcceptance);
     }
     //==============================================================================================
 
@@ -283,6 +287,30 @@ public class MainActivity extends AppCompatActivity {
     //##############################################################################################
     //###########################       Receiver Functions     #####################################
     //##############################################################################################
+
+
+    //==============================================================================================
+    BroadcastReceiver receiverTermsAcceptance = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("mgdev", "receiverTermsAcceptance.onReceive");
+
+            _termsAccepted = intent.getBooleanExtra(
+                    getResources().getString(R.string.terms_acceptance),
+                    false);
+
+            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(selfRef);
+            final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+            SPeditor.putBoolean("termsAcceptance", _termsAccepted);
+            SPeditor.apply();
+
+
+        }// end of onReceive
+    };// end of receiverTermsAcceptance
+    //==============================================================================================
 
 
     //==============================================================================================
@@ -658,110 +686,113 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
     public void startTermsAcceptance(){
 
+        Intent intent = new Intent(this, TermsActivity.class);
 
-//        ConsentDialog dialog = new ConsentDialog(this);
-
-        //dialog.show();
-
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(this,
-                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
-
-        WebView webView = new WebView(this);
-        //webView.setId(R.id.);
-
-        webView.loadUrl("file:///android_asset/ExeterLocateConcentPage.html");
-        webView.setWebViewClient(new WebViewClient(){
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url){
-                view.loadUrl(url);
-                return true;
-            }
-        });
-        alert.setView(webView);
-
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor SPeditor = SP.edit();
-
-        alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                _termsAccepted = true;
-                SPeditor.putBoolean("termsAcceptance", _termsAccepted);
-                SPeditor.apply();
-                dialog.dismiss();
-            }
-        });
-
-        alert.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-
-                //System.exit(0);
-            }
-        });
-
-        alert.setCancelable(false);
-
-        AlertDialog dialog = alert.create();
-
-        //dialog.getWindow().setBackgroundDrawable(getDrawable(R.color.white));
-
-        dialog.show();
-
-        // Access the button and set it to invisible
-        final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        button.setVisibility(View.INVISIBLE);
-
-        webView.getViewTreeObserver().addOnScrollChangedListener(
-                new ViewTreeObserver.OnScrollChangedListener() {
-                    @Override
-                    public void onScrollChanged() {
-
-                        //Log.v("mgdev", "+++ scrollchanged "+webView.getScrollY());
-
-                        int maxScrollExtent =
-                                (int) ((webView.getContentHeight() *
-                                        webView.getResources().getDisplayMetrics().density)
-                                        - webView.getHeight())-1;
-
-                        int diff = ((int)(maxScrollExtent * 0.9)) - webView.getScrollY();
-
-                        //Log.v("mgdev", "-----------------------::"+diff);
-                        //Log.v("mgdev", "maxScrollExtent"+maxScrollExtent);
-                        //Log.v("mgdev", "webView.getScrollY()"+webView.getScrollY());
-
-                        // if diff is zero, then the bottom has been reached
-                        if (diff <= 0 && maxScrollExtent != 0) {
-
-                                //Log.v("mgdev", "Accept?!?!");
-
-                                button.setVisibility(View.VISIBLE);
-
-                            }// end of if diff = 0
-                    }// end of onScrollChanged
-                }// end of ViewTreeObserver.OnScrollChangedListener
-        );// end of addOnScrollChangedListener
+        startActivity(intent);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            webView.getViewTreeObserver().addOnWindowFocusChangeListener(
-                    new ViewTreeObserver.OnWindowFocusChangeListener() {
-                        @Override
-                        public void onWindowFocusChanged(boolean hasFocus) {
-
-                            Log.v("mgdev", "dialog.onWindowFocusChanged");
-
-                            if(hasFocus && _termsAccepted){
-                                dialog.hide();
-                            }
-
-
-                        }// end of onWindowFocusChanged
-                    }//end of OnWindowFocusChangeListener
-            );// end of addOnWindowFocusChangeListener
-        }
+//        //---------------------------------------
+//
+//
+//
+//        AlertDialog.Builder alert = new AlertDialog.Builder(this,
+//                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
+//
+//        WebView webView = new WebView(this);
+//        //webView.setId(R.id.);
+//
+//        webView.loadUrl("file:///android_asset/ExeterLocateConcentPage.html");
+//        webView.setWebViewClient(new WebViewClient(){
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url){
+//                view.loadUrl(url);
+//                return true;
+//            }
+//        });
+//        alert.setView(webView);
+//
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+//        final SharedPreferences.Editor SPeditor = SP.edit();
+//
+//        alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                _termsAccepted = true;
+//                SPeditor.putBoolean("termsAcceptance", _termsAccepted);
+//                SPeditor.apply();
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        alert.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                finish();
+//
+//                //System.exit(0);
+//            }
+//        });
+//
+//        alert.setCancelable(false);
+//
+//        AlertDialog dialog = alert.create();
+//
+//        //dialog.getWindow().setBackgroundDrawable(getDrawable(R.color.white));
+//
+//        dialog.show();
+//
+//        // Access the button and set it to invisible
+//        final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//        button.setVisibility(View.INVISIBLE);
+//
+//        webView.getViewTreeObserver().addOnScrollChangedListener(
+//                new ViewTreeObserver.OnScrollChangedListener() {
+//                    @Override
+//                    public void onScrollChanged() {
+//
+//                        //Log.v("mgdev", "+++ scrollchanged "+webView.getScrollY());
+//
+//                        int maxScrollExtent =
+//                                (int) ((webView.getContentHeight() *
+//                                        webView.getResources().getDisplayMetrics().density)
+//                                        - webView.getHeight())-1;
+//
+//                        int diff = ((int)(maxScrollExtent * 0.9)) - webView.getScrollY();
+//
+//                        //Log.v("mgdev", "-----------------------::"+diff);
+//                        //Log.v("mgdev", "maxScrollExtent"+maxScrollExtent);
+//                        //Log.v("mgdev", "webView.getScrollY()"+webView.getScrollY());
+//
+//                        // if diff is zero, then the bottom has been reached
+//                        if (diff <= 0 && maxScrollExtent != 0) {
+//
+//                                //Log.v("mgdev", "Accept?!?!");
+//
+//                                button.setVisibility(View.VISIBLE);
+//
+//                            }// end of if diff = 0
+//                    }// end of onScrollChanged
+//                }// end of ViewTreeObserver.OnScrollChangedListener
+//        );// end of addOnScrollChangedListener
+//
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+//            webView.getViewTreeObserver().addOnWindowFocusChangeListener(
+//                    new ViewTreeObserver.OnWindowFocusChangeListener() {
+//                        @Override
+//                        public void onWindowFocusChanged(boolean hasFocus) {
+//
+//                            Log.v("mgdev", "dialog.onWindowFocusChanged");
+//
+//                            if(hasFocus && _termsAccepted){
+//                                dialog.hide();
+//                            }
+//
+//
+//                        }// end of onWindowFocusChanged
+//                    }//end of OnWindowFocusChangeListener
+//            );// end of addOnWindowFocusChangeListener
+//        }
 
 
 
