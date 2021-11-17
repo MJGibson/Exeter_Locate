@@ -5,8 +5,15 @@ import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.os.Build;
+import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.CoordinatesProvider;
+import androidx.test.espresso.action.GeneralLocation;
+import androidx.test.espresso.action.GeneralSwipeAction;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Swipe;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
@@ -24,7 +31,6 @@ import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -130,6 +136,17 @@ public class MainActivityTests extends TestCase {
     //###################################      TESTS       #########################################
     //##############################################################################################
 
+    private static ViewAction swipeFromTopToBottom() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.BOTTOM_CENTER,
+                new CoordinatesProvider() {
+                    @Override
+                    public float[] calculateCoordinates(View view) {
+                        float[] coordinates =  GeneralLocation.CENTER.calculateCoordinates(view);
+                        coordinates[1] = 0;
+                        return coordinates;
+                    }
+                }, Press.FINGER);
+    }
 
     //==============================================================================================
     @FlakyTest
@@ -140,10 +157,16 @@ public class MainActivityTests extends TestCase {
 
 
         // find web view and swipe down until Accept is presented
-        for(int i = 0; i < 15; ++i) {
+        for(int i = 0; i < 5; ++i) {
             //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
-            onView(withId(R.id.scroll)).perform(swipeUp());
+            //onView(withId(R.id.scroll)).perform(swipeUp());
+
+            onView(withId(R.id.scroll))
+                .perform(swipeFromTopToBottom());
         }
+//        onView(withId(R.id.scroll))
+//                .perform(swipeFromTopToBottom());
+                //.perform(ViewActions.swipeUp());
 
 
 //        // Initialize UiDevice instance
