@@ -5,13 +5,11 @@ import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.os.Build;
-import android.webkit.WebView;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
@@ -24,8 +22,16 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeUp;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.common.truth.Truth.assertThat;
+import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 //@RunWith(MockitoJUnitRunner.class)
@@ -134,57 +140,58 @@ public class MainActivityTests extends TestCase {
 
 
         // find web view and swipe down until Accept is presented
-//        for(int i = 0; i < 5; ++i)
-//            onView(isAssignableFrom(WebView.class)).perform(swipeUp());
-
-
-
-        // Initialize UiDevice instance
-        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-
-        // Search for correct button in the dialog.
-        UiObject webView = uiDevice.findObject(new UiSelector().className(WebView.class));
-
-        try {
-            if (webView.exists() ) {
-
-                int height = webView.getBounds().height();
-
-                //Log.d("mg_test", "test_agree_button_exits: "+height);
-
-                for(int i = 0; i < 5; ++i)
-                    webView.swipeUp(5);
-            }else{
-                fail("Webview doesn't exist");
-            }
-
-        } catch (UiObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
+        for(int i = 0; i < 5; ++i) {
+            //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
+            onView(withId(R.id.scroll)).perform(swipeUp());
         }
+
+
+//        // Initialize UiDevice instance
+//        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+//
+//        // Search for correct button in the dialog.
+//        UiObject webView = uiDevice.findObject(new UiSelector().className(WebView.class));
+//
+//        try {
+//            if (webView.exists() ) {
+//
+//                int height = webView.getBounds().height();
+//
+//                //Log.d("mg_test", "test_agree_button_exits: "+height);
+//
+//                for(int i = 0; i < 5; ++i)
+//                    webView.swipeUp(5);
+//            }else{
+//                fail("Webview doesn't exist");
+//            }
+//
+//        } catch (UiObjectNotFoundException e) {
+//            e.printStackTrace();
+//            fail();
+//        }
 
 
         // find accept button
-//        onView(withText("Accept"))
-//                .inRoot(isDialog()) // <---
-//                .check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.accept_button),withText("Accept")))
+                //.inRoot(isDialog()) // <---
+                .check(matches(isDisplayed()));
+
+        onView(withText("Accept")).perform(click());
+
+//        // Search for correct button in the dialog.
+//        UiObject button = uiDevice.findObject(new UiSelector().text("ACCEPT"));
 //
-//        onView(withText("Accept")).perform(click());
-
-        // Search for correct button in the dialog.
-        UiObject button = uiDevice.findObject(new UiSelector().text("ACCEPT"));
-
-        try {
-            if (button.exists() && button.isEnabled()) {
-                button.click();
-            }else{
-                fail("Button doesn't exist");
-            }
-
-        } catch (UiObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
+//        try {
+//            if (button.exists() && button.isEnabled()) {
+//                button.click();
+//            }else{
+//                fail("Button doesn't exist");
+//            }
+//
+//        } catch (UiObjectNotFoundException e) {
+//            e.printStackTrace();
+//            fail();
+//        }
 
     }// end of test_agree_button_exits
     //==============================================================================================
@@ -200,30 +207,30 @@ public class MainActivityTests extends TestCase {
         //startActivity(getInstrumentation().getTargetContext(),new Intent(), null);
 
 
-//        onView(withText("Disagree"))
-////                .inRoot(isDialog()) // <---
-//                .check(matches(isDisplayed()));
-//        //.perform(click());
+        onView(allOf(withId(R.id.disagree_button),withText("Disagree")))
+//                .inRoot(isDialog()) // <---
+                .check(matches(isDisplayed()));
+        //.perform(click());
+
+        onView(withText("Disagree")).perform(click());
+
+//        // Initialize UiDevice instance
+//        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 //
-//        onView(withText("Disagree")).perform(click());
-
-        // Initialize UiDevice instance
-        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-
-        // Search for correct button in the dialog.
-        UiObject button = uiDevice.findObject(new UiSelector().text("DISAGREE"));
-
-        try {
-            if (button.exists() && button.isEnabled()) {
-                button.click();
-            }else{
-                fail("Button doesn't exist");
-            }
-
-        } catch (UiObjectNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
+//        // Search for correct button in the dialog.
+//        UiObject button = uiDevice.findObject(new UiSelector().text("Disagree"));
+//
+//        try {
+//            if (button.exists() && button.isEnabled()) {
+//                button.click();
+//            }else{
+//                fail("Button doesn't exist");
+//            }
+//
+//        } catch (UiObjectNotFoundException e) {
+//            e.printStackTrace();
+//            fail();
+//        }
 
 
         //System.out.println(scenario.getResult().getResultCode());
