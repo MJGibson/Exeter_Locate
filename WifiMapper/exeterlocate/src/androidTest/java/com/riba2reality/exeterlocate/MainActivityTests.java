@@ -140,7 +140,7 @@ public class MainActivityTests extends TestCase {
 
 
         // find web view and swipe down until Accept is presented
-        for(int i = 0; i < 5; ++i) {
+        for(int i = 0; i < 15; ++i) {
             //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
             onView(withId(R.id.scroll)).perform(swipeUp());
         }
