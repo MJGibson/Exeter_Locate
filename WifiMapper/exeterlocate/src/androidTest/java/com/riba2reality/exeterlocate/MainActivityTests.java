@@ -200,7 +200,7 @@ public class MainActivityTests extends TestCase {
                 //.inRoot(isDialog()) // <---
                 .check(matches(isDisplayed()));
 
-        onView(withText("Accept")).perform(click());
+//        onView(withText("Accept")).perform(click());
 
 //        // Search for correct button in the dialog.
 //        UiObject button = uiDevice.findObject(new UiSelector().text("ACCEPT"));
