@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -157,12 +158,12 @@ public class MainActivityTests extends TestCase {
 
 
         // find web view and swipe down until Accept is presented
-        for(int i = 0; i < 5; ++i) {
+        for(int i = 0; i < 50; ++i) {
             //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
-            //onView(withId(R.id.scroll)).perform(swipeUp());
+            onView(withId(R.id.scroll)).perform(swipeUp());
 
-            onView(withId(R.id.scroll))
-                .perform(swipeFromTopToBottom());
+//            onView(withId(R.id.scroll))
+//                .perform(swipeFromTopToBottom());
         }
 //        onView(withId(R.id.scroll))
 //                .perform(swipeFromTopToBottom());
