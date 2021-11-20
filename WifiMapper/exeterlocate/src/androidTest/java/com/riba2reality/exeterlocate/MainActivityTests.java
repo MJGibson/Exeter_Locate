@@ -23,6 +23,7 @@ import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
+import com.riba2reality.exeterlocate.messages.GpsMessageActivity;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import junit.framework.TestCase;
@@ -283,6 +284,7 @@ public class MainActivityTests extends TestCase {
 
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
+        GpsMessageActivity._test = true;
 
         //test_agree_button_exits();
 

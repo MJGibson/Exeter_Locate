@@ -513,11 +513,16 @@ public class MainActivity extends AppCompatActivity {
         boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted) {
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted && !GpsMessageActivity._test) {
 
             Log.d("mgdev", "MainActivity.checkGpsEnabled. GPS disabled");
 
-            startMessageActivityGPSOff();
+//            // note this isn't perfect
+//            if(TrackerScanner.runningOnEmulator()){
+//
+//            }else {
+                startMessageActivityGPSOff();
+//            }
 
         }// end of if gps not enabled
 
