@@ -23,7 +23,7 @@ android:
     #- sys-img-armeabi-v7a-android-22
     - sys-img-armeabi-v7a-google_apis-24
     - sys-img-armeabi-v7a-android-24
-    - sys-img-x86-android-24
+
 licenses:
   - 'android-sdk-preview-license-.+'
   - 'android-sdk-license-.+'
@@ -34,7 +34,9 @@ before_install:
   - yes | sdkmanager "platforms;android-30"
     
 before_script:
-  - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
+  #- echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
+  - echo y | sdkmanager "system-images;android-$API;$EMU_FLAVOR;$ABI" #>/dev/null # install our emulator
+  - echo y | avdmanager create avd --force -n test -k "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
   - emulator -avd test -no-skin -no-audio -no-window -gpu off  &
   #- adb shell settings put global window_animation_scale 0 &
   #- adb shell settings put global transition_animation_scale 0 &
@@ -65,8 +67,11 @@ script:
 env: 
   global:
     # install timeout in minutes (2 minutes by default)
-    - ADB_INSTALL_TIMEOUT=
+    - ADB_INSTALL_TIMEOUT=8
     - CODECOV_TOKEN=eae3e3fd-ce8e-47e2-a3c0-928c84551a60 # note this is MJGibson version
+    - API=24
+    - ABI=armeabi-v7a
+    - EMU_FLAVOR=default # use google_apis flavor if no default flavor emulator
 
 
 after_success:
