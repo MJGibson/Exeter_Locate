@@ -3,16 +3,25 @@ sudo: required
 
 language: android
 dist: trusty
+
 android:
   components:
+    # Uncomment the lines below if you want to
+    # use the latest revision of Android SDK Tools
+    # - platform-tools
+    # - tools
+    
     - tools
     - build-tools-30.0.2
+    - build-tools-23.0.3
+    
     - android-30
-    - android-22
+    - android-23
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-22
+    #- sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-23
 licenses:
   - 'android-sdk-preview-license-.+'
   - 'android-sdk-license-.+'
@@ -23,12 +32,13 @@ before_install:
   - yes | sdkmanager "platforms;android-30"
     
 before_script:
-  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-  - emulator -avd test -no-audio -no-window &
+  - echo no | android create avd --force -n test -t android-23 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window -gpu off  &
   #- adb shell settings put global window_animation_scale 0 &
   #- adb shell settings put global transition_animation_scale 0 &
   #- adb shell settings put global animator_duration_scale 0 &
   - android-wait-for-emulator
+  - adb devices
   - adb shell input keyevent 82 &
   
 before_cache:
@@ -42,15 +52,19 @@ cache:
   - $HOME/.android/build-cache
     
 script:
-- cd WifiMapper
-- ./gradlew clean test build
-#- ./gradlew jacocoTestReport
-#- ./gradlew createDebugCoverageReport
-#- ./gradlew connectedCheck #instrucment tests
-- ./gradlew jacocoTestReport
+  - cd WifiMapper
+  - android list target
+  - ./gradlew clean test build
+# - ./gradlew jacocoTestReport
+# - ./gradlew createDebugCoverageReport
+# - ./gradlew connectedCheck #instrucment tests
+  - ./gradlew jacocoTestReport
 
-env: # note this is MJGibson version
-  - CODECOV_TOKEN=eae3e3fd-ce8e-47e2-a3c0-928c84551a60
+env: 
+  global:
+    # install timeout in minutes (2 minutes by default)
+    - ADB_INSTALL_TIMEOUT=
+    - CODECOV_TOKEN=eae3e3fd-ce8e-47e2-a3c0-928c84551a60 # note this is MJGibson version
 
 
 after_success:
