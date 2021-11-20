@@ -43,6 +43,7 @@ public class GpsMessageActivity extends AppCompatActivity {
     private Button ok_button;
 
     public static String provider = LocationManager.GPS_PROVIDER;
+    public static boolean _test = false;
 
     //----------------------------------------------------------------------------------------------
 
@@ -71,7 +72,7 @@ public class GpsMessageActivity extends AppCompatActivity {
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 
-        if (manager.isProviderEnabled( provider ) ) {
+        if (manager.isProviderEnabled( provider ) && !_test) {
 
             Log.d("mgdev", "GpsMessageActivity.checkGpsEnabled. GPS enabled");
 
