@@ -3,27 +3,16 @@ sudo: required
 
 language: android
 dist: trusty
-
 android:
   components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
-    # - platform-tools
-    # - tools
-    
     - tools
     - build-tools-30.0.2
-    - build-tools-24.0.1
-    
     - android-30
-    - android-24
+    - android-22
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    #- sys-img-armeabi-v7a-android-22
-    - sys-img-armeabi-v7a-google_apis-24
-    - sys-img-armeabi-v7a-android-24
-
+    - sys-img-armeabi-v7a-android-22
 licenses:
   - 'android-sdk-preview-license-.+'
   - 'android-sdk-license-.+'
@@ -34,24 +23,13 @@ before_install:
   - yes | sdkmanager "platforms;android-30"
     
 before_script:
-  #- echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
-  # Install the rest of tools (e.g. avdmanager)
-  - echo y | sdkmanager "platform-tools" #>/dev/null
-  - echo y | sdkmanager "tools" #>/dev/null # A second time per Travis docs, gets latest versions
-  - echo y | sdkmanager "build-tools;29.0.2" >/dev/null # Implicit gradle dependency - gradle drives changes
-  - echo y | sdkmanager "platforms;android-$API" >/dev/null # We need the API of the emulator we will run
-  - echo y | sdkmanager "platforms;android-29" >/dev/null # We need the API of the current compileSdkVersion from gradle.properties
-  - echo y | sdkmanager --channel=4 "emulator" # Experiment with canary, specifying 28.0.3 (prior version) did not work
-  - ls -lat ${ANDROID_HOME}/emulator
-  - echo y | sdkmanager "extras;android;m2repository" >/dev/null
-  - echo y | sdkmanager "system-images;android-$API;$EMU_FLAVOR;$ABI" #>/dev/null # install our emulator
-  - echo y | avdmanager create avd --force -n test -k "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
-  - emulator -avd test -no-skin -no-audio -no-window -gpu off  &
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - echo y | adb shell appops set com.riba2reality.exeterlocate 58 allow
   #- adb shell settings put global window_animation_scale 0 &
   #- adb shell settings put global transition_animation_scale 0 &
   #- adb shell settings put global animator_duration_scale 0 &
   - android-wait-for-emulator
-  - adb devices
   - adb shell input keyevent 82 &
   
 before_cache:
@@ -65,22 +43,15 @@ cache:
   - $HOME/.android/build-cache
     
 script:
-  - cd WifiMapper
-  - android list target
-  - ./gradlew clean test build
-# - ./gradlew jacocoTestReport
-# - ./gradlew createDebugCoverageReport
-# - ./gradlew connectedCheck #instrucment tests
-  - ./gradlew jacocoTestReport
+- cd WifiMapper
+- ./gradlew clean test build
+#- ./gradlew jacocoTestReport
+#- ./gradlew createDebugCoverageReport
+#- ./gradlew connectedCheck #instrucment tests
+- ./gradlew jacocoTestReport
 
-env: 
-  global:
-    # install timeout in minutes (2 minutes by default)
-    - ADB_INSTALL_TIMEOUT=8
-    - CODECOV_TOKEN=eae3e3fd-ce8e-47e2-a3c0-928c84551a60 # note this is MJGibson version
-    - API=24
-    - ABI=armeabi-v7a
-    - EMU_FLAVOR=default # use google_apis flavor if no default flavor emulator
+env: # note this is MJGibson version
+  - CODECOV_TOKEN=eae3e3fd-ce8e-47e2-a3c0-928c84551a60
 
 
 after_success:
