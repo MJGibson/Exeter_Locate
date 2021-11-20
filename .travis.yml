@@ -35,6 +35,8 @@ before_install:
     
 before_script:
   #- echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
+  # Install the rest of tools (e.g. avdmanager)
+  - sdkmanager tools
   - echo y | sdkmanager "system-images;android-$API;$EMU_FLAVOR;$ABI" #>/dev/null # install our emulator
   - echo y | avdmanager create avd --force -n test -k "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
   - emulator -avd test -no-skin -no-audio -no-window -gpu off  &
