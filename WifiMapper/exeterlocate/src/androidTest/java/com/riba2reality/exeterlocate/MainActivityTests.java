@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.view.View;
 
@@ -18,7 +17,6 @@ import androidx.test.espresso.action.Swipe;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
@@ -285,10 +283,19 @@ public class MainActivityTests extends TestCase {
 
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
-        WifiManager wifi = (WifiManager) InstrumentationRegistry.getInstrumentation().getTargetContext().getSystemService(Context.WIFI_SERVICE);
-        wifi.setWifiEnabled(true);
 
-        test_agree_button_exits();
+        //test_agree_button_exits();
+
+        // find web view and swipe down until Accept is presented
+        for(int i = 0; i < 50; ++i) {
+            //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
+            onView(withId(R.id.scroll)).perform(swipeUp());
+
+//            onView(withId(R.id.scroll))
+//                .perform(swipeFromTopToBottom());
+        }
+
+
         onView(withText("Accept")).perform(click());
 
 //        onView(withId(R.id.textView_status)).check(matches(withText(R.string.start_button_stop_text)));
