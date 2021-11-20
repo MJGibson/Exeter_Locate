@@ -563,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth ???
         } else {
-            if (!mBluetoothAdapter.isEnabled() && _termsAccepted) {
+            if (!mBluetoothAdapter.isEnabled() && _termsAccepted && !GpsMessageActivity._test) {
                 // Bluetooth is not enable :)
                 startMessageActivityBluetoothOff();
             }
@@ -584,7 +584,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (!wifi.isWifiEnabled() && _termsAccepted){
+        if (!wifi.isWifiEnabled() && _termsAccepted && !GpsMessageActivity._test){
             if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1 && TrackerScanner.runningOnEmulator()){
 
             }else {
