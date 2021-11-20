@@ -295,6 +295,9 @@ public class MainActivityTests extends TestCase {
 
 
 //        assertTrue("Failed to deny permissions",denyPermission());
+            assertTrue("Failed to Grant permissions",grantPermission());
+
+            sleep(400);
 
             assertTrue("Failed to Start Service",isLocationServiceRunning());
 
