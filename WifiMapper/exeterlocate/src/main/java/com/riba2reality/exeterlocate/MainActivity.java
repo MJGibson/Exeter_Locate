@@ -576,9 +576,15 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences.Editor SPeditor = SP.edit();
         boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
 
+
+
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!wifi.isWifiEnabled() && _termsAccepted){
-            startMessageActivityWifiOff();
+            if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1 && TrackerScanner.runningOnEmulator()){
+
+            }else {
+                startMessageActivityWifiOff();
+            }
         }
 
     }// end of checkWifiEnabled

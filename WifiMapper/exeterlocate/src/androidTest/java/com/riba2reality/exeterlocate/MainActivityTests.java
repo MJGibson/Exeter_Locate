@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.view.View;
 
@@ -17,6 +18,8 @@ import androidx.test.espresso.action.Swipe;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
@@ -26,6 +29,7 @@ import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import junit.framework.TestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,10 +59,10 @@ public class MainActivityTests extends TestCase {
 
 
 
-//    @Rule
-//    public GrantPermissionRule mGrantPermissionRule =
-//            GrantPermissionRule.grant(
-//                    "android.permission.ACCESS_FINE_LOCATION");
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.ACCESS_FINE_LOCATION");
 
     //==============================================================================================
     private boolean grantPermission() {
@@ -281,6 +285,8 @@ public class MainActivityTests extends TestCase {
 
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
+        WifiManager wifi = (WifiManager) InstrumentationRegistry.getInstrumentation().getTargetContext().getSystemService(Context.WIFI_SERVICE);
+        wifi.setWifiEnabled(true);
 
         test_agree_button_exits();
         onView(withText("Accept")).perform(click());
@@ -295,9 +301,8 @@ public class MainActivityTests extends TestCase {
 
 
 //        assertTrue("Failed to deny permissions",denyPermission());
-            assertTrue("Failed to Grant permissions",grantPermission());
-
-            sleep(400);
+//            assertTrue("Failed to Grant permissions",grantPermission());
+//            sleep(400);
 
             assertTrue("Failed to Start Service",isLocationServiceRunning());
 
