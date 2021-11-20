@@ -28,6 +28,7 @@ import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -336,6 +337,11 @@ public class MainActivityTests extends TestCase {
     }// end of shouldUpdateTextAfterButtonClick
     //==============================================================================================
 
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        GpsMessageActivity._test = true;
+    }
 
 //    public void testStartServiceOnInit () {
 //        final AtomicBoolean serviceStarted = new AtomicBoolean(false);
