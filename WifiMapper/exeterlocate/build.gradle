@@ -40,6 +40,10 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         applicationId "com.riba2reality.exeterlocate"
         minSdkVersion 16
@@ -49,7 +53,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //testInstrumentationRunnerArguments clearPackageData: 'true'
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }// end of defaultConfig
 
     buildTypes {
@@ -62,6 +66,18 @@ android {
         }
     }
 
+
+//    productFlavors {
+//        // The actual application flavor
+//        production {
+//            minSdkVersion 16
+//        }
+//        // Test application flavor for uiautomatior tests
+//        Debugtest {
+//            defaultConfig.minSdkVersion 19
+//        }
+//    }
+
 //    viewBinding {
 //        enabled=true
 //    }
@@ -73,7 +89,8 @@ android {
     }
 
     testOptions {
-        //execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        execution 'ANDROID_TEST_ORCHESTRATOR'
         //animationsDisabled true
 
 
@@ -98,13 +115,15 @@ dependencies {
     implementation 'com.google.android.play:core:1.8.0'
     //compile 'com.riba2reality.exeterlocatecore'
 
+//    implementation 'com.google.android.gms:play-services-base:17.0.0'
+//    implementation 'com.google.android.gms:play-services-location:17.1.0'
 
     //--------------------------------------------------------------------------------
     // test implementations
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
 
     androidTestImplementation 'androidx.test:rules:1.3.0'
@@ -125,19 +144,21 @@ dependencies {
 //    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
 //
 //
-    androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'
+    //androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.0.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 //    implementation "androidx.core:core-ktx:+"
 //    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 //    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-//    androidTestUtil 'androidx.test:orchestrator:1.2.0'
+//    androidTestUtil 'androidx.test:orchestrator:1.4.0'
+//    androidTestUtil 'com.android.support.test:orchestrator:1.0.1'
 
     // Core library
-    androidTestImplementation 'androidx.test:core:1.0.0'
+    androidTestImplementation 'androidx.test:core:1.4.0'
 
     // AndroidJUnitRunner and JUnit Rules
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test:rules:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
 
     // Assertions
     androidTestImplementation 'androidx.test.ext:junit:1.0.0'

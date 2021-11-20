@@ -18,5 +18,8 @@
     <string name="AppActive_OutsideGeoFence">App is active.
         \nYour phone is off-campus and not recording any data.
         \nPlease tap the tick to stop.</string>
+    <string name="MustHaveGPS">For this app to work, you must have GPS on</string>
+    <string name="MustHaveGPS_message">This App uses GPS to locate this device when scanning other devices. This information helps researchers build a map of other scans. If you have GPS turned off, this app will not work.\n\nPlease go to setting and turn on GPS.</string>
+
 
 </resources>
