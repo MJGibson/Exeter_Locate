@@ -47,7 +47,7 @@ script:
 #- ./gradlew jacocoTestReport
 #- ./gradlew createDebugCoverageReport
 #- ./gradlew connectedCheck #instrucment tests
-- echo y | adb shell appops set com.riba2reality.exeterlocate 58 allow
+- adb shell appops set com.riba2reality.exeterlocate 58 allow
 - ./gradlew jacocoTestReport
 
 env: # note this is MJGibson version
