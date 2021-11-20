@@ -341,6 +341,7 @@ public class MainActivityTests extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         GpsMessageActivity._test = true;
+        TrackerScanner._test = true; // disable network
     }
 
 //    public void testStartServiceOnInit () {

@@ -115,6 +115,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private int mag_lambda = 60;
     private int accel_lambda = 60;
 
+    public static boolean _test = false;
+
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues
 
@@ -1051,7 +1053,7 @@ public class TrackerScanner extends Service implements LocationListener {
 //            String provider = locationManager.getBestProvider(criteria, true);
         String provider = LocationManager.NETWORK_PROVIDER;
 
-        if(runningOnEmulator){
+        if(runningOnEmulator || _test){
             provider = LocationManager.GPS_PROVIDER;
         }
 
