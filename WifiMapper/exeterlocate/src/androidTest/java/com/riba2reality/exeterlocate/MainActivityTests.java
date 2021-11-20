@@ -38,6 +38,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.common.truth.Truth.assertThat;
+import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -228,6 +229,8 @@ public class MainActivityTests extends TestCase {
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
 
+
+
         //startActivity(getInstrumentation().getTargetContext(),new Intent(), null);
 
 
@@ -271,47 +274,50 @@ public class MainActivityTests extends TestCase {
 
 
 
-//    //==============================================================================================
-////    @Test
-////    @FlakyTest
-//    public void should_displayNoPermission_when_permissionAreDenied() {
-//
-//        //ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
-//
-//
-//
-//
-//        // click start-stop button
-//        onView(withId(R.id.circleIcon)).perform(click());
-//        try {
-//            sleep(400);
-//
-//            onView(withId(R.id.circleIcon)).check(matches(withText(R.string.start_button_stop_text)));
-//
-////        assertTrue("Failed to deny permissions",denyPermission());
-//
-//            assertTrue("Failed to Start Service",isLocationServiceRunning());
-//
-//        }
-//        catch ( InterruptedException ex){
-//
-//        }
-//
-//
-//        //onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
-//
-////        assertTrue("Failed to deny permissions",denyPermission());
-//
-//        //assertTrue("Failed to Start Service",isLocationServiceRunning());
-//
-////        onView(withText(R.string.PermissionDeniedToastText))
-////                .inRoot(withDecorView(not(mActivityRule.getActivity().getWindow().getDecorView())))
-////                .check(matches(isDisplayed()));
-//
-//
-//        //onView(withId(R.id.text)).check(matches(withText("Hello World!")));
-//    }// end of shouldUpdateTextAfterButtonClick
-//    //==============================================================================================
+    //==============================================================================================
+    @Test
+    @FlakyTest
+    public void should_displayNoPermission_when_permissionAreDenied() {
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+        test_agree_button_exits();
+        onView(withText("Accept")).perform(click());
+
+//        onView(withId(R.id.textView_status)).check(matches(withText(R.string.start_button_stop_text)));
+
+        // click start-stop button
+        onView(withId(R.id.circleIcon)).perform(click());
+        try {
+            sleep(400);
+
+
+
+//        assertTrue("Failed to deny permissions",denyPermission());
+
+            assertTrue("Failed to Start Service",isLocationServiceRunning());
+
+        }
+        catch ( InterruptedException ex){
+
+        }
+
+
+        //onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
+
+//        assertTrue("Failed to deny permissions",denyPermission());
+
+        //assertTrue("Failed to Start Service",isLocationServiceRunning());
+
+//        onView(withText(R.string.PermissionDeniedToastText))
+//                .inRoot(withDecorView(not(mActivityRule.getActivity().getWindow().getDecorView())))
+//                .check(matches(isDisplayed()));
+
+
+        //onView(withId(R.id.text)).check(matches(withText("Hello World!")));
+    }// end of shouldUpdateTextAfterButtonClick
+    //==============================================================================================
 
 
 //    public void testStartServiceOnInit () {
