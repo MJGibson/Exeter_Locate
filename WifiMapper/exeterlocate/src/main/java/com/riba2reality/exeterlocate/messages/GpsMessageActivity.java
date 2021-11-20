@@ -42,6 +42,8 @@ public class GpsMessageActivity extends AppCompatActivity {
     private TextView message;
     private Button ok_button;
 
+    public static String provider = LocationManager.GPS_PROVIDER;
+
     //----------------------------------------------------------------------------------------------
 
     //==============================================================================================
@@ -68,7 +70,8 @@ public class GpsMessageActivity extends AppCompatActivity {
 
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if (manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+
+        if (manager.isProviderEnabled( provider ) ) {
 
             Log.d("mgdev", "GpsMessageActivity.checkGpsEnabled. GPS enabled");
 
@@ -115,11 +118,8 @@ public class GpsMessageActivity extends AppCompatActivity {
 
         // set up text
 
-        title.setText("For this app to work, you must have GPS on");
-        message.setText("This App uses GPS to locate this device when scanning other devices." +
-                "This information helps researchers build a map of other scans." +
-                "If you have GPS turned off, this app will not work.\n\n" +
-                "Please go to setting and turn on GPS.");
+        title.setText(R.string.MustHaveGPS);
+        message.setText(R.string.MustHaveGPS_message);
         messageIcon.setImageResource(R.drawable.gps_disconnected_foreground);
         ok_button.setText("Allow GPS");
         ok_button.setOnClickListener(allowGPSButtonPressed);

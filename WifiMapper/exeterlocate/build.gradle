@@ -111,6 +111,8 @@ dependencies {
     implementation 'com.google.android.play:core:1.8.0'
     //compile 'com.riba2reality.exeterlocatecore'
 
+//    implementation 'com.google.android.gms:play-services-base:17.0.0'
+//    implementation 'com.google.android.gms:play-services-location:17.1.0'
 
     //--------------------------------------------------------------------------------
     // test implementations

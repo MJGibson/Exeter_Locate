@@ -3,5 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+
     <uses-sdk tools:overrideLibrary="android_libs.ub_uiautomator"/>
 </manifest>
