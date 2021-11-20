@@ -25,7 +25,6 @@ before_install:
 before_script:
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
-  - echo y | adb shell appops set com.riba2reality.exeterlocate 58 allow
   #- adb shell settings put global window_animation_scale 0 &
   #- adb shell settings put global transition_animation_scale 0 &
   #- adb shell settings put global animator_duration_scale 0 &
@@ -48,6 +47,7 @@ script:
 #- ./gradlew jacocoTestReport
 #- ./gradlew createDebugCoverageReport
 #- ./gradlew connectedCheck #instrucment tests
+- echo y | adb shell appops set com.riba2reality.exeterlocate 58 allow
 - ./gradlew jacocoTestReport
 
 env: # note this is MJGibson version
