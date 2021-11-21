@@ -54,8 +54,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunnerArguments clearPackageData: 'true'
-        //testInstrumentationRunnerArguments coverage: 'true'
-        //testInstrumentationRunnerArguments useTestStorageService: 'true'
+        testInstrumentationRunnerArguments coverage: 'true'
+        testInstrumentationRunnerArguments useTestStorageService: 'true'
         //testInstrumentationRunnerArguments coverageFilePath: '/data/local/tmp/'
     }// end of defaultConfig
 
@@ -93,7 +93,7 @@ android {
     }
 
     testOptions {
-//        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
 //        execution 'ANDROID_TEST_ORCHESTRATOR'
         //animationsDisabled true
 
@@ -154,7 +154,7 @@ dependencies {
 //    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 //    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-//    androidTestUtil 'androidx.test:orchestrator:1.4.0'
+    androidTestUtil 'androidx.test:orchestrator:1.4.0'
 //    androidTestUtil 'com.android.support.test:orchestrator:1.0.1'
 
     // Core library
