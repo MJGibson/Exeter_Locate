@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
@@ -17,6 +19,7 @@ import androidx.test.espresso.action.Swipe;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
@@ -159,6 +162,15 @@ public class MainActivityTests extends TestCase {
     @Test
     public void test_agree_button_exits() {
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.apply();
+
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
 
@@ -230,6 +242,15 @@ public class MainActivityTests extends TestCase {
     @Test
     public void test_disagree_button_exits() {
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.apply();
+
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
 
@@ -283,23 +304,36 @@ public class MainActivityTests extends TestCase {
     @FlakyTest
     public void should_displayNoPermission_when_permissionAreDenied() {
 
-        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", true);
+        SPeditor.apply();
 
         GpsMessageActivity._test = true;
 
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+
         //test_agree_button_exits();
 
-        // find web view and swipe down until Accept is presented
-        for(int i = 0; i < 50; ++i) {
-            //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
-            onView(withId(R.id.scroll)).perform(swipeUp());
-
-//            onView(withId(R.id.scroll))
-//                .perform(swipeFromTopToBottom());
-        }
-
-
-        onView(withText("Accept")).perform(click());
+//        // find web view and swipe down until Accept is presented
+//        for(int i = 0; i < 50; ++i) {
+//            //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
+//            onView(withId(R.id.scroll)).perform(swipeUp());
+//
+////            onView(withId(R.id.scroll))
+////                .perform(swipeFromTopToBottom());
+//        }
+//
+//
+//        onView(withText("Accept")).perform(click());
 
 //        onView(withId(R.id.textView_status)).check(matches(withText(R.string.start_button_stop_text)));
 

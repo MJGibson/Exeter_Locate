@@ -1053,8 +1053,7 @@ public class TrackerScanner extends Service implements LocationListener {
 //            String provider = locationManager.getBestProvider(criteria, true);
         String provider = LocationManager.NETWORK_PROVIDER;
 
-        if(runningOnEmulator
-                //|| _test
+        if(runningOnEmulator || _test
            ){
             provider = LocationManager.GPS_PROVIDER;
         }

@@ -53,7 +53,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: 'true'
+        //testInstrumentationRunnerArguments clearPackageData: 'true'
+        testInstrumentationRunnerArguments coverage: 'true'
+        testInstrumentationRunnerArguments useTestStorageService: 'true'
+        testInstrumentationRunnerArguments coverageFilePath: '/data/local/tmp/'
     }// end of defaultConfig
 
     buildTypes {
@@ -66,6 +69,7 @@ android {
         }
     }
 
+    useLibrary 'android.test.runner'
 
 //    productFlavors {
 //        // The actual application flavor
@@ -89,7 +93,7 @@ android {
     }
 
     testOptions {
-        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        execution 'ANDROIDX_TEST_ORCHESTRATOR'
 //        execution 'ANDROID_TEST_ORCHESTRATOR'
         //animationsDisabled true
 
