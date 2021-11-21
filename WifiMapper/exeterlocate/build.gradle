@@ -54,8 +54,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunnerArguments clearPackageData: 'true'
-        testInstrumentationRunnerArguments coverage: 'true'
-        testInstrumentationRunnerArguments useTestStorageService: 'true'
+        //testInstrumentationRunnerArguments coverage: 'true'
+        //testInstrumentationRunnerArguments useTestStorageService: 'true'
         //testInstrumentationRunnerArguments coverageFilePath: '/data/local/tmp/'
     }// end of defaultConfig
 
