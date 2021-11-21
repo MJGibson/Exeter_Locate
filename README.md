@@ -1,3 +1,6 @@
+[![Build Status](https://api.travis-ci.com/MJGibson/Exeter_Locate.svg?token=mzMvhbbqQddH8AcaAx8d&branch=main)](https://app.travis-ci.com//MJGibson/Exeter_Locate)
+
+
 <img src="WifiMapper/exeterlocate/src/main/exeter_locate_icon-playstore.png" width="200" alt="Exeter Locate logo"/>
 
 # Exeter Locate Application/Server
