@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import androidx.test.core.app.ActivityScenario;
@@ -17,15 +19,20 @@ import androidx.test.espresso.action.Swipe;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
+import com.riba2reality.exeterlocate.messages.GpsMessageActivity;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,6 +45,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.common.truth.Truth.assertThat;
+import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -54,10 +62,10 @@ public class MainActivityTests extends TestCase {
 
 
 
-//    @Rule
-//    public GrantPermissionRule mGrantPermissionRule =
-//            GrantPermissionRule.grant(
-//                    "android.permission.ACCESS_FINE_LOCATION");
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.ACCESS_FINE_LOCATION");
 
     //==============================================================================================
     private boolean grantPermission() {
@@ -154,6 +162,15 @@ public class MainActivityTests extends TestCase {
     @Test
     public void test_agree_button_exits() {
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.apply();
+
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
 
 
@@ -225,7 +242,18 @@ public class MainActivityTests extends TestCase {
     @Test
     public void test_disagree_button_exits() {
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.apply();
+
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
 
 
         //startActivity(getInstrumentation().getTargetContext(),new Intent(), null);
@@ -271,48 +299,84 @@ public class MainActivityTests extends TestCase {
 
 
 
-//    //==============================================================================================
-////    @Test
-////    @FlakyTest
-//    public void should_displayNoPermission_when_permissionAreDenied() {
-//
-//        //ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
-//
-//
-//
-//
-//        // click start-stop button
-//        onView(withId(R.id.circleIcon)).perform(click());
-//        try {
-//            sleep(400);
-//
-//            onView(withId(R.id.circleIcon)).check(matches(withText(R.string.start_button_stop_text)));
-//
-////        assertTrue("Failed to deny permissions",denyPermission());
-//
-//            assertTrue("Failed to Start Service",isLocationServiceRunning());
-//
-//        }
-//        catch ( InterruptedException ex){
-//
-//        }
-//
-//
-//        //onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
-//
-////        assertTrue("Failed to deny permissions",denyPermission());
-//
-//        //assertTrue("Failed to Start Service",isLocationServiceRunning());
-//
-////        onView(withText(R.string.PermissionDeniedToastText))
-////                .inRoot(withDecorView(not(mActivityRule.getActivity().getWindow().getDecorView())))
-////                .check(matches(isDisplayed()));
-//
-//
-//        //onView(withId(R.id.text)).check(matches(withText("Hello World!")));
-//    }// end of shouldUpdateTextAfterButtonClick
-//    //==============================================================================================
+    //==============================================================================================
+    @Test
+    @FlakyTest
+    public void should_displayNoPermission_when_permissionAreDenied() {
 
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", true);
+        SPeditor.apply();
+
+        GpsMessageActivity._test = true;
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+
+
+
+        //test_agree_button_exits();
+
+//        // find web view and swipe down until Accept is presented
+//        for(int i = 0; i < 50; ++i) {
+//            //onView(isAssignableFrom(WebView.class)).perform(swipeUp());
+//            onView(withId(R.id.scroll)).perform(swipeUp());
+//
+////            onView(withId(R.id.scroll))
+////                .perform(swipeFromTopToBottom());
+//        }
+//
+//
+//        onView(withText("Accept")).perform(click());
+
+//        onView(withId(R.id.textView_status)).check(matches(withText(R.string.start_button_stop_text)));
+
+        // click start-stop button
+        onView(withId(R.id.circleIcon)).perform(click());
+        try {
+            sleep(400);
+
+
+
+//        assertTrue("Failed to deny permissions",denyPermission());
+//            assertTrue("Failed to Grant permissions",grantPermission());
+//            sleep(400);
+
+            assertTrue("Failed to Start Service",isLocationServiceRunning());
+
+        }
+        catch ( InterruptedException ex){
+
+        }
+
+
+        //onView(withId(R.id.startStopButton)).check(matches(withText(R.string.start_button_stop_text)));
+
+//        assertTrue("Failed to deny permissions",denyPermission());
+
+        //assertTrue("Failed to Start Service",isLocationServiceRunning());
+
+//        onView(withText(R.string.PermissionDeniedToastText))
+//                .inRoot(withDecorView(not(mActivityRule.getActivity().getWindow().getDecorView())))
+//                .check(matches(isDisplayed()));
+
+
+        //onView(withId(R.id.text)).check(matches(withText("Hello World!")));
+    }// end of shouldUpdateTextAfterButtonClick
+    //==============================================================================================
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        GpsMessageActivity._test = true;
+        TrackerScanner._test = true; // disable network
+    }
 
 //    public void testStartServiceOnInit () {
 //        final AtomicBoolean serviceStarted = new AtomicBoolean(false);

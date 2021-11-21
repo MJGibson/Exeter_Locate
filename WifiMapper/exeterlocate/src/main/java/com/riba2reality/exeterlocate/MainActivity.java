@@ -513,11 +513,16 @@ public class MainActivity extends AppCompatActivity {
         boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted) {
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted && !GpsMessageActivity._test) {
 
             Log.d("mgdev", "MainActivity.checkGpsEnabled. GPS disabled");
 
-            startMessageActivityGPSOff();
+//            // note this isn't perfect
+//            if(TrackerScanner.runningOnEmulator()){
+//
+//            }else {
+                startMessageActivityGPSOff();
+//            }
 
         }// end of if gps not enabled
 
@@ -558,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth ???
         } else {
-            if (!mBluetoothAdapter.isEnabled() && _termsAccepted) {
+            if (!mBluetoothAdapter.isEnabled() && _termsAccepted && !GpsMessageActivity._test) {
                 // Bluetooth is not enable :)
                 startMessageActivityBluetoothOff();
             }
@@ -576,9 +581,15 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences.Editor SPeditor = SP.edit();
         boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
 
+
+
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (!wifi.isWifiEnabled() && _termsAccepted){
-            startMessageActivityWifiOff();
+        if (!wifi.isWifiEnabled() && _termsAccepted && !GpsMessageActivity._test){
+            if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1 && TrackerScanner.runningOnEmulator()){
+
+            }else {
+                startMessageActivityWifiOff();
+            }
         }
 
     }// end of checkWifiEnabled

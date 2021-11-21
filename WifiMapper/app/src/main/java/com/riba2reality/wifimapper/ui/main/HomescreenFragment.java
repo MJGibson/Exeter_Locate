@@ -179,11 +179,11 @@ public class HomescreenFragment extends Fragment {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             // Device doesn't support Bluetooth
+        }else {
+
+            // ble stuff
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         }
-
-        // ble stuff
-        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-
 
         return rootView;
     }

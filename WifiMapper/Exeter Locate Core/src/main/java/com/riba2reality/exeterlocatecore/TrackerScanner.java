@@ -115,6 +115,8 @@ public class TrackerScanner extends Service implements LocationListener {
     private int mag_lambda = 60;
     private int accel_lambda = 60;
 
+    public static boolean _test = false;
+
     //----------------------------------------------------------------------------------------------
     // result/dispatch queues
 
@@ -481,6 +483,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     //==============================================================================================
     @Override
+    @Deprecated
     public void onStatusChanged(String s, int i, Bundle bundle) {
 
     }
@@ -1003,7 +1006,7 @@ public class TrackerScanner extends Service implements LocationListener {
     // location functions
 
     //==============================================================================================
-    private boolean runningOnEmulator(){
+    public static boolean runningOnEmulator(){
 
         // Android SDK emulator
         boolean result = (Build.FINGERPRINT.startsWith("google/sdk_gphone_")
@@ -1050,7 +1053,8 @@ public class TrackerScanner extends Service implements LocationListener {
 //            String provider = locationManager.getBestProvider(criteria, true);
         String provider = LocationManager.NETWORK_PROVIDER;
 
-        if(runningOnEmulator){
+        if(runningOnEmulator || _test
+           ){
             provider = LocationManager.GPS_PROVIDER;
         }
 
@@ -1115,6 +1119,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
         }// end of onLocationChanged
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras){
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider){}
+
+        @Override
+        public void onProviderDisabled(String provider){}
+
     };// end of cellLocationListener
     //==============================================================================================
 
