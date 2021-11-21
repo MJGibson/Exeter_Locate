@@ -8,7 +8,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath 'com.android.tools.build:gradle:4.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
 
@@ -16,7 +16,6 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-
 
 //com.android.ddmlib.DdmPreferences.setTimeOut(30000)
 

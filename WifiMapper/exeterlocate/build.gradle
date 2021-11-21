@@ -53,10 +53,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //testInstrumentationRunnerArguments clearPackageData: 'true'
-        //testInstrumentationRunnerArguments coverage: 'true'
-        //testInstrumentationRunnerArguments useTestStorageService: 'true'
-        //testInstrumentationRunnerArguments coverageFilePath: '/data/local/tmp/'
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }// end of defaultConfig
 
     buildTypes {
@@ -69,7 +66,6 @@ android {
         }
     }
 
-    //useLibrary 'android.test.runner'
 
 //    productFlavors {
 //        // The actual application flavor
