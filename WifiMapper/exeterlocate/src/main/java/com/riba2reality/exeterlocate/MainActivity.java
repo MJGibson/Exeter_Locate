@@ -132,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
     private MainActivity selfRef = this;
 
 
+
+
     //##############################################################################################
 
     //==============================================================================================
@@ -238,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         active = true;
         super.onStart();
 
-        startAlarms();
+        startAlarms(this);
 
         checkTermsAcceptance();
 
@@ -490,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
 
         // if location service is not running, we assume don't know and are therefore outside
         // geoFence
-        if( isLocationServiceRunning() ){
+        if( isLocationServiceRunning(this) ){
 
             Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
             intent.setAction(
@@ -609,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void checkButtons(){
 
-        if( isLocationServiceRunning() ){
+        if( isLocationServiceRunning(this) ){
             //startStopButton.setText(R.string.start_button_stop_text);
             running = true;
 
@@ -700,17 +702,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
-    public void startAlarms(){
+    public static void startAlarms(Context context){
 
         Log.d("mgdev", "MainActivity.startAlarms");
 
         //we are using alarm manager for the notification
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         //this intent will be called when taping the notification
-        Intent notificationIntent = new Intent(this, AlarmReceiver.class);
+        Intent notificationIntent = new Intent(context, AlarmReceiver.class);
         //this pendingIntent will be called by the broadcast receiver
-        PendingIntent broadcast = PendingIntent.getBroadcast(this, 100,
+        PendingIntent broadcast = PendingIntent.getBroadcast(context, 100,
                 notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -720,10 +722,14 @@ public class MainActivity extends AppCompatActivity {
         cal.set(Calendar.HOUR_OF_DAY, 8); // cal.set NOT cal.add
         cal.set(Calendar.MINUTE,30);
         cal.set(Calendar.SECOND, 0);
+
+        // add a day to make it tomorrow
+        cal.add(Calendar.DAY_OF_MONTH, 0);
+
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 cal.getTimeInMillis(),
-                10000,
-                //AlarmManager.INTERVAL_DAY,
+                //10000,
+                AlarmManager.INTERVAL_DAY,
                 broadcast);//alarm manager will repeat the notification each day at the set time
 
 
@@ -1005,10 +1011,10 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return True if the TrackerScanner Service is running, othewise false
      */
-    private boolean isLocationServiceRunning() {
+    public static boolean isLocationServiceRunning(Context context) {
 
         ActivityManager activityManager =
-                (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (activityManager != null) {
 
             for (ActivityManager.RunningServiceInfo service :
@@ -1044,7 +1050,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("mgdev", "MainActivity.startLocationService");
 
-        if (!isLocationServiceRunning()) {
+        if (!isLocationServiceRunning(this)) {
 
             //Log.d("mgdev", "MainActivity.startLocationService.!isLocationServiceRunning()");
 
@@ -1171,7 +1177,7 @@ public class MainActivity extends AppCompatActivity {
     private void stopLocationService() {
 
 
-        if (isLocationServiceRunning()) {
+        if (isLocationServiceRunning(this)) {
 
 //            startStopButton.setText(R.string.start_button_initial_text);
 //            running = false;
@@ -1250,7 +1256,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
 
-                                if(isLocationServiceRunning()){
+                                if(isLocationServiceRunning(selfRef)){
                                     startDisplayIconAnimation();
                                 }
 

@@ -25,39 +25,44 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Log.d("mgdev", "AlarmReceiver.onReceive");
 
-        Intent notificationIntent = new Intent(context, NotificationActivity.class);//on tap this activity will open
+        if(!MainActivity.isLocationServiceRunning(context)) {
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(NotificationActivity.class);
-        stackBuilder.addNextIntent(notificationIntent);
+            Intent notificationIntent = new Intent(context, MainActivity.class);//on tap this activity will open
 
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);//getting the pendingIntent
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addNextIntent(notificationIntent);
 
-        Notification.Builder builder = new Notification.Builder(context);//building the notification
+            PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);//getting the pendingIntent
 
-        Notification notification = builder.setContentTitle("Demo App Notification")
-                .setContentText("New Notification From Demo App..")
-                .setTicker("New Message Alert!")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent).build();
+            Notification.Builder builder = new Notification.Builder(context);//building the notification
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(CHANNEL_ID);
-        }
+            Notification notification = builder.setContentTitle("Exeter Locate")
+                    .setContentText("Please remember to turn on Exeter Locate")
+                    //.setTicker("New Message Alert!")
+                    .setSmallIcon(R.mipmap.exeter_locate_icon)
+                    .setContentIntent(pendingIntent).build();
 
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setChannelId(CHANNEL_ID);
+            }
+
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //below creating notification channel, because of androids latest update, O is Oreo
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "NotificationDemo",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            notificationManager.createNotificationChannel(channel);
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(
+                        CHANNEL_ID,
+                        "NotificationExeterLocate",
+                        NotificationManager.IMPORTANCE_DEFAULT
+                );
+                notificationManager.createNotificationChannel(channel);
+            }
 
-        notificationManager.notify(0, notification);
-    }
+            notificationManager.notify(0, notification);
+        }// end of if not isLocationServiceRunning
+
+
+    }// end of onReceive
     //==============================================================================================
 
 

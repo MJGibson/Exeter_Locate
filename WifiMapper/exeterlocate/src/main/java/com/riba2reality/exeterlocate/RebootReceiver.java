@@ -14,6 +14,8 @@ public class RebootReceiver extends BroadcastReceiver {
 
             Log.d("mgdev", "RebootReceiver.onReceive");
 
+            MainActivity.startAlarms(context);
+
 //            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 //
 //            Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
