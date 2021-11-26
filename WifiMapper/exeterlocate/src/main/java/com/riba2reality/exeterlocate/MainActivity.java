@@ -4,6 +4,8 @@ package com.riba2reality.exeterlocate;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
@@ -52,6 +54,7 @@ import com.riba2reality.exeterlocate.messages.WifiMessageActivity;
 import com.riba2reality.exeterlocatecore.DataStores.Constants;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
+import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -234,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         active = true;
         super.onStart();
+
+        startAlarms();
 
         checkTermsAcceptance();
 
@@ -692,6 +697,38 @@ public class MainActivity extends AppCompatActivity {
     //##############################################################################################
     //#############################     Start others things        #################################
     //##############################################################################################
+
+
+    //==============================================================================================
+    public void startAlarms(){
+
+        Log.d("mgdev", "MainActivity.startAlarms");
+
+        //we are using alarm manager for the notification
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        //this intent will be called when taping the notification
+        Intent notificationIntent = new Intent(this, AlarmReceiver.class);
+        //this pendingIntent will be called by the broadcast receiver
+        PendingIntent broadcast = PendingIntent.getBroadcast(this, 100,
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar cal = Calendar.getInstance();//getting calender instance
+
+        cal.setTimeInMillis(System.currentTimeMillis());//setting the time from device
+        cal.set(Calendar.HOUR_OF_DAY, 8); // cal.set NOT cal.add
+        cal.set(Calendar.MINUTE,30);
+        cal.set(Calendar.SECOND, 0);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                cal.getTimeInMillis(),
+                10000,
+                //AlarmManager.INTERVAL_DAY,
+                broadcast);//alarm manager will repeat the notification each day at the set time
+
+
+    }// end of startAlarms
+    //==============================================================================================
 
 
     //==============================================================================================
