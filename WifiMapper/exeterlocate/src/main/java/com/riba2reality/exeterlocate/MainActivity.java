@@ -724,7 +724,9 @@ public class MainActivity extends AppCompatActivity {
         cal.set(Calendar.SECOND, 0);
 
         // add a day to make it tomorrow
-        cal.add(Calendar.DAY_OF_MONTH, 0);
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+
+        //Log.d("mgdev", "Alarms: "+cal.toString());
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 cal.getTimeInMillis(),

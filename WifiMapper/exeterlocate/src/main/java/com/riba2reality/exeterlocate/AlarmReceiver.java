@@ -12,6 +12,8 @@ import android.util.Log;
 
 import androidx.core.app.TaskStackBuilder;
 
+import java.util.Calendar;
+
 public class AlarmReceiver extends BroadcastReceiver {
 
 
@@ -25,15 +27,29 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Log.d("mgdev", "AlarmReceiver.onReceive");
 
-        if(!MainActivity.isLocationServiceRunning(context)) {
 
-            Intent notificationIntent = new Intent(context, MainActivity.class);//on tap this activity will open
+        Calendar cal = Calendar.getInstance();//getting calender instance
+        cal.setTimeInMillis(System.currentTimeMillis());//setting the time from device
+
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+
+        boolean weekend = false;
+        if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SATURDAY){
+            weekend = true;
+        }
+
+
+        if(!MainActivity.isLocationServiceRunning(context) && !weekend) {
+
+            //on tap this activity will open
+            Intent notificationIntent = new Intent(context, MainActivity.class);
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
             stackBuilder.addParentStack(MainActivity.class);
             stackBuilder.addNextIntent(notificationIntent);
 
-            PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);//getting the pendingIntent
+            PendingIntent pendingIntent = stackBuilder.getPendingIntent(0,
+                    PendingIntent.FLAG_UPDATE_CURRENT);//getting the pendingIntent
 
             Notification.Builder builder = new Notification.Builder(context);//building the notification
 
