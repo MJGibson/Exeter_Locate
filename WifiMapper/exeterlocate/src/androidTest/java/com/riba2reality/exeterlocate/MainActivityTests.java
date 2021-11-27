@@ -160,7 +160,7 @@ public class MainActivityTests extends TestCase {
     //==============================================================================================
     @FlakyTest
     @Test
-    public void test_agree_button_exits() {
+    public void test_agree() {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
                 InstrumentationRegistry.getInstrumentation().getTargetContext()
@@ -217,7 +217,19 @@ public class MainActivityTests extends TestCase {
                 //.inRoot(isDialog()) // <---
                 .check(matches(isDisplayed()));
 
-//        onView(withText("Accept")).perform(click());
+        //-----------------------------------------------------
+        // click agree and check it has the desired result
+
+
+        onView(withText("Accept")).perform(click());
+
+
+        boolean termsAccepted = SP.getBoolean("termsAcceptance", false);
+
+        assertTrue("Terms should be accepted after Accept click", termsAccepted);
+
+
+        //-----------------------------------------------------
 
 //        // Search for correct button in the dialog.
 //        UiObject button = uiDevice.findObject(new UiSelector().text("ACCEPT"));
@@ -240,7 +252,7 @@ public class MainActivityTests extends TestCase {
     //==============================================================================================
     @FlakyTest
     @Test
-    public void test_disagree_button_exits() {
+    public void test_disagree() {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
                 InstrumentationRegistry.getInstrumentation().getTargetContext()
@@ -403,29 +415,6 @@ public class MainActivityTests extends TestCase {
 //                .getTargetContext(), MainActivity.class);
 //        mLaunchIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(getInstrumentation().getTargetContext(),mLaunchIntent,null );
-//    }
-
-
-//    @After
-//    public void tearDown() {
-//        Instrumentation var10000 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10000, "InstrumentationRegistry.getInstrumentation()");
-//        UiAutomation var1 = var10000.getUiAutomation();
-//        StringBuilder var10001 = (new StringBuilder()).append("pm revoke ");
-//        Instrumentation var10002 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10002, "InstrumentationRegistry.getInstrumentation()");
-//        Context var2 = var10002.getTargetContext();
-//        Intrinsics.checkNotNullExpressionValue(var2, "InstrumentationRegistry.…mentation().targetContext");
-//        var1.executeShellCommand(var10001.append(var2.getPackageName()).append(" android.permission.ACCESS_COARSE_LOCATION").toString());
-//        var10000 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10000, "InstrumentationRegistry.getInstrumentation()");
-//        var1 = var10000.getUiAutomation();
-//        var10001 = (new StringBuilder()).append("pm revoke ");
-//        var10002 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10002, "InstrumentationRegistry.getInstrumentation()");
-//        var2 = var10002.getTargetContext();
-//        Intrinsics.checkNotNullExpressionValue(var2, "InstrumentationRegistry.…mentation().targetContext");
-//        var1.executeShellCommand(var10001.append(var2.getPackageName()).append(" android.permission.ACCESS_FINE_LOCATION").toString());
 //    }
 
 
