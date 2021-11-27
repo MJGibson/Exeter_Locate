@@ -124,11 +124,8 @@ public class BluetoothMessageActivity extends AppCompatActivity {
 //        }
 
 
-        title.setText("For this app to work, you must have Bluetooth on");
-        message.setText("This App uses Bluetooth to locate nearby Bluetooth devices" +
-                ". If you have Bluetooth turned off, this app will not work.\n\n This App uses " +
-                "'Bluetooth low energy' - a battery saving technology.\n\n" +
-                "Please go to setting and turn on Bluetooth.");
+        title.setText(R.string.MustHaveBluetooth);
+        message.setText(R.string.MustHaveBluetooth_Message);
         messageIcon.setImageResource(R.drawable.bluetoot_disconnected_foreground);
         ok_button.setText("Allow Bluetooth");
         ok_button.setOnClickListener(allowBluetoothButtonPressed);

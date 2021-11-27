@@ -43,6 +43,8 @@ public class InternetMessageActivity extends AppCompatActivity {
 
     private boolean active;
 
+    public static boolean _test = false;
+
     //----------------------------------------------------------------------------------------------
 
     //==============================================================================================
@@ -82,8 +84,13 @@ public class InternetMessageActivity extends AppCompatActivity {
 
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+        if(
+                (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
+                .getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                        .getState() == NetworkInfo.State.CONNECTED)
+                        && !_test
+        ) {
             //we are connected to a network
             connected = true;
             finish();
@@ -132,10 +139,8 @@ public class InternetMessageActivity extends AppCompatActivity {
 
         // set up text
 
-        title.setText("For this app to work, you must have an Internet connection");
-        message.setText("This App uses the internet to communicate results to server" +
-                ". If you have no internet connection, this app will not work.\n\n" +
-                "Please go to setting and turn on Wi-Fi or mobile data.");
+        title.setText(R.string.MustHaveInternet);
+        message.setText(R.string.MustHaveInternet_Message);
         messageIcon.setImageResource(R.drawable.internet_disconnected_foreground);
         ok_button.setText("Allow Internet");
         ok_button.setOnClickListener(allowInternetButtonPressed);
