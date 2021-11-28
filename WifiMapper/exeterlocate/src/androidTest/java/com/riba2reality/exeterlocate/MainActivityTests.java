@@ -3,12 +3,15 @@ package com.riba2reality.exeterlocate;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.CoordinatesProvider;
@@ -60,6 +63,7 @@ public class MainActivityTests extends TestCase {
 
 
 
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
 
     @Rule
@@ -141,10 +145,8 @@ public class MainActivityTests extends TestCase {
     }// end of isLocationServiceRunning
     //==============================================================================================
 
-    //##############################################################################################
-    //###################################      TESTS       #########################################
-    //##############################################################################################
 
+    //==============================================================================================
     private static ViewAction swipeFromTopToBottom() {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.BOTTOM_CENTER,
                 new CoordinatesProvider() {
@@ -156,6 +158,47 @@ public class MainActivityTests extends TestCase {
                     }
                 }, Press.FINGER);
     }
+    //==============================================================================================
+
+    //##############################################################################################
+    //###################################      TESTS       #########################################
+    //##############################################################################################
+
+
+    //==============================================================================================
+    @Test
+    public void test_bleReceiver(){
+
+
+        // DONT THINK THIS WORKS!!!
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.apply();
+
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+        //MainActivity mainActivity = new MainActivity();
+
+
+        //LocalBroadcastManager.getInstance(context).registerReceiver(mainActivity.receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+
+        Intent i = new Intent(BluetoothAdapter.ACTION_STATE_CHANGED);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+
+
+
+
+
+    }// end of test_bleReceiver
+    //==============================================================================================
+
 
     //==============================================================================================
     @FlakyTest
