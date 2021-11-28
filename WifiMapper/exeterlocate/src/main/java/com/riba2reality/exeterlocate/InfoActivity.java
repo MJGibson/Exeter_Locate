@@ -97,6 +97,7 @@ public class InfoActivity extends AppCompatActivity {
         infoWebView.setWebViewClient(new WebViewClient());
         // load from asset file, but could check an actualy website and default to this
         infoWebView.loadUrl("file:///android_asset/ExeterLocateInformationpage.html");
+        infoWebView.getSettings().setJavaScriptEnabled(true);
 
 //        String infoPageHtml = readTextFromAsset("ExeterLocateInformationpage.html");
 //
