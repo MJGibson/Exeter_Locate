@@ -134,7 +134,7 @@ dependencies {
 //
 //    testImplementation 'org.robolectric:robolectric:4.4'
     // Robolectric
-    testImplementation "org.robolectric:robolectric:3.3.2"
+    testImplementation "org.robolectric:robolectric:4.7.2"
 //    testImplementation 'androidx.test:core:1.2.0'
 //
 //    def mockito_version = '2.28.2'
@@ -157,6 +157,7 @@ dependencies {
 
     // Core library
     androidTestImplementation 'androidx.test:core:1.4.0'
+
 
     // AndroidJUnitRunner and JUnit Rules
     androidTestImplementation 'androidx.test:runner:1.4.0'
