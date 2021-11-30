@@ -6,7 +6,6 @@ dist: trusty
 android:
   components:
     - tools
-    - tools
     - build-tools-30.0.2
     - android-30
     - android-24
@@ -22,10 +21,20 @@ licenses:
 before_install:
 #  - chmod +x gradlew
   - yes | sdkmanager "platforms;android-30"
+  - yes | sdkmanager tools
+  - yes | sdkmanager --update
+  #- yes | sdkmanager --install "system-images;android-29;default;x86"
+  - yes | sdkmanager --install "system-images;android-25;google_apis;armeabi-v7a"
+  #- yes | sdkmanager --install "system-images;android-31;google_apis;arm64-v8a"
+  #- echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-29;default;x86" --tag "default" --abi "x86"
+  - echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-25;google_apis;armeabi-v7a" --tag "google-apis" --abi "armeabi-v7a"
+  #- echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-31;google_apis;arm64-v8a" --tag "google_apis" --abi "arm64-v8a"
+  #PANIC: Avd's CPU Architecture '' is not supported by the QEMU2 emulator on x86_64 host.
+  - $ANDROID_HOME/emulator/emulator -avd test -no-skin -no-audio -no-window &
     
 before_script:
-  - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
-  - emulator -avd test -no-audio -no-window &
+  #- echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
+  #- emulator -avd test -no-audio -no-window &
   #- adb shell settings put global window_animation_scale 0 &
   #- adb shell settings put global transition_animation_scale 0 &
   #- adb shell settings put global animator_duration_scale 0 &
