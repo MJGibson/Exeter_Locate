@@ -6,13 +6,14 @@ dist: trusty
 android:
   components:
     - tools
+    - tools
     - build-tools-30.0.2
     - android-30
-    - android-26
+    - android-24
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-x86-google_apis-26
+    - sys-img-armeabi-v7a-android-24
 licenses:
   - 'android-sdk-preview-license-.+'
   - 'android-sdk-license-.+'
@@ -23,7 +24,7 @@ before_install:
   - yes | sdkmanager "platforms;android-30"
     
 before_script:
-  - echo no | android create avd --force -n test -t android-26 --abi x86
+  - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   #- adb shell settings put global window_animation_scale 0 &
   #- adb shell settings put global transition_animation_scale 0 &
