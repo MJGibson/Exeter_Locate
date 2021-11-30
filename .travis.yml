@@ -3,6 +3,10 @@ sudo: required
 
 language: android
 dist: trusty
+
+env:
+  - ADB_INSTALL_TIMEOUT=30
+
 android:
   components:
     - tools
