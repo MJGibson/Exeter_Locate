@@ -55,14 +55,14 @@ public class AlarmReceiverTests extends TestCase {
 
     //==============================================================================================
     @Test
-    public void CheckAlarms(){
+    public void Check_startAlarms(){
 
 
 //        ActivityScenario<InternetMessageActivity> scenario =
 //                ActivityScenario.launch(InternetMessageActivity.class);
 
 
-
+        // checks alarm set...
         Assert.assertNull(shadowAlarmManager.getNextScheduledAlarm());
         //new ResetAlarm(RuntimeEnvironment.getApplication().getApplicationContext());
         MainActivity.startAlarms(RuntimeEnvironment.getApplication().getApplicationContext());
@@ -70,11 +70,27 @@ public class AlarmReceiverTests extends TestCase {
         Assert.assertNotNull(repeatingAlarm);
 
 
-
-
-    }// end of checkTitle
+    }// end of Check_startAlarms
     //==============================================================================================
 
+    //==============================================================================================
+    @Test
+    public void Check_Alarms_triggered(){
 
+
+//        ActivityScenario<InternetMessageActivity> scenario =
+//                ActivityScenario.launch(InternetMessageActivity.class);
+
+
+        // set alarms
+        MainActivity.startAlarms(RuntimeEnvironment.getApplication().getApplicationContext());
+        ShadowAlarmManager.ScheduledAlarm repeatingAlarm = shadowAlarmManager.getNextScheduledAlarm();
+        Assert.assertNotNull(repeatingAlarm);
+
+
+
+
+    }// end of Check_startAlarms
+    //==============================================================================================
 
 }// end of AlarmReceiverTests
