@@ -4,9 +4,6 @@ sudo: required
 language: android
 dist: trusty
 
-env:
-  - ADB_INSTALL_TIMEOUT=30
-
 android:
   components:
     - tools
@@ -66,6 +63,7 @@ script:
 
 env: # note this is MJGibson version
   - CODECOV_TOKEN=eae3e3fd-ce8e-47e2-a3c0-928c84551a60
+  - ADB_INSTALL_TIMEOUT=30
 
 
 after_success:
