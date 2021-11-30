@@ -27,7 +27,7 @@ before_install:
   - yes | sdkmanager --install "system-images;android-25;google_apis;armeabi-v7a"
   #- yes | sdkmanager --install "system-images;android-31;google_apis;arm64-v8a"
   #- echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-29;default;x86" --tag "default" --abi "x86"
-  - echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-25;google_apis;armeabi-v7a" --tag "google-apis" --abi "armeabi-v7a"
+  - echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-25;google_apis;armeabi-v7a" --tag "google_apis" --abi "armeabi-v7a"
   #- echo "no" | avdmanager --verbose create avd --force --name "test" --package "system-images;android-31;google_apis;arm64-v8a" --tag "google_apis" --abi "arm64-v8a"
   #PANIC: Avd's CPU Architecture '' is not supported by the QEMU2 emulator on x86_64 host.
   - $ANDROID_HOME/emulator/emulator -avd test -no-skin -no-audio -no-window &
