@@ -867,8 +867,21 @@ public class MainActivity extends AppCompatActivity {
      * Starts the InfoActivity
      */
     public void startInfoActivty(){
-        Intent intent = new Intent(this, InfoActivity.class);
-        startActivity(intent);
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean InfoActivityActive = SP.getBoolean("InfoActivityActive", false);
+        if(!InfoActivityActive){
+            InfoActivityActive = true;
+
+            Intent intent = new Intent(this, InfoActivity.class);
+            startActivity(intent);
+
+            SPeditor.putBoolean("InfoActivityActive", InfoActivityActive);
+            SPeditor.apply();
+        }
+
     }//end of
     //==============================================================================================
 
