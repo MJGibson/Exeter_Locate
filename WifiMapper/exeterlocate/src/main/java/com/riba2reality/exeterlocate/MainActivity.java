@@ -105,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView circleAnimation1;
     private ImageView circleAnimation2;
     private ImageView circleIcon;
-    private TextView status_textView;
+    private TextView status_textView_top;
+    private TextView status_textView_bottom;
     private Handler iconAniHandler;
 
 
@@ -175,7 +176,9 @@ public class MainActivity extends AppCompatActivity {
         this.circleIcon.setOnClickListener(startStopButtonPressed);
         this.circleAnimation1 = findViewById(R.id.circleAnimation1);
         this.circleAnimation2 = findViewById(R.id.circleAnimation2);
-        this.status_textView =  findViewById(R.id.textView_status);
+
+        this.status_textView_top =  findViewById(R.id.textView_status_top);
+        this.status_textView_bottom =  findViewById(R.id.textView_status_bottom);
 
         // set up title bar
         ActionBar actionBar = getSupportActionBar();
@@ -627,18 +630,19 @@ public class MainActivity extends AppCompatActivity {
             circleIcon.setImageResource(R.mipmap.tick_round);
 
             if(_insideGeoFence) {
-                status_textView.setText(
+                status_textView_top.setText(
                         R.string.AppActive);
             }else{
                 if(!_geoFenceChecked){
-                    status_textView.setText(
+                    status_textView_top.setText(
                             R.string.AppActive_NotCheckedGeoFence);
                 }else {
-                    status_textView.setText(
+                    status_textView_top.setText(
                             R.string.AppActive_OutsideGeoFence);
                 }
             }
 
+            status_textView_bottom.setText(R.string.To_pause_record);
 
             //startDisplayIconAnimation();
 
@@ -667,7 +671,8 @@ public class MainActivity extends AppCompatActivity {
             circleIcon.setImageResource(R.mipmap.cross_round);
             //circleIcon.image
 
-            status_textView.setText(R.string.AppNotactive);
+            status_textView_top.setText(R.string.AppNotactive);
+            status_textView_bottom.setText(R.string.To_continue_record);
 
         }// end of if/else isLocationServiceRunning
 
@@ -1109,7 +1114,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
 
         String postType = "POST";
 
