@@ -58,7 +58,10 @@ import com.riba2reality.exeterlocatecore.DataStores.WifiScanResult;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,7 +99,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.0";
+    public static final String libraryVersion = "1.6.1";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -1401,6 +1404,47 @@ public class TrackerScanner extends Service implements LocationListener {
     //##############################################################################################
     // wifi functions
 
+
+    //==============================================================================================
+    /**
+     * Hashes a string
+     *
+     * @param input input string
+     * @return the hashed string
+     */
+    public static String encryptThisString(String input)
+    {
+        try {
+            // getInstance() method is called with algorithm SHA-224
+            MessageDigest md = MessageDigest.getInstance("SHA-224");
+
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            byte[] messageDigest = md.digest(input.getBytes());
+
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+
+            // Add preceding 0s to make it 32 bit
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+
+            // return the HashText
+            return hashtext;
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    //==============================================================================================
+
     //==============================================================================================
     final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
@@ -1432,7 +1476,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
                 WifiResult wifiResult = new WifiResult();
-                wifiResult.macAddress = scanResult.BSSID;
+
+                wifiResult.macAddress = encryptThisString(scanResult.BSSID);
                 wifiResult.signalStrength = scanResult.level;
 
 
@@ -1836,7 +1881,7 @@ public class TrackerScanner extends Service implements LocationListener {
                     Log.d("mgdev", "BluetoothTabFragment.onScanResult");
 
                     BluetoothLEResult bleResult = new BluetoothLEResult();
-                    bleResult.macAddress = result.getDevice().getAddress();
+                    bleResult.macAddress = encryptThisString(result.getDevice().getAddress());
                     //bleResult.signalStrength = result.getRssi();
 
 //            String message;
