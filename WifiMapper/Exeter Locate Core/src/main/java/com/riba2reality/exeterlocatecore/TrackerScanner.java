@@ -3005,6 +3005,8 @@ public class TrackerScanner extends Service implements LocationListener {
                 {
                     case Constants.ACTION_START_LOCATION_SERVICE:
 
+                        Log.d("mgdev", "TrackerScanner.onStartCommand().ACTION_START_LOCATION_SERVICE");
+
                         _mode = intent.getBooleanExtra("MODE", false);
 
                         _serverAddress = intent.getStringExtra("ServerAddress");
