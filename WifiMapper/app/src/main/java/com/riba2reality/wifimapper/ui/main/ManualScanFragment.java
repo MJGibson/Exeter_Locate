@@ -415,14 +415,14 @@ public class ManualScanFragment extends Fragment {
             int locationQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_LOCATION_QUEUE_COUNT,-1);
             int wifiQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT,-1);
             int magQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT,-1);
-            int accelQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT,-1);
+//            int accelQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT,-1);
             int bleQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT,-1);
 
             String buttonMessage = buttonStandardText
                     + " L["+locationQueueSize+ "]"
                     + " W["+wifiQueueSize+ "]"
                     + " M["+magQueueSize+ "]"
-                    + " A["+accelQueueSize+ "]"
+//                    + " A["+accelQueueSize+ "]"
                     + " b["+bleQueueSize+ "]"
                     + " Time remaining["+remainingDuration+ "]";
 
