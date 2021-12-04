@@ -58,10 +58,12 @@ import com.riba2reality.exeterlocatecore.DataStores.WifiScanResult;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.0";
+    public static final String libraryVersion = "1.6.1";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -113,7 +115,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private int ble_lambda = 60;
     private int ble_duration = 10;
     private int mag_lambda = 60;
-    private int accel_lambda = 60;
+//    private int accel_lambda = 60;
 
     public static boolean _test = false;
 
@@ -156,7 +158,7 @@ public class TrackerScanner extends Service implements LocationListener {
     static final public String TRACKERSCANNER_LOCATION_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_LOCATION_QUEUE_COUNT";
     static final public String TRACKERSCANNER_WIFI_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_WIFI_QUEUE_COUNT";
     static final public String TRACKERSCANNER_MAG_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MAG_QUEUE_COUNT";
-    static final public String TRACKERSCANNER_ACCEL_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT";
+//    static final public String TRACKERSCANNER_ACCEL_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_ACCEL_QUEUE_COUNT";
     static final public String TRACKERSCANNER_BLE_QUEUE_COUNT = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT";
 
     static final public String TRACKERSCANNER_MANUAL_SCAN_REMAINING = "com.riba2reality.exeterlocatecore.TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING";
@@ -175,7 +177,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private LocationResult lastLocation = new LocationResult();
     private WifiScanResult lastWifiScan;
     private SensorResult lastMagScan;
-    private SensorResult lastAccelScan;
+//    private SensorResult lastAccelScan;
 
 
 
@@ -190,7 +192,7 @@ public class TrackerScanner extends Service implements LocationListener {
     private int manualScanCount_loction = 0;
     private int manualScanCount_wifi = 0;
     private int manualScanCount_mag = 0;
-    private int manualScanCount_accel = 0;
+//    private int manualScanCount_accel = 0;
     private int manualScanCount_ble = 0;
 
     NotificationManager _notificationManager;
@@ -241,7 +243,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     private boolean magAvailable = false;
-    private boolean accelAvailable = false;
+//    private boolean accelAvailable = false;
 
 
     //----------------------------------------------------------------------------------------------
@@ -304,11 +306,11 @@ public class TrackerScanner extends Service implements LocationListener {
     }
     //==============================================================================================
 
-    //==============================================================================================
-    public void setaccel_lambda(int lambda){
-        this.accel_lambda = lambda;
-    }
-    //==============================================================================================
+//    //==============================================================================================
+//    public void setaccel_lambda(int lambda){
+//        this.accel_lambda = lambda;
+//    }
+//    //==============================================================================================
 
     //==============================================================================================
     public void setgPS_duration(int duration){
@@ -365,15 +367,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
         }
 
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
-        {
-            // Success! There's a magnetometer.
-            accelAvailable = true;
-        } else {
-            // Failure! No magnetometer.
-            accelAvailable = false;
-
-        }
+//        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+//        {
+//            // Success! There's a magnetometer.
+//            accelAvailable = true;
+//        } else {
+//            // Failure! No magnetometer.
+//            accelAvailable = false;
+//
+//        }
 
         //---------------------------------
         //initiate the bluetooth
@@ -473,7 +475,7 @@ public class TrackerScanner extends Service implements LocationListener {
         intent.putExtra(TRACKERSCANNER_LOCATION_QUEUE_COUNT, this.manualScanCount_loction);
         intent.putExtra(TRACKERSCANNER_WIFI_QUEUE_COUNT, this.manualScanCount_wifi);
         intent.putExtra(TRACKERSCANNER_MAG_QUEUE_COUNT, this.manualScanCount_mag);
-        intent.putExtra(TRACKERSCANNER_ACCEL_QUEUE_COUNT, this.manualScanCount_accel);
+//        intent.putExtra(TRACKERSCANNER_ACCEL_QUEUE_COUNT, this.manualScanCount_accel);
         intent.putExtra(TRACKERSCANNER_BLE_QUEUE_COUNT, this.manualScanCount_ble);
 
 
@@ -765,30 +767,30 @@ public class TrackerScanner extends Service implements LocationListener {
     };// end of runnable periodicUpdate_mag
     //==============================================================================================
 
-    //==============================================================================================
-    private final Runnable periodicUpdate_accel = new Runnable() {
-        @Override
-        public void run() {
-            if (running) {
-                int accelInterval = getResources().getInteger(R.integer.defaultVal_accel);
-                int interval = accelInterval;
-                if(_mode){
-                    interval = TrackerScanner.getPoisson(accel_lambda);
-                }else {
-                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    interval = SP.getInt("interval_accel", accelInterval);
-                }
-                handler.postDelayed(periodicUpdate_accel, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
-            } else {
-                return;
-            }
-
-            ScanAccel();
-
-
-        }
-    };
-    //==============================================================================================
+//    //==============================================================================================
+//    private final Runnable periodicUpdate_accel = new Runnable() {
+//        @Override
+//        public void run() {
+//            if (running) {
+//                int accelInterval = getResources().getInteger(R.integer.defaultVal_accel);
+//                int interval = accelInterval;
+//                if(_mode){
+//                    interval = TrackerScanner.getPoisson(accel_lambda);
+//                }else {
+//                    SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//                    interval = SP.getInt("interval_accel", accelInterval);
+//                }
+//                handler.postDelayed(periodicUpdate_accel, interval * 1000 - SystemClock.elapsedRealtime() % 1000);
+//            } else {
+//                return;
+//            }
+//
+//            ScanAccel();
+//
+//
+//        }
+//    };
+//    //==============================================================================================
 
     //##############################################################################################
     // recievers
@@ -933,43 +935,43 @@ public class TrackerScanner extends Service implements LocationListener {
             thisCombinedScanResult.magSensorResult = lastMagScan;
         }
 
-        if(lastAccelScan == null){
-            return; // bail
-        }
-
-        if(!accelAvailable){
-            thisCombinedScanResult.accelSensorResult = new SensorResult();
-        }
-        else{
-            thisCombinedScanResult.accelSensorResult = lastAccelScan;
-        }
-
-        if(magAvailable && accelAvailable) {
-
-            float gravity[] = {thisCombinedScanResult.accelSensorResult.X,
-                    thisCombinedScanResult.accelSensorResult.Y,
-                    thisCombinedScanResult.accelSensorResult.Z};
-
-            float geomagnetic[] = {thisCombinedScanResult.magSensorResult.X,
-                    thisCombinedScanResult.magSensorResult.Y,
-                    thisCombinedScanResult.magSensorResult.Z};
-
-            float identifyMatrix_R[] = new float[9];
-            float rotationMatrix_I[] = new float[9];
-
-
-
-            boolean success = sensorManager.getRotationMatrix(identifyMatrix_R, rotationMatrix_I,
-                    gravity, geomagnetic
-            );
-
-            Log.d("getRotationMatrix", "identifyMatrix_R: " + Arrays.toString(identifyMatrix_R));
-            Log.d("getRotationMatrix", "rotationMatrix_I: " + Arrays.toString(rotationMatrix_I));
-
-            thisCombinedScanResult.matrix_R = identifyMatrix_R;
-            thisCombinedScanResult.matrix_I = rotationMatrix_I;
-
-        }
+//        if(lastAccelScan == null){
+//            return; // bail
+//        }
+//
+//        if(!accelAvailable){
+//            thisCombinedScanResult.accelSensorResult = new SensorResult();
+//        }
+//        else{
+//            thisCombinedScanResult.accelSensorResult = lastAccelScan;
+//        }
+//
+//        if(magAvailable && accelAvailable) {
+//
+//            float gravity[] = {thisCombinedScanResult.accelSensorResult.X,
+//                    thisCombinedScanResult.accelSensorResult.Y,
+//                    thisCombinedScanResult.accelSensorResult.Z};
+//
+//            float geomagnetic[] = {thisCombinedScanResult.magSensorResult.X,
+//                    thisCombinedScanResult.magSensorResult.Y,
+//                    thisCombinedScanResult.magSensorResult.Z};
+//
+//            float identifyMatrix_R[] = new float[9];
+//            float rotationMatrix_I[] = new float[9];
+//
+//
+//
+//            boolean success = sensorManager.getRotationMatrix(identifyMatrix_R, rotationMatrix_I,
+//                    gravity, geomagnetic
+//            );
+//
+//            Log.d("getRotationMatrix", "identifyMatrix_R: " + Arrays.toString(identifyMatrix_R));
+//            Log.d("getRotationMatrix", "rotationMatrix_I: " + Arrays.toString(rotationMatrix_I));
+//
+//            thisCombinedScanResult.matrix_R = identifyMatrix_R;
+//            thisCombinedScanResult.matrix_I = rotationMatrix_I;
+//
+//        }
 
         //--------------
 
@@ -1401,6 +1403,47 @@ public class TrackerScanner extends Service implements LocationListener {
     //##############################################################################################
     // wifi functions
 
+
+    //==============================================================================================
+    /**
+     * Hashes a string
+     *
+     * @param input input string
+     * @return the hashed string
+     */
+    public static String encryptThisString(String input)
+    {
+        try {
+            // getInstance() method is called with algorithm SHA-224
+            MessageDigest md = MessageDigest.getInstance("SHA-224");
+
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            byte[] messageDigest = md.digest(input.getBytes());
+
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+
+            // Add preceding 0s to make it 32 bit
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+
+            // return the HashText
+            return hashtext;
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    //==============================================================================================
+
     //==============================================================================================
     final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
@@ -1432,7 +1475,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
                 WifiResult wifiResult = new WifiResult();
-                wifiResult.macAddress = scanResult.BSSID;
+
+                wifiResult.macAddress = encryptThisString(scanResult.BSSID);
                 wifiResult.signalStrength = scanResult.level;
 
 
@@ -1602,108 +1646,108 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
-    //##############################################################################################
-    // accelerometer sensor function
-
-
-    //==============================================================================================
-    private SensorEventListener accelSensorListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-
-            // only perform a single scan
-            sensorManager.unregisterListener(accelSensorListener);
-
-            Log.d("Trace", "TrackerScanner.accelSensorListener.event()");
-
-//            String currentTime =
-//                    new SimpleDateFormat(
-//                            "yyyy-MM-dd:HH:mm:ss",
-//                            Locale.getDefault()).format(new Date());
-
-            SensorResult result = new SensorResult();
-
-            result.dateTime = Calendar.getInstance().getTimeInMillis();
-
-//            result.dateTime_old = currentTime;
-
-            result.X = event.values[0];
-            result.Y = event.values[1];
-            result.Z = event.values[2];
-
-            result.message = manualScanMessage;
-
-
-            long timeDelay = Long.MAX_VALUE;
-            if(LastTimeStamp != Long.MAX_VALUE){
-
-                timeDelay = event.timestamp - LastTimeStamp;
-                //timeDelay = LastTimeStamp;
-            }
-
-
-
-
-            //-------------------------------------------------------------
-
-            lastAccelScan = result;
-
-//            accelSensorResultQueue.add(result);
-            ServerMessage serverMessage = encodeAccelResult(result);
-            messageQueue.add(serverMessage);
-
-
-            LastTimeStamp = event.timestamp;
-
-            //-------------------------------------------------------------
-
-            manualScanCount_accel += 1;
-
-            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
-
-            //if(!running){
-            if(durationRemaining > 0){
-                //combinedScanResult.accelSensorResult = result;
-                //checkAllScansCompleted();
-
-                sendResult(MANUAL_SCAN_MESSAGE+"Accel Scan updated."
-                                + "Location: " + manualScanMessage
-                                //+" ("+result.X+","+result.Y+","+result.Z+")"
-                        //+"\n["+timeDelay+"]"
-                        //+"\n["+LastTimeStamp+"]"
-                );
-
-            }else{
-
-                sendResult("Accel Scan updated."
-                                //+" ("+result.X+","+result.Y+","+result.Z+")"
-                        //+"\n["+timeDelay+"]"
-                        //+"\n["+LastTimeStamp+"]"
-                );
-            }
-
-        }// end of onSensorChanged
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-    };// end of magnetic sensor event listener;
-    //==============================================================================================
-
-
-
-    //==============================================================================================
-    private void ScanAccel(){
-
-        //sensorMag
-
-        // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a second)
-        Log.d("ACCELscan", "Initiated");
-        sensorManager.registerListener(accelSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
-
-    }// end of startSensor
-    //==============================================================================================
+//    //##############################################################################################
+//    // accelerometer sensor function
+//
+//
+//    //==============================================================================================
+//    private SensorEventListener accelSensorListener = new SensorEventListener() {
+//        @Override
+//        public void onSensorChanged(SensorEvent event) {
+//
+//            // only perform a single scan
+//            sensorManager.unregisterListener(accelSensorListener);
+//
+//            Log.d("Trace", "TrackerScanner.accelSensorListener.event()");
+//
+////            String currentTime =
+////                    new SimpleDateFormat(
+////                            "yyyy-MM-dd:HH:mm:ss",
+////                            Locale.getDefault()).format(new Date());
+//
+//            SensorResult result = new SensorResult();
+//
+//            result.dateTime = Calendar.getInstance().getTimeInMillis();
+//
+////            result.dateTime_old = currentTime;
+//
+//            result.X = event.values[0];
+//            result.Y = event.values[1];
+//            result.Z = event.values[2];
+//
+//            result.message = manualScanMessage;
+//
+//
+//            long timeDelay = Long.MAX_VALUE;
+//            if(LastTimeStamp != Long.MAX_VALUE){
+//
+//                timeDelay = event.timestamp - LastTimeStamp;
+//                //timeDelay = LastTimeStamp;
+//            }
+//
+//
+//
+//
+//            //-------------------------------------------------------------
+//
+//            lastAccelScan = result;
+//
+////            accelSensorResultQueue.add(result);
+//            ServerMessage serverMessage = encodeAccelResult(result);
+//            messageQueue.add(serverMessage);
+//
+//
+//            LastTimeStamp = event.timestamp;
+//
+//            //-------------------------------------------------------------
+//
+//            manualScanCount_accel += 1;
+//
+//            long durationRemaining = stopManualScanTime - SystemClock.elapsedRealtime();
+//
+//            //if(!running){
+//            if(durationRemaining > 0){
+//                //combinedScanResult.accelSensorResult = result;
+//                //checkAllScansCompleted();
+//
+//                sendResult(MANUAL_SCAN_MESSAGE+"Accel Scan updated."
+//                                + "Location: " + manualScanMessage
+//                                //+" ("+result.X+","+result.Y+","+result.Z+")"
+//                        //+"\n["+timeDelay+"]"
+//                        //+"\n["+LastTimeStamp+"]"
+//                );
+//
+//            }else{
+//
+//                sendResult("Accel Scan updated."
+//                                //+" ("+result.X+","+result.Y+","+result.Z+")"
+//                        //+"\n["+timeDelay+"]"
+//                        //+"\n["+LastTimeStamp+"]"
+//                );
+//            }
+//
+//        }// end of onSensorChanged
+//
+//        @Override
+//        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+//
+//        }
+//    };// end of magnetic sensor event listener;
+//    //==============================================================================================
+//
+//
+//
+//    //==============================================================================================
+//    private void ScanAccel(){
+//
+//        //sensorMag
+//
+//        // register the listener above, NOTE microsecond(i.e. not milli[1k], but 1 million-th of a second)
+//        Log.d("ACCELscan", "Initiated");
+//        sensorManager.registerListener(accelSensorListener,sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
+//
+//    }// end of startSensor
+//    //==============================================================================================
 
 
     //##############################################################################################
@@ -1836,7 +1880,7 @@ public class TrackerScanner extends Service implements LocationListener {
                     Log.d("mgdev", "BluetoothTabFragment.onScanResult");
 
                     BluetoothLEResult bleResult = new BluetoothLEResult();
-                    bleResult.macAddress = result.getDevice().getAddress();
+                    bleResult.macAddress = encryptThisString(result.getDevice().getAddress());
                     //bleResult.signalStrength = result.getRssi();
 
 //            String message;
@@ -2174,108 +2218,51 @@ public class TrackerScanner extends Service implements LocationListener {
     }// end of encodeMagResult
     //==============================================================================================
 
-//    //==============================================================================================
-//    private void postMagResult() {
-//
-//
-//        // empty the queue
-//        while (this.magSensorResultQueue.size() > 0) {
-//
-//            ServerMessage serverMessage = encodeMagResult(magSensorResultQueue.poll());
-//
-//            PostToServer thisPost = new PostToServer(this,
-//                    getResources().openRawResource(R.raw.fullchain),
-//                    getResources().openRawResource(R.raw.user),
-//                    serverMessage
-//            );
-//            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-//            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
-//            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
-//
-//            thisPost.execute();
-//
-//            this.sendResult("Sending to server: Magnetic sensor result.");
-//
-//
-//        }// end of looping queue
-//
-//
-//    }// end of postWifiResult
-//    //==============================================================================================
-
-
-    //==============================================================================================
-    private ServerMessage encodeAccelResult(SensorResult sensorResult){
-
-        ServerMessage serverMessage = new ServerMessage();
-
-        //------------------------------------------------------------------
-
-        HashMap<String, String> parameters = new HashMap<>();
-
-        parameters.put("UUID", _deviceID);
-
-        parameters.put("DATABASE", _database);
-
-        parameters.put("MESSAGE", this.manualScanMessage);
-
-        parameters.put("ACCEL_TIME", Long.toString(sensorResult.dateTime));
-
-//        parameters.put("ACCEL_TIME_OLD", sensorResult.dateTime_old);
-        //-----
-
-        parameters.put("ACCEL_X",Double.toString(sensorResult.X));
-        parameters.put("ACCEL_Y",Double.toString(sensorResult.Y));
-        parameters.put("ACCEL_Z",Double.toString(sensorResult.Z));
-        //-----
-
-        String message = "";
-
-        try {
-            message = getPostDataString(parameters);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //------------------------------------------------------------------
-
-        serverMessage.message = message;
-        serverMessage.messageType = ServerMessage.MessageType.ACCEL;
-
-
-
-        return serverMessage;
-    }// end of encodeAccelResult
-    //==============================================================================================
 
 //    //==============================================================================================
-//    private void postAccelResult() {
+//    private ServerMessage encodeAccelResult(SensorResult sensorResult){
+//
+//        ServerMessage serverMessage = new ServerMessage();
+//
+//        //------------------------------------------------------------------
+//
+//        HashMap<String, String> parameters = new HashMap<>();
+//
+//        parameters.put("UUID", _deviceID);
+//
+//        parameters.put("DATABASE", _database);
+//
+//        parameters.put("MESSAGE", this.manualScanMessage);
+//
+//        parameters.put("ACCEL_TIME", Long.toString(sensorResult.dateTime));
+//
+////        parameters.put("ACCEL_TIME_OLD", sensorResult.dateTime_old);
+//        //-----
+//
+//        parameters.put("ACCEL_X",Double.toString(sensorResult.X));
+//        parameters.put("ACCEL_Y",Double.toString(sensorResult.Y));
+//        parameters.put("ACCEL_Z",Double.toString(sensorResult.Z));
+//        //-----
+//
+//        String message = "";
+//
+//        try {
+//            message = getPostDataString(parameters);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //------------------------------------------------------------------
+//
+//        serverMessage.message = message;
+//        serverMessage.messageType = ServerMessage.MessageType.ACCEL;
 //
 //
-//        // empty the queue
-//        while (this.accelSensorResultQueue.size() > 0) {
 //
-//            ServerMessage serverMessage = encodeAccelResult(accelSensorResultQueue.poll());
-//
-//            PostToServer thisPost = new PostToServer(this,
-//                    getResources().openRawResource(R.raw.fullchain),
-//                    getResources().openRawResource(R.raw.user),
-//                    serverMessage
-//            );
-//            //PostWifiResultToServer thisPost = new PostWifiResultToServer(this);
-//            //thisPost.is = getResources().openRawResource(R.raw.fullchain);
-//            //thisPost.wifiScanResult = wifiScanResultResendQueue.poll();
-//
-//            thisPost.execute();
-//
-//            this.sendResult("Sending to server: Accelerometer sensor result.");
-//
-//
-//        }// end of looping queue
-//
-//
-//    }// end of postAccelResult
+//        return serverMessage;
+//    }// end of encodeAccelResult
 //    //==============================================================================================
+
 
 
 
@@ -2353,12 +2340,12 @@ public class TrackerScanner extends Service implements LocationListener {
         //}
 
         //------------
-        // accelerometer
-
-        parameters.put("ACCEL_TIME", Long.toString(combinedScanResult.accelSensorResult.dateTime));
-        parameters.put("ACCEL_X", String.valueOf(combinedScanResult.accelSensorResult.X));
-        parameters.put("ACCEL_Y", String.valueOf(combinedScanResult.accelSensorResult.Y));
-        parameters.put("ACCEL_Z", String.valueOf(combinedScanResult.accelSensorResult.Z));
+//        // accelerometer
+//
+//        parameters.put("ACCEL_TIME", Long.toString(combinedScanResult.accelSensorResult.dateTime));
+//        parameters.put("ACCEL_X", String.valueOf(combinedScanResult.accelSensorResult.X));
+//        parameters.put("ACCEL_Y", String.valueOf(combinedScanResult.accelSensorResult.Y));
+//        parameters.put("ACCEL_Z", String.valueOf(combinedScanResult.accelSensorResult.Z));
 
         //------------
         // wifi
@@ -2371,8 +2358,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         parameters.put("signalStrengthsJson", new Gson().toJson(signalStrengths));
 
-        parameters.put("matrix_R", new Gson().toJson(combinedScanResult.matrix_R));
-        parameters.put("matrix_I", new Gson().toJson(combinedScanResult.matrix_I));
+//        parameters.put("matrix_R", new Gson().toJson(combinedScanResult.matrix_R));
+//        parameters.put("matrix_I", new Gson().toJson(combinedScanResult.matrix_I));
 
         String message = "";
 
@@ -2449,10 +2436,10 @@ public class TrackerScanner extends Service implements LocationListener {
                     message = "Wi-Fi";
                     postType = PostToServer.TYPE.valueOf(_postType);
                     break;
-                case ACCEL:
-                    endpoint = "/accel/";
-                    message = "Accelerometer";
-                    break;
+//                case ACCEL:
+//                    endpoint = "/accel/";
+//                    message = "Accelerometer";
+//                    break;
                 case COMBINED:
                     endpoint = "/";
                     message = "Combined";
@@ -2638,8 +2625,8 @@ public class TrackerScanner extends Service implements LocationListener {
         if(magAvailable)
             handler.removeCallbacks(periodicUpdate_mag);
 
-        if(accelAvailable)
-            handler.removeCallbacks(periodicUpdate_accel);
+//        if(accelAvailable)
+//            handler.removeCallbacks(periodicUpdate_accel);
 
         handler.removeCallbacks(periodicUpdate_scan);
 
@@ -2960,19 +2947,13 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     private void scanOthers(){
 
-//        if (!wifiManager.isWifiEnabled()) {
-//            Toast.makeText(this, "WiFi is disabled ... We need to enable it",
-//                    Toast.LENGTH_LONG).show();
-//            wifiManager.setWifiEnabled(true);
-//        }
-
         handler.post(periodicUpdate_wifi);
 
         if(magAvailable)
             handler.post(periodicUpdate_mag);
 
-        if(accelAvailable)
-            handler.post(periodicUpdate_accel);
+//        if(accelAvailable)
+//            handler.post(periodicUpdate_accel);
 
 
 
@@ -3023,6 +3004,8 @@ public class TrackerScanner extends Service implements LocationListener {
                 //if (action.equals(Constants.ACTION_START_LOCATION_SERVICE))
                 {
                     case Constants.ACTION_START_LOCATION_SERVICE:
+
+                        Log.d("mgdev", "TrackerScanner.onStartCommand().ACTION_START_LOCATION_SERVICE");
 
                         _mode = intent.getBooleanExtra("MODE", false);
 
@@ -3076,7 +3059,7 @@ public class TrackerScanner extends Service implements LocationListener {
                         manualScanCount_loction = 0;
                         manualScanCount_wifi = 0;
                         manualScanCount_mag = 0;
-                        manualScanCount_accel = 0;
+//                        manualScanCount_accel = 0;
                         manualScanCount_ble = 0;
 
                         String message = intent.getStringExtra("message");

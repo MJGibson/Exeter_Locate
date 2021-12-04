@@ -105,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView circleAnimation1;
     private ImageView circleAnimation2;
     private ImageView circleIcon;
-    private TextView status_textView;
+    private TextView status_textView_top;
+    private TextView status_textView_bottom;
     private Handler iconAniHandler;
 
 
@@ -175,7 +176,9 @@ public class MainActivity extends AppCompatActivity {
         this.circleIcon.setOnClickListener(startStopButtonPressed);
         this.circleAnimation1 = findViewById(R.id.circleAnimation1);
         this.circleAnimation2 = findViewById(R.id.circleAnimation2);
-        this.status_textView =  findViewById(R.id.textView_status);
+
+        this.status_textView_top =  findViewById(R.id.textView_status_top);
+        this.status_textView_bottom =  findViewById(R.id.textView_status_bottom);
 
         // set up title bar
         ActionBar actionBar = getSupportActionBar();
@@ -271,6 +274,8 @@ public class MainActivity extends AppCompatActivity {
     }
     //==============================================================================================
 
+
+
     //==============================================================================================
     /**
      * onStop Method
@@ -313,6 +318,25 @@ public class MainActivity extends AppCompatActivity {
 
             SPeditor.putBoolean("termsAcceptance", _termsAccepted);
             SPeditor.apply();
+
+            // assuming the terms are accepted, then start the location service already...
+            if (_termsAccepted){
+                if (ContextCompat.checkSelfPermission(
+                        getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                            MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_CODE_LOCATION_PERMISSIONS
+                    );
+                } else {
+
+                    Log.d("mgdev", "MainActivity.onClick.permission.accepted");
+
+                    startLocationService();
+
+                }//end of if permission already accepted
+            }
 
 
         }// end of onReceive
@@ -627,18 +651,19 @@ public class MainActivity extends AppCompatActivity {
             circleIcon.setImageResource(R.mipmap.tick_round);
 
             if(_insideGeoFence) {
-                status_textView.setText(
+                status_textView_top.setText(
                         R.string.AppActive);
             }else{
                 if(!_geoFenceChecked){
-                    status_textView.setText(
+                    status_textView_top.setText(
                             R.string.AppActive_NotCheckedGeoFence);
                 }else {
-                    status_textView.setText(
+                    status_textView_top.setText(
                             R.string.AppActive_OutsideGeoFence);
                 }
             }
 
+            status_textView_bottom.setText(R.string.To_pause_record);
 
             //startDisplayIconAnimation();
 
@@ -667,7 +692,8 @@ public class MainActivity extends AppCompatActivity {
             circleIcon.setImageResource(R.mipmap.cross_round);
             //circleIcon.image
 
-            status_textView.setText(R.string.AppNotactive);
+            status_textView_top.setText(R.string.AppNotactive);
+            status_textView_bottom.setText(R.string.To_continue_record);
 
         }// end of if/else isLocationServiceRunning
 
@@ -862,8 +888,21 @@ public class MainActivity extends AppCompatActivity {
      * Starts the InfoActivity
      */
     public void startInfoActivty(){
-        Intent intent = new Intent(this, InfoActivity.class);
-        startActivity(intent);
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        boolean InfoActivityActive = SP.getBoolean("InfoActivityActive", false);
+        if(!InfoActivityActive){
+            InfoActivityActive = true;
+
+            Intent intent = new Intent(this, InfoActivity.class);
+            startActivity(intent);
+
+            SPeditor.putBoolean("InfoActivityActive", InfoActivityActive);
+            SPeditor.apply();
+        }
+
     }//end of
     //==============================================================================================
 
@@ -1099,11 +1138,26 @@ public class MainActivity extends AppCompatActivity {
         //Log.d("mgdev", "MainActivity.startService");
 
 
+        luanchService(packageName, this, _deviceID);
 
 
-        Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
+
+        checkButtons();
+
+        //runThread();
+
+    }// end of startService
+    //==============================================================================================
+
+    //==============================================================================================
+    public static void luanchService(String packageName, Context context, String deviceID){
+
+
+        Log.d("mgdev", "MainActivity.luanchService: "+packageName );
+
+        Intent intent = new Intent(context, TrackerScanner.class);
         intent.setAction(
-                getResources().getString(R.string.action_start_location_service)
+                context.getResources().getString(R.string.action_start_location_service)
         );
         intent.putExtra("MODE", true); // engage citizen mode
 
@@ -1113,7 +1167,6 @@ public class MainActivity extends AppCompatActivity {
 
         String postType = "POST";
 
-        String deviceID = _deviceID;
 
         boolean useSSL = true;
 
@@ -1127,14 +1180,15 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("post_type", postType);
 
 
-        startService(intent);
-        Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
 
-        checkButtons();
+        Toast.makeText(context, "Location service started", Toast.LENGTH_SHORT).show();
 
-        //runThread();
-
-    }// end of startService
+    }// end of luanchService
     //==============================================================================================
 
     //==============================================================================================
