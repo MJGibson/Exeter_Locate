@@ -63,7 +63,7 @@ before_install:
   - rm android-sdk-tools.zip
 
   # Avoid harmless sdkmanager warning  
-  - mkdir ~/.android
+  #- mkdir ~/.android
   - echo 'count=0' > ~/.android/repositories.cfg
 
   # Accept all Android license agreements
