@@ -85,15 +85,16 @@ install:
   - |
     EMU_PARAMS="-verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048"
     EMU_COMMAND="emulator"
-    if [[ $ABI =~ "x86" ]]; then
-      EMU_COMMAND="emulator-headless"
-    fi
+    #if [[ $ABI =~ "x86" ]]; then
+    #  EMU_COMMAND="emulator-headless"
+    #fi
+    
     # This double "sudo" monstrosity is used to have Travis execute the
     # emulator with its new group permissions and help preserve the rule
     # of least privilege.
     sudo -E sudo -u $USER -E bash -c "${ANDROID_HOME}/emulator/${EMU_COMMAND} -avd test ${AUDIO} ${EMU_PARAMS} &"
   # Wait for emulator to be ready
-  - ./tools/android-wait-for-emulator.sh
+  - sudo ./tools/android-wait-for-emulator.sh
   - adb shell input keyevent 82 &
 
   # Switch back to our target JDK version to build and run tests
