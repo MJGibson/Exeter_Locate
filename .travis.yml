@@ -79,8 +79,8 @@ install:
   - echo y | sdkmanager "emulator" >/dev/null
   - echo y | sdkmanager "extras;android;m2repository" >/dev/null
   - echo y | sdkmanager "system-images;android-$API;$EMU_FLAVOR;$ABI" >/dev/null # install our emulator
-  - sudo chgrp libvirt ram.img
-  - chmod 766 ram.img
+  #- sudo chgrp libvirt ram.img
+  #- chmod 766 ram.img
 
   # Create an Android emulator
   - echo no | avdmanager create avd --force -n test -k "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
