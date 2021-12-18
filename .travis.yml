@@ -41,7 +41,7 @@ env:
    ##- API=26 # Fails with unrecognized tests? orchestrator change or something?
    #- API=27
    #- API=28
-   #- API=29
+   - API=29
    - API=30
 
 
