@@ -128,6 +128,24 @@ public class InfoActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * Closes the activity
+     *
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+        SPeditor.putBoolean("InfoActivityActive", false);
+        SPeditor.apply();
+
+    }// end of onDestroy
+    //==============================================================================================
+
+    //==============================================================================================
     private String readTextFromAsset(String fileName){
 
         String returnValue = "";

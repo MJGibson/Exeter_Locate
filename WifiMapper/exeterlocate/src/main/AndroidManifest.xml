@@ -30,7 +30,7 @@
         <activity android:name="com.riba2reality.exeterlocate.messages.WifiMessageActivity"></activity>
         <activity android:name="com.riba2reality.exeterlocate.messages.InternetMessageActivity"></activity>
         <activity android:name="com.riba2reality.exeterlocate.messages.GpsMessageActivity"></activity>
-        <activity android:name=".NotificationActivity"></activity>
+
         <activity android:name="com.riba2reality.exeterlocate.InfoActivity" />
         <activity android:name="com.riba2reality.exeterlocate.TermsActivity" />
         <activity android:name="com.riba2reality.exeterlocate.MainActivity">
