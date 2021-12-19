@@ -28,7 +28,7 @@ env:
     - PATH=${ANDROID_HOME}:${ANDROID_HOME}/emulator:${TOOLS}:${TOOLS}/bin:${ANDROID_HOME}/platform-tools:${PATH}
   matrix:
    #- API=15 # only runs locally. Create+Start once from AndroidStudio to init sdcard. Then only from command-line w/-engine classic
-   - API=16 ABI=x86 AUDIO=-no-audio
+   #- API=16 ABI=x86 AUDIO=-no-audio #runs out of memory?
    - API=17 ABI=x86
    - API=18 ABI=x86 # API18 has started being flaky
    #- API=19 ABI=armeabi-v7a # Fails: kernel/emulator mismatch, and emulator-29+ doesn't support "-engine classic" to fix
