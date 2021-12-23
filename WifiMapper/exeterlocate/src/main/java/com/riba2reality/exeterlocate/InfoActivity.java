@@ -94,8 +94,22 @@ public class InfoActivity extends AppCompatActivity {
 
         // set up webview - information, T&C's
 
-        infoWebView.setWebViewClient(new WebViewClient());
+        infoWebView.setWebViewClient(new WebViewClient()
+//                                     {
+//            // overcome the ontouchstart registration bug !
+//             @Override
+//             public void onPageFinished(WebView view, String url)
+//             {
+//                 super.onPageFinished(view, url);
+//                 final WebView myWebView = (WebView) findViewById(R.id.infoWebView);
+//                 infoWebView.scrollTo(1, 0);
+//                 infoWebView.scrollTo(0, 0);
+//             }
+//         }
+        );
         // load from asset file, but could check an actualy website and default to this
+
+        infoWebView.getSettings().setJavaScriptEnabled(true);
         infoWebView.loadUrl("file:///android_asset/ExeterLocateInformationpage.html");
 
 //        String infoPageHtml = readTextFromAsset("ExeterLocateInformationpage.html");

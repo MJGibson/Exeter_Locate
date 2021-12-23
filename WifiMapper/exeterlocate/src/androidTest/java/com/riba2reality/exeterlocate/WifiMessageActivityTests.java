@@ -1,6 +1,5 @@
 package com.riba2reality.exeterlocate;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 
 import androidx.test.core.app.ActivityScenario;
@@ -8,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.riba2reality.exeterlocate.messages.BluetoothMessageActivity;
+import com.riba2reality.exeterlocate.messages.WifiMessageActivity;
 
 import junit.framework.TestCase;
 
@@ -24,11 +23,11 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class BluetoothMessageActivityTests extends TestCase {
+public class WifiMessageActivityTests extends TestCase {
 
 //    @Rule
-//    public ActivityScenarioRule<BluetoothMessageActivity> activityRule
-//            = new ActivityScenarioRule<>(BluetoothMessageActivity.class);
+//    public ActivityScenarioRule<InternetMessageActivity> activityRule
+//            = new ActivityScenarioRule<>(InternetMessageActivity.class);
 
     Context context;
 
@@ -36,12 +35,9 @@ public class BluetoothMessageActivityTests extends TestCase {
     //==============================================================================================
     private void turnWifiOff(){
 
-        //WifiMessageActivity._test = true;
-        //Disable bluetooth
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.disable();
-        }
+        WifiMessageActivity._test = true;
+//        WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+//        wifiManager.setWifiEnabled(false);
 
 
     }// end of turnWifiOff
@@ -58,8 +54,8 @@ public class BluetoothMessageActivityTests extends TestCase {
         // turn off Wi-Fi, as otherwise it'll de-activate this activity.
         turnWifiOff();
 
-        ActivityScenario<BluetoothMessageActivity> scenario =
-                ActivityScenario.launch(BluetoothMessageActivity.class);
+        ActivityScenario<WifiMessageActivity> scenario =
+                ActivityScenario.launch(WifiMessageActivity.class);
 
 
     }// end of init
@@ -79,7 +75,7 @@ public class BluetoothMessageActivityTests extends TestCase {
 
         onView(withId(R.id.textView_title))
                 .check(matches(withText(
-                        context.getResources().getString(R.string.MustHaveBluetooth))));
+                        context.getResources().getString(R.string.MustHaveWifi))));
 
 
     }// end of checkTitle
@@ -98,7 +94,7 @@ public class BluetoothMessageActivityTests extends TestCase {
 
         onView(withId(R.id.textView_Message))
                 .check(matches(withText(
-                        context.getResources().getString(R.string.MustHaveBluetooth_Message))));
+                        context.getResources().getString(R.string.MustHaveWifi_Message))));
 
 
     }// end of checkTitle
@@ -106,4 +102,4 @@ public class BluetoothMessageActivityTests extends TestCase {
 
 
 
-}// end of BluetoothMessageActivityTests
+}// end of WifiMessageActivityTests

@@ -41,6 +41,8 @@ public class WifiMessageActivity extends AppCompatActivity {
     private TextView message;
     private Button ok_button;
 
+    public static boolean _test = false;
+
     //----------------------------------------------------------------------------------------------
 
     //==============================================================================================
@@ -64,7 +66,7 @@ public class WifiMessageActivity extends AppCompatActivity {
     private void checkWifiEnabled(){
 
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (wifi.isWifiEnabled()){
+        if (wifi.isWifiEnabled() && !_test){
             finish();
         }
 
@@ -107,10 +109,8 @@ public class WifiMessageActivity extends AppCompatActivity {
 
         // set up text
 
-        title.setText("For this app to work, you must have Wi-Fi on");
-        message.setText("This App uses Wi-Fi to locate nearby Wi-Fi devices" +
-                ". If you have Wi-Fi turned off, this app will not work.\n\n" +
-                "Please go to setting and turn on Wi-Fi.");
+        title.setText(R.string.MustHaveWifi);
+        message.setText(R.string.MustHaveWifi_Message);
         messageIcon.setImageResource(R.drawable.wifi_disconnected_foreground);
         ok_button.setText("Allow Wi-Fi");
         ok_button.setOnClickListener(allowWifiButtonPressed);

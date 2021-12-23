@@ -7,6 +7,7 @@
     <string name="information_t_c_s"><![CDATA[Information/T&C\'s]]></string>
     <string name="versionInfoText">versions: <br /> ID:</string>
 
+
     <string name="AppNotactive">
         App is inactive.
     </string>
@@ -17,6 +18,7 @@
         App is active.
         \nLocation not determined yet.
         \nNo data is being recorded.
+
         \n Recording will begin when your phone is on-campus.
     </string>
     <string name="AppActive_OutsideGeoFence">App is active.
@@ -32,9 +34,16 @@
     </string>
     
     <string name="MustHaveGPS">For this app to work, you must have GPS on</string>
+    
     <string name="MustHaveGPS_message">
         This App uses GPS to locate this device when scanning other devices. This information helps researchers build a map of other scans. If you have GPS turned off, this app will not work.\n\nPlease go to setting and turn on GPS.
     </string>
+    <string name="MustHaveBluetooth">For this app to work, you must have Bluetooth on</string>
+    <string name="MustHaveBluetooth_Message">This App uses Bluetooth to locate nearby Bluetooth devices. If you have Bluetooth turned off, this app will not work.\n\n This App uses \'Bluetooth low energy\' - a battery saving technology.\n\nPlease go to setting and turn on Bluetooth.</string>
+    <string name="MustHaveInternet">For this app to work, you must have an Internet connection</string>
+    <string name="MustHaveInternet_Message">This App uses the internet to communicate results to server. If you have no internet connection, this app will not work.\n\nPlease go to setting and turn on Wi-Fi or mobile data.</string>
+    <string name="MustHaveWifi">For this app to work, you must have Wi-Fi on</string>
+    <string name="MustHaveWifi_Message">This App uses Wi-Fi to locate nearby Wi-Fi devices. If you have Wi-Fi turned off, this app will not work.\n\nPlease go to setting and turn on Wi-Fi.</string>
 
 
 </resources>

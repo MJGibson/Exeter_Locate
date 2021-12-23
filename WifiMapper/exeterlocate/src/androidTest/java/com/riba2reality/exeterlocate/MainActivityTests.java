@@ -3,12 +3,15 @@ package com.riba2reality.exeterlocate;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.CoordinatesProvider;
@@ -60,6 +63,7 @@ public class MainActivityTests extends TestCase {
 
 
 
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
 
     @Rule
@@ -141,10 +145,8 @@ public class MainActivityTests extends TestCase {
     }// end of isLocationServiceRunning
     //==============================================================================================
 
-    //##############################################################################################
-    //###################################      TESTS       #########################################
-    //##############################################################################################
 
+    //==============================================================================================
     private static ViewAction swipeFromTopToBottom() {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.BOTTOM_CENTER,
                 new CoordinatesProvider() {
@@ -156,11 +158,52 @@ public class MainActivityTests extends TestCase {
                     }
                 }, Press.FINGER);
     }
+    //==============================================================================================
+
+    //##############################################################################################
+    //###################################      TESTS       #########################################
+    //##############################################################################################
+
+
+    //==============================================================================================
+    @Test
+    public void test_bleReceiver(){
+
+
+        // DONT THINK THIS WORKS!!!
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().getTargetContext()
+        );
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+
+        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.apply();
+
+
+        ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
+        //MainActivity mainActivity = new MainActivity();
+
+
+        //LocalBroadcastManager.getInstance(context).registerReceiver(mainActivity.receiverBle, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+
+        Intent i = new Intent(BluetoothAdapter.ACTION_STATE_CHANGED);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+
+
+
+
+
+    }// end of test_bleReceiver
+    //==============================================================================================
+
 
     //==============================================================================================
     @FlakyTest
     @Test
-    public void test_agree_button_exits() {
+    public void test_agree() {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
                 InstrumentationRegistry.getInstrumentation().getTargetContext()
@@ -217,7 +260,19 @@ public class MainActivityTests extends TestCase {
                 //.inRoot(isDialog()) // <---
                 .check(matches(isDisplayed()));
 
-//        onView(withText("Accept")).perform(click());
+        //-----------------------------------------------------
+        // click agree and check it has the desired result
+
+
+        onView(withText("Accept")).perform(click());
+
+
+        boolean termsAccepted = SP.getBoolean("termsAcceptance", false);
+
+        assertTrue("Terms should be accepted after Accept click", termsAccepted);
+
+
+        //-----------------------------------------------------
 
 //        // Search for correct button in the dialog.
 //        UiObject button = uiDevice.findObject(new UiSelector().text("ACCEPT"));
@@ -240,7 +295,7 @@ public class MainActivityTests extends TestCase {
     //==============================================================================================
     @FlakyTest
     @Test
-    public void test_disagree_button_exits() {
+    public void test_disagree() {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(
                 InstrumentationRegistry.getInstrumentation().getTargetContext()
@@ -403,29 +458,6 @@ public class MainActivityTests extends TestCase {
 //                .getTargetContext(), MainActivity.class);
 //        mLaunchIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(getInstrumentation().getTargetContext(),mLaunchIntent,null );
-//    }
-
-
-//    @After
-//    public void tearDown() {
-//        Instrumentation var10000 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10000, "InstrumentationRegistry.getInstrumentation()");
-//        UiAutomation var1 = var10000.getUiAutomation();
-//        StringBuilder var10001 = (new StringBuilder()).append("pm revoke ");
-//        Instrumentation var10002 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10002, "InstrumentationRegistry.getInstrumentation()");
-//        Context var2 = var10002.getTargetContext();
-//        Intrinsics.checkNotNullExpressionValue(var2, "InstrumentationRegistry.…mentation().targetContext");
-//        var1.executeShellCommand(var10001.append(var2.getPackageName()).append(" android.permission.ACCESS_COARSE_LOCATION").toString());
-//        var10000 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10000, "InstrumentationRegistry.getInstrumentation()");
-//        var1 = var10000.getUiAutomation();
-//        var10001 = (new StringBuilder()).append("pm revoke ");
-//        var10002 = InstrumentationRegistry.getInstrumentation();
-//        Intrinsics.checkNotNullExpressionValue(var10002, "InstrumentationRegistry.getInstrumentation()");
-//        var2 = var10002.getTargetContext();
-//        Intrinsics.checkNotNullExpressionValue(var2, "InstrumentationRegistry.…mentation().targetContext");
-//        var1.executeShellCommand(var10001.append(var2.getPackageName()).append(" android.permission.ACCESS_FINE_LOCATION").toString());
 //    }
 
 
