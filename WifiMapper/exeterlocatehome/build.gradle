@@ -1,0 +1,119 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.riba2reality.exeterlocatehome"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation project(path: ':Exeter Locate Core')
+    implementation 'com.google.android.play:core:1.8.0'
+    //compile 'com.riba2reality.exeterlocatecore'
+
+//    implementation 'com.google.android.gms:play-services-base:17.0.0'
+//    implementation 'com.google.android.gms:play-services-location:17.1.0'
+
+    //--------------------------------------------------------------------------------
+    // test implementations
+
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+
+    androidTestImplementation 'androidx.test:rules:1.3.0'
+//    androidTestImplementation 'androidx.test:runner:1.1.1'
+//
+//    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+//
+//    testImplementation 'org.robolectric:robolectric:4.4'
+    // Robolectric
+//    testImplementation "org.robolectric:robolectric:4.7.2"
+//    testImplementation 'androidx.test:core:1.2.0'
+//
+//    def mockito_version = '2.28.2'
+//
+//    // For local unit tests on your development machine
+//    testImplementation "org.mockito:mockito-core:$mockito_version"
+//
+//    // For instrumentation tests on Android devices and emulators
+//    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
+//
+//
+    //androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.0.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+//    implementation "androidx.core:core-ktx:+"
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+//    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+//    androidTestUtil 'androidx.test:orchestrator:1.4.0'
+//    androidTestUtil 'com.android.support.test:orchestrator:1.0.1'
+
+    // Core library
+    androidTestImplementation 'androidx.test:core:1.4.0'
+
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+
+    // Assertions
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
+    androidTestImplementation 'androidx.test.ext:truth:1.0.0'
+    androidTestImplementation 'com.google.truth:truth:0.42'
+
+    // Espresso dependencies
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.1.0'
+    androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.1.0'
+
+    // The following Espresso dependency can be either "implementation"
+    // or "androidTestImplementation", depending on whether you want the
+    // dependency to appear on your APK's compile classpath or the test APK
+    // classpath.
+    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.1.'
+    //--------------------------------------------------------------------------------
+
+    // Glide v4
+    //implementation 'com.github.bumptech.glide:glide:4.12.0'
+    //annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+
+
+}// end of dependancies
+
+
+repositories {
+    mavenCentral()
+}
