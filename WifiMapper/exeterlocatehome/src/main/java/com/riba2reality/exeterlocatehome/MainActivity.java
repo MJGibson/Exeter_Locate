@@ -47,12 +47,11 @@ import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.tasks.OnSuccessListener;
 import com.google.android.play.core.tasks.Task;
+import com.riba2reality.exeterlocatecore.TrackerScanner;
 import com.riba2reality.exeterlocatehome.messages.BluetoothMessageActivity;
 import com.riba2reality.exeterlocatehome.messages.GpsMessageActivity;
 import com.riba2reality.exeterlocatehome.messages.InternetMessageActivity;
 import com.riba2reality.exeterlocatehome.messages.WifiMessageActivity;
-import com.riba2reality.exeterlocatecore.DataStores.Constants;
-import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import java.util.Calendar;
 import java.util.UUID;
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
         checkTermsAcceptance();
 
-        requestGeoFenceUpdate();
+        //requestGeoFenceUpdate();
 
         checkForUpdates();
 
@@ -511,30 +510,30 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
 
-    //==============================================================================================
-    private void requestGeoFenceUpdate(){
-
-        // if location service is not running, we assume don't know and are therefore outside
-        // geoFence
-        if( isLocationServiceRunning(this) ){
-
-            Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
-            intent.setAction(
-                    Constants.ACTION_REQUEST_GEOFENCE_UPDATE
-            );
-
-            startService(intent);
-
-            Log.d("test1", "MainActivty.requestGeoFenceUpdate()");
-
-
-        }// end of location service is running
-        else{
-            _insideGeoFence = false;
-        }
-
-    }// end of requestGeoFenceUpdate
-    //==============================================================================================
+//    //==============================================================================================
+//    private void requestGeoFenceUpdate(){
+//
+//        // if location service is not running, we assume don't know and are therefore outside
+//        // geoFence
+//        if( isLocationServiceRunning(this) ){
+//
+//            Intent intent = new Intent(this.getApplicationContext(), TrackerScanner.class);
+//            intent.setAction(
+//                    Constants.ACTION_REQUEST_GEOFENCE_UPDATE
+//            );
+//
+//            startService(intent);
+//
+//            Log.d("test1", "MainActivty.requestGeoFenceUpdate()");
+//
+//
+//        }// end of location service is running
+//        else{
+//            _insideGeoFence = false;
+//        }
+//
+//    }// end of requestGeoFenceUpdate
+//    //==============================================================================================
 
     //==============================================================================================
     private void checkGpsEnabled(){
