@@ -219,9 +219,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiverGeoFenceUpdates),
-                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
-        );
+//        LocalBroadcastManager.getInstance(this).registerReceiver((receiverGeoFenceUpdates),
+//                new IntentFilter(TrackerScanner.TRACKERSCANNER_RESULT)
+//        );
 
         _MainActivity = this;
 
@@ -344,23 +344,23 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
 
-    //==============================================================================================
-    BroadcastReceiver receiverGeoFenceUpdates = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Log.d("mgdev", "receiverGeoFenceUpdates.onReceive");
-
-            _insideGeoFence = intent.getBooleanExtra(TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE,
-                    false);
-            _geoFenceChecked =  intent.getBooleanExtra(
-                    TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE_FIRST,
-                    false);
-
-
-        }// end of onReceive
-    };
-    //==============================================================================================
+//    //==============================================================================================
+//    BroadcastReceiver receiverGeoFenceUpdates = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//
+//            Log.d("mgdev", "receiverGeoFenceUpdates.onReceive");
+//
+//            _insideGeoFence = intent.getBooleanExtra(TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE,
+//                    false);
+//            _geoFenceChecked =  intent.getBooleanExtra(
+//                    TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE_FIRST,
+//                    false);
+//
+//
+//        }// end of onReceive
+//    };
+//    //==============================================================================================
 
     //==============================================================================================
     BroadcastReceiver receiverBle = new BroadcastReceiver() {
@@ -650,18 +650,18 @@ public class MainActivity extends AppCompatActivity {
                     PorterDuff.Mode.SRC_ATOP);
             circleIcon.setImageResource(R.mipmap.tick_round);
 
-            if(_insideGeoFence) {
+//            if(_insideGeoFence) {
                 status_textView_top.setText(
                         R.string.AppActive);
-            }else{
-                if(!_geoFenceChecked){
-                    status_textView_top.setText(
-                            R.string.AppActive_NotCheckedGeoFence);
-                }else {
-                    status_textView_top.setText(
-                            R.string.AppActive_OutsideGeoFence);
-                }
-            }
+//            }else{
+//                if(!_geoFenceChecked){
+//                    status_textView_top.setText(
+//                            R.string.AppActive_NotCheckedGeoFence);
+//                }else {
+//                    status_textView_top.setText(
+//                            R.string.AppActive_OutsideGeoFence);
+//                }
+//            }
 
             status_textView_bottom.setText(R.string.To_pause_record);
 
@@ -1163,7 +1163,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
 
         String postType = "POST";
 
@@ -1178,6 +1178,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("PACKAGE", packageName);
 
         intent.putExtra("post_type", postType);
+
+        intent.putExtra("GeoFence", false);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

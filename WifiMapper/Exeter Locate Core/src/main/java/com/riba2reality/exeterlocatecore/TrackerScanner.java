@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.2";
+    public static final String libraryVersion = "1.7.0";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -262,6 +262,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
     private String _postType;
 
+    private boolean _geofenceInUse = false;
     private boolean insideGeoFence = false;
     private boolean geoFenceChecked = false;
 
@@ -1222,7 +1223,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
         if(_mode){
 
-            checkGeoFence(location);
+
+            if(_geofenceInUse)
+                checkGeoFence(location);
 
 
 
@@ -1236,10 +1239,16 @@ public class TrackerScanner extends Service implements LocationListener {
 
             } // end of if over gps scan time
             else {
-                // only add the location result, if inside geo fence
-                if(insideGeoFence) {
+                // only add the location result, if inside geo fence, and geoFence is inuse
+                if(_geofenceInUse) {
+                    if (insideGeoFence) {
+                        addLocationResult(location);
+                    }
+                }else{
                     addLocationResult(location);
                 }
+
+
             }
 
 
@@ -2666,13 +2675,15 @@ public class TrackerScanner extends Service implements LocationListener {
         String message = "Scanning...";
 
 
-        if(!geoFenceChecked)
-            message += "Location not determined...";
-        else{
-            if(insideGeoFence){
-                message = "On-campus Scanning...";
-            }else{
-                message = "Off-campus, Not recording data...";
+        if(_geofenceInUse) {
+            if (!geoFenceChecked)
+                message += "Location not determined...";
+            else {
+                if (insideGeoFence) {
+                    message = "On-campus Scanning...";
+                } else {
+                    message = "Off-campus, Not recording data...";
+                }
             }
         }
 
@@ -2915,14 +2926,17 @@ public class TrackerScanner extends Service implements LocationListener {
 
         // activate the location service
         if(_mode){
+
+
             handler.post(periodicUpdate_gps);
 
-            requestCelllocation();
+            // only need the cell locations if we're using the geoFence
+            if( _geofenceInUse) {
+                requestCelllocation();
+            }
 
         }else {
             requestlocation();
-
-
 
         }
 
@@ -2931,7 +2945,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
         // check if citizen mode, then only lunch other scans if inside geoFence
-        if(_mode){
+        if(_mode && _geofenceInUse){
             if(insideGeoFence){
                 scanOthers();
             }
@@ -3017,6 +3031,8 @@ public class TrackerScanner extends Service implements LocationListener {
                         _callingPackage = intent.getStringExtra("PACKAGE");
 
                         _postType = intent.getStringExtra("post_type");
+
+                        _geofenceInUse = intent.getBooleanExtra("GeoFence", false);
 
 
                         startScanning();

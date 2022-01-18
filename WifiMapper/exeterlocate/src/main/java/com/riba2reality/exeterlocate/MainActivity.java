@@ -1163,7 +1163,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "beta";
+        String dataBase = "devTest";
 
         String postType = "POST";
 
@@ -1178,6 +1178,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("PACKAGE", packageName);
 
         intent.putExtra("post_type", postType);
+
+        intent.putExtra("GeoFence", true);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
