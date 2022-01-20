@@ -26,80 +26,79 @@ import com.riba2reality.wifimapper.R;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Manual Scan Fragment {@link Fragment} subclass.
  * Use the {@link ManualScanFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ *
+ *
  */
 public class ManualScanFragment extends Fragment {
 
 
     private int selectedLocation = -1;
 
-    //private TrackerScannerSingle scans;
-
-
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
-
     boolean scanCompleted = true;
 
-    @Override
-    public void onStart() {
-        super.onStart();
-//        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
-//                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
-//        );
-
-        Log.d("Trace", "ManualScanFragment.onStart()");
-
-    }
-
-    @Override
-    public void onStop() {
-//        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(receiver);
-        super.onStop();
-    }
+    //==============================================================================================
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        Log.d("Trace", "ManualScanFragment.onStart()");
+//
+//    }// end of onStart
+    //==============================================================================================
 
     //==============================================================================================
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//    }// end of onStop
+    //==============================================================================================
+
+    //==============================================================================================
+    /**
+     * No Arguement contrustor
+     */
     public ManualScanFragment() {
         // Required empty public constructor
 
-
-
-    }
+    }// enf of main constructor
     //==============================================================================================
 
 
     //==============================================================================================
+    /**
+     * Factory method which return a new instance of this Manual Scan Fragment
+     * @param index
+     * @return
+     */
     public static ManualScanFragment newInstance(int index) {
         ManualScanFragment fragment = new ManualScanFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SECTION_NUMBER, index);
-        fragment.setArguments(bundle);
         return fragment;
     }
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        if (getArguments() != null) {
-//            // TODO: Rename and change types of parameters
-//            String mParam1 = getArguments().getString(ARG_PARAM1);
-//            String mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-    }
+    }// end of onCreate
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * onCreateView sets up the fragment
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -107,25 +106,25 @@ public class ManualScanFragment extends Fragment {
         Log.d("Trace", "ManualScanFragment.onCreateView()");
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_manual_scan, container, false);
+        View rootView =
+                inflater.inflate(R.layout.fragment_manual_scan, container, false);
 
         Spinner dropdown = rootView.findViewById(R.id.spinner1);
 
         // Create an ArrayAdapter using the string array and a default spinner
         ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
-                .createFromResource(this.getActivity(), R.array.locations1,
+                .createFromResource(this.getActivity(), R.array.locations2,
                         android.R.layout.simple_spinner_item);
 
         // Specify the layout to use when the list of choices appears
-        staticAdapter
-                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
         dropdown.setAdapter(staticAdapter);
 
         dropdown.setOnItemSelectedListener(dropDownListerner);
 
-        //--------
+        //-------------------------
 
         Button scanButton = rootView.findViewById(R.id.manualScanButton);
 
@@ -137,19 +136,6 @@ public class ManualScanFragment extends Fragment {
         });
 
         scanButton.setEnabled(scanCompleted);
-
-        //scans = new TrackerScannerSingle(getActivity());
-        //
-
-//        rootView.findViewById(R.id.manualPostButton).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                postManualScans();
-//            }
-//        });
-
-        //requestUpdate();
-
 
         //-------------------------
 
@@ -171,12 +157,13 @@ public class ManualScanFragment extends Fragment {
 
 
     //==============================================================================================
+    /**
+     * Request and updated from the Backend
+     */
     private void requestUpdate() {
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
         intent.setAction(Constants.ACTION_REQUEST_UPDATE);
-
-        //intent.putExtra("message", imageName);
 
         getActivity().startService(intent);
     }
@@ -185,6 +172,9 @@ public class ManualScanFragment extends Fragment {
 
 
     //==============================================================================================
+    /**
+     * Drop down listener which changes the images depending on the drop downs selection
+     */
     private AdapterView.OnItemSelectedListener dropDownListerner = new AdapterView.OnItemSelectedListener() {
 
 
@@ -201,18 +191,9 @@ public class ManualScanFragment extends Fragment {
                 return;//bail
             }
 
-
-
-//            if(imageName.compareTo("n")==0){
-//                imageName="o"; // there is no "n"
-//            }
-
-            //imageName += ".png";
-
-            //Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
             Log.d("locImage: ", imageName);
 
-            int image_id = getResources().getIdentifier(imageName, "drawable", getActivity().getPackageName());
+            int image_id = getResources().getIdentifier("fig_" + imageName, "drawable", getActivity().getPackageName());
 
 
 
@@ -227,7 +208,10 @@ public class ManualScanFragment extends Fragment {
             //-------------------------------------------------
 
             ImageView mImageViewPic= (ImageView) getActivity().findViewById(R.id.imageViewPic);
-            String pictureName = imageName + "_pic";
+
+            //String pictureName = imageName + "_pic";
+            String pictureName = imageName ;
+
             int picture_id = getResources().getIdentifier(pictureName, "drawable", getActivity().getPackageName());
 
             mImageViewPic.setImageResource(picture_id);
@@ -248,11 +232,16 @@ public class ManualScanFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * Returns the lower case letter of alphabet at the given index(@param i)
+     * @param i Index of the alphabet
+     * @return return the letter of the alphabet at the given index
+     */
     private String getCharForNumber(int i) {
         String returnVal = i >= 0 && i < 27 ? String.valueOf((char)(i + 97)) : null;
-        if(returnVal.compareTo("n")==0){
-            returnVal="o"; // there is no "n"
-        }
+//        if(returnVal.compareTo("n")==0){
+//            returnVal="o"; // there is no "n"
+//        }
         return returnVal;
     }
     //==============================================================================================

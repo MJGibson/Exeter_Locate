@@ -268,7 +268,7 @@ def combined():
             collection.insert_one(
                 {
                     "UUID": jsonData["UUID"],
-                    #"MESSAGE": jsonData["MESSAGE"],
+                    "MESSAGE": jsonData["MESSAGE"],
                     "WIFI_TIME": jsonData["WIFI_TIME"],
                     "Macs": list(MacAddressesJSON),
                     "level": list(signalStregthsJSON),
@@ -341,7 +341,7 @@ def gps():
                 "z": float(jsonData["ALTITUDE"]),
                 "acc": float(jsonData["ACC"]),
                 #"provider": jsonData["PROVIDER"],
-                #"message": jsonData["MESSAGE"],
+                "message": jsonData["MESSAGE"],
             }
         )
         return format_message("Server: GPS data stored successfully.")
@@ -444,7 +444,7 @@ def wifi():
                             "WIFI_TIME": int(jsonData["WIFI_TIME"]),
                             "Macs_ID": MacAddressesJSONDict[mac],
                             "level": int(strength),
-                            #"message": jsonData["MESSAGE"],
+                            "message": jsonData["MESSAGE"],
                         }
                     )
                 collection = db[wifiCollection]
@@ -475,7 +475,7 @@ def wifi():
                             "_id": idnum,
                             "Macs": mac,
                             #"level": int(strength),
-                            #"message": jsonData["MESSAGE"],
+                            "message": jsonData["MESSAGE"],
                         }
                     )
                 
@@ -585,7 +585,7 @@ def ble():
                             #"BLE_TIME_OLD": jsonData["BLE_TIME_OLD"],
                             "Macs_ID": MacAddressesJSONDict[mac],
                             "level": int(strength),
-                            #"message": jsonData["MESSAGE"],
+                            "message": jsonData["MESSAGE"],
                         }
                     )
 
@@ -618,7 +618,7 @@ def ble():
                             "_id": idnum,
                             "Macs": mac,
                             #"level": int(strength),
-                            #"message": jsonData["MESSAGE"],
+                            "message": jsonData["MESSAGE"],
                         }
                     )
                 
@@ -670,7 +670,7 @@ def mag():
             "MAG_x": float(jsonData["MAG_X"]),
             "MAG_y": float(jsonData["MAG_Y"]),
             "MAG_z": float(jsonData["MAG_Z"]),
-            #"message": jsonData["MESSAGE"],
+            "message": jsonData["MESSAGE"],
             }
 
 
@@ -722,7 +722,7 @@ def accel():
             "ACCEL_X": float(jsonData["ACCEL_X"]),
             "ACCEL_Y": float(jsonData["ACCEL_Y"]),
             "ACCEL_Z": float(jsonData["ACCEL_Z"]),
-            #"message": jsonData["MESSAGE"],
+            "message": jsonData["MESSAGE"],
             }
 
 
