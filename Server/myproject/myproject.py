@@ -73,9 +73,11 @@ KEYS_REQUIRED_FOR_COMBINED = list(
     set(KEYS_REQUIRED_FOR_GPS).union(
         KEYS_REQUIRED_FOR_WIFI,
         KEYS_REQUIRED_FOR_MAG,
-        KEYS_REQUIRED_FOR_ACCEL,
+        #KEYS_REQUIRED_FOR_ACCEL,
         #KEYS_REQUIRED_FOR_BLE,
-        ["MESSAGE", "matrix_R", "matrix_I"]
+        ["MESSAGE", 
+        #"matrix_R", "matrix_I"
+        ]
     )
 )
 
@@ -243,12 +245,12 @@ def combined():
                         "MAG_x": float(jsonData["MAG_X"]),
                         "MAG_y": float(jsonData["MAG_Y"]),
                         "MAG_z": float(jsonData["MAG_Z"]),
-                        "ACCEL_TIME": ibt(jsonData["ACCEL_TIME"]),
-                        "ACCEL_X": float(jsonData["ACCEL_X"]),
-                        "ACCEL_Y": float(jsonData["ACCEL_Y"]),
-                        "ACCEL_Z": float(jsonData["ACCEL_Z"]),
-                        "matrix_R": jsonData["matrix_R"],
-                        "matrix_I": jsonData["matrix_I"],
+                        #"ACCEL_TIME": ibt(jsonData["ACCEL_TIME"]),
+                        #"ACCEL_X": float(jsonData["ACCEL_X"]),
+                        #"ACCEL_Y": float(jsonData["ACCEL_Y"]),
+                        #"ACCEL_Z": float(jsonData["ACCEL_Z"]),
+                        #"matrix_R": jsonData["matrix_R"],
+                        #"matrix_I": jsonData["matrix_I"],
                     }
             
             
@@ -282,12 +284,12 @@ def combined():
                     "MAG_x": float(jsonData["MAG_X"]),
                     "MAG_y": float(jsonData["MAG_Y"]),
                     "MAG_z": float(jsonData["MAG_Z"]),
-                    "ACCEL_TIME": int(jsonData["ACCEL_TIME"]),
-                    "ACCEL_X": float(jsonData["ACCEL_X"]),
-                    "ACCEL_Y": float(jsonData["ACCEL_Y"]),
-                    "ACCEL_Z": float(jsonData["ACCEL_Z"]),
-                    "matrix_R": jsonData["matrix_R"],
-                    "matrix_I": jsonData["matrix_I"],
+                    #"ACCEL_TIME": int(jsonData["ACCEL_TIME"]),
+                    #"ACCEL_X": float(jsonData["ACCEL_X"]),
+                    #"ACCEL_Y": float(jsonData["ACCEL_Y"]),
+                    #"ACCEL_Z": float(jsonData["ACCEL_Z"]),
+                    #"matrix_R": jsonData["matrix_R"],
+                    #"matrix_I": jsonData["matrix_I"],
                 }
             )
 

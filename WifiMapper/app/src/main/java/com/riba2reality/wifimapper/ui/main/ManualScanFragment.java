@@ -248,6 +248,9 @@ public class ManualScanFragment extends Fragment {
 
 
     //==============================================================================================
+    /**
+     * Initiates a manual scan with the currently selected location
+     */
     private void manualScan(){
 
         Log.d("Trace", "ManualScan()");
@@ -260,6 +263,8 @@ public class ManualScanFragment extends Fragment {
         String imageName = getCharForNumber(selectedLocation);
 
 
+        //----------------------------------------------------------
+
         String[] server_values = getResources().getStringArray(R.array.server_values);
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
@@ -271,6 +276,7 @@ public class ManualScanFragment extends Fragment {
             Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
             return;
         }
+        //----------------------------------------------------------
 
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
@@ -290,44 +296,54 @@ public class ManualScanFragment extends Fragment {
         //----------------------------------------------------------
 
 
+        intent.putExtra("MODE", false); // disengage citizen mode, thus dev mode
+
+        //String[] server_values = getResources().getStringArray(com.riba2reality.exeterlocatecore.R.array.server_values);
+        //SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        String postType = SP.getString("post_type", "POST");
+
+        // get the packagename of the main activity, note this is a fragment
+        String packageName =  getActivity().getClass().getName();
+
+        intent.putExtra("ServerAddress", address);
+        intent.putExtra("database", dataBase);
+        intent.putExtra("DeviceID", deviceID);
+        intent.putExtra("SSL_switch", useSSL);
+
+        intent.putExtra("PACKAGE", packageName);
+
+
+        intent.putExtra("post_type", postType);
+
+
+
+        //----------------------------------------------------------
+
+
         getActivity().startService(intent);
 
 
-
-        //Toast.makeText(getActivity(), "Started single scan set", Toast.LENGTH_SHORT).show();
-
-
-
-//
-//        if(scans==null) {
-//            scans = new TrackerScannerSingle(getActivity());
-//        }
-//
-//
-
-//        scans.scanAll(imageName);
 
     }// end of manual scan
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     *  Post the manual scans to the server
+     */
     private void postManualScans(){
 
         Log.d("Trace", "postManualScans()");
 
 
-
-//        String[] server_values = getResources().getStringArray(R.array.server_values);
-//
-//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-//        String serverAddress = SP.getString("ServerAddress", server_values[1]);
-//
-//        //System.out.println("ServerAddress: "+serverAddress);
-//
-//        if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
-//            Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
 
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
@@ -343,6 +359,9 @@ public class ManualScanFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * BroadcastReceiver for when manual scan is completed
+     */
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -351,36 +370,12 @@ public class ManualScanFragment extends Fragment {
 
             scanCompleted = true;
 
-            //String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
-
-            //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-
-
-            //TextView logTextView = findViewById(R.id.log);
-            //final ScrollView scroll = findViewById(R.id.logScroll);
-
-            //scanButton.setEnabled(true);
-            //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
-
-
 
             Button scanButton = getActivity().findViewById(R.id.manualScanButton);
 
             if(scanButton!=null){
                 scanButton.setEnabled(true);
             }
-
-            //getActivity().findViewById(R.id.manualPostButton).setEnabled(true);
-
-//            int combinedQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT,-1);
-//
-//            int resendQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT,-1);
-//
-//            String postButtonTextUpdate = "Post Data - ("+String.valueOf(combinedQueueSize)+"),["
-//                    +String.valueOf(resendQueueSize)+"]";
-//
-//            Button postButton = getActivity().findViewById(R.id.manualPostButton);
-//            postButton.setText(postButtonTextUpdate);
 
 
 
@@ -389,6 +384,9 @@ public class ManualScanFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * BroadcastReceiver for when the backend sends updates about the manual scan
+     */
     BroadcastReceiver updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
