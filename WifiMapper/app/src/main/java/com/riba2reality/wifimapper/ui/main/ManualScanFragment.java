@@ -262,8 +262,9 @@ public class ManualScanFragment extends Fragment {
 
             OverlayItem overlayItem = new OverlayItem("Location:"+key, "California", geoPoint);
             Drawable markerDrawable =
-                    getContext().getDrawable(
-                            R.drawable.ic_menu_mylocation);
+                    getContext().getDrawable(R.drawable.ic_menu_mylocation);
+
+
             overlayItem.setMarker(markerDrawable);
 
 
@@ -282,7 +283,38 @@ public class ManualScanFragment extends Fragment {
             @Override
             public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
 
+                Drawable markerDrawable =
+                        getContext().getDrawable(R.drawable.ic_menu_mylocation);
+
+                Drawable selectedMarkerDrawable =
+                        getContext().getDrawable(R.drawable.green_location_foreground);
+                selectedMarkerDrawable.setBounds(0, 0, 10, 10);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    selectedMarkerDrawable.setColorFilter(
+//                            getContext().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+//                }
+
+                //for(OverlayItem item: overlayItemArrayList){
+//                OverlayItem item;
+//                for(int index = 0; index < overlayItemArrayList.size(); ++index){
+//                    item = overlayItemArrayList.get(index);
+//                    if(index == i) {
+//                        item.setMarker(selectedMarkerDrawable);
+//                    }else {
+//                        item.setMarker(markerDrawable);
+//                    }
+//                }
+
+                for(OverlayItem item: overlayItemArrayList){
+                    item.setMarker(markerDrawable);
+                }
+
                 Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
+
+                overlayItem.setMarker(selectedMarkerDrawable);
+
+                map.invalidate();
+
                 return true; // Handled this event.
             }
 
