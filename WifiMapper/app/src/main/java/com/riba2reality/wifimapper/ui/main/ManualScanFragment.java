@@ -57,6 +57,8 @@ public class ManualScanFragment extends Fragment {
     private MapView map;
     private IMapController mapController;
 
+    ArrayList<OverlayItem> overlayItemArrayList = new ArrayList<>();
+
 
     //==============================================================================================
     public void onResume() {
@@ -244,7 +246,7 @@ public class ManualScanFragment extends Fragment {
 
         Map<String, LatLng> tempMap = Constants.Fiducal_locations;
 
-        ArrayList<OverlayItem> overlayItemArrayList = new ArrayList<>();
+
 
         for (String key : tempMap.keySet()) {
             //
@@ -260,9 +262,9 @@ public class ManualScanFragment extends Fragment {
 
             GeoPoint geoPoint = new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
 
-            OverlayItem overlayItem = new OverlayItem("Location:"+key, "California", geoPoint);
+            OverlayItem overlayItem = new OverlayItem("Location:"+key, key, geoPoint);
             Drawable markerDrawable =
-                    getContext().getDrawable(R.drawable.ic_menu_mylocation);
+                    getContext().getDrawable(R.drawable.main_location);
 
 
             overlayItem.setMarker(markerDrawable);
@@ -284,11 +286,11 @@ public class ManualScanFragment extends Fragment {
             public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
 
                 Drawable markerDrawable =
-                        getContext().getDrawable(R.drawable.ic_menu_mylocation);
+                        getContext().getDrawable(R.drawable.main_location);
 
                 Drawable selectedMarkerDrawable =
                         getContext().getDrawable(R.drawable.green_location_foreground);
-                selectedMarkerDrawable.setBounds(0, 0, 10, 10);
+                //selectedMarkerDrawable.setBounds(0, 0, 10, 10);
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                    selectedMarkerDrawable.setColorFilter(
 //                            getContext().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
@@ -309,11 +311,20 @@ public class ManualScanFragment extends Fragment {
                     item.setMarker(markerDrawable);
                 }
 
-                Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
 
                 overlayItem.setMarker(selectedMarkerDrawable);
 
                 map.invalidate();
+
+                Spinner dropdown = getActivity().findViewById(R.id.spinner1);
+
+                int index = getNumberForChar(overlayItem.getSnippet());
+
+
+                Log.d("Trace", "ManualScanFragment.onItemSingleTapUp() "+index);
+
+                dropdown.setSelection(index,true);
 
                 return true; // Handled this event.
             }
@@ -371,7 +382,8 @@ public class ManualScanFragment extends Fragment {
 
             Log.d("locImage: ", imageName);
 
-            int image_id = getResources().getIdentifier("fig_" + imageName, "drawable", getActivity().getPackageName());
+            int image_id = getResources().getIdentifier("fig_" + imageName, "drawable",
+                    getActivity().getPackageName());
 
 
 
@@ -396,6 +408,47 @@ public class ManualScanFragment extends Fragment {
 
 
 
+
+            //-------------------------------------------------
+
+            Drawable markerDrawable =
+                    getContext().getDrawable(R.drawable.main_location);
+
+            Drawable selectedMarkerDrawable =
+                    getContext().getDrawable(R.drawable.green_location_foreground);
+            //selectedMarkerDrawable.setBounds(0, 0, 10, 10);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    selectedMarkerDrawable.setColorFilter(
+//                            getContext().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+//                }
+
+            //for(OverlayItem item: overlayItemArrayList){
+//                OverlayItem item;
+//                for(int index = 0; index < overlayItemArrayList.size(); ++index){
+//                    item = overlayItemArrayList.get(index);
+//                    if(index == i) {
+//                        item.setMarker(selectedMarkerDrawable);
+//                    }else {
+//                        item.setMarker(markerDrawable);
+//                    }
+//                }
+
+            for(OverlayItem item: overlayItemArrayList){
+
+                if(item.getSnippet().compareToIgnoreCase(imageName)==0){
+                    item.setMarker(selectedMarkerDrawable);
+                }else{
+                    item.setMarker(markerDrawable);
+                }
+
+
+            }
+
+            //Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
+
+            //overlayItem.setMarker(selectedMarkerDrawable);
+
+            map.invalidate();
 
             //-------------------------------------------------
 
@@ -424,6 +477,18 @@ public class ManualScanFragment extends Fragment {
     }
     //==============================================================================================
 
+    //==============================================================================================
+    /**
+     * Returns the index in the alphabet of the first character in the given string(@param s),
+     * assuming captial letters of the alphabet
+     * @param s the string with atleast 1 character
+     * @return return the index in the alphabet
+     */
+    private int getNumberForChar(String s) {
+        int returnVal = ((int)s.charAt(0))-65;
+        return returnVal;
+    }
+    //==============================================================================================
 
     //==============================================================================================
     /**
