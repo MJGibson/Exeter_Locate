@@ -639,6 +639,7 @@ public class ManualScanFragment extends Fragment {
             //
 
             String buttonStandardText = getResources().getString(R.string.perform_scan);
+            String imageName = getCharForNumber(selectedLocation);
 
             double remainingDuration = ((double)intent.getLongExtra(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING,-1))/1000.0;
 
@@ -649,6 +650,7 @@ public class ManualScanFragment extends Fragment {
             int bleQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT,-1);
 
             String buttonMessage = buttonStandardText
+                    + "{" + imageName + "}" 
                     + " L["+locationQueueSize+ "]"
                     + " W["+wifiQueueSize+ "]"
                     + " M["+magQueueSize+ "]"
