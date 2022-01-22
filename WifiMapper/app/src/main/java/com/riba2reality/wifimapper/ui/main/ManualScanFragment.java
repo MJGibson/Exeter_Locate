@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -650,15 +651,33 @@ public class ManualScanFragment extends Fragment {
             int bleQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT,-1);
 
             String buttonMessage = buttonStandardText
-                    + "{" + imageName + "}" 
+                    + "{" + imageName + "}"
                     + " L["+locationQueueSize+ "]"
                     + " W["+wifiQueueSize+ "]"
                     + " M["+magQueueSize+ "]"
 //                    + " A["+accelQueueSize+ "]"
                     + " b["+bleQueueSize+ "]"
-                    + " Time remaining["+remainingDuration+ "]";
+                    //+ " Time remaining["+remainingDuration+ "]"
+                    ;
 
+            ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
 
+            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+
+            int manualScanDuration = getResources().getInteger(R.integer.defaultVal_manual_scan);
+            manualScanDuration = SP.getInt("duration_manual_scan", manualScanDuration);
+
+//            Log.d("test", "manualScanDuration "+ manualScanDuration);
+//            Log.d("test", "(manualScanDuration- remainingDuration) "+
+//                    (manualScanDuration- remainingDuration));
+//            Log.d("test", "(manualScanDuration / (manualScanDuration- remainingDuration)) "
+//                    + (manualScanDuration / (manualScanDuration- remainingDuration)));
+
+            double progress = ((manualScanDuration- remainingDuration) /manualScanDuration)*100.0;
+
+            Log.d("test", "progress "+ progress);
+
+            progressBar.setProgress((int)Math.round(progress));
 
             Button scanButton = getActivity().findViewById(R.id.manualScanButton);
 

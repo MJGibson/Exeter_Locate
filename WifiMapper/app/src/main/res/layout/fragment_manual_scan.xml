@@ -78,6 +78,14 @@
                 android:scaleType="fitCenter"
             />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            />
+
     </LinearLayout>
 
 
