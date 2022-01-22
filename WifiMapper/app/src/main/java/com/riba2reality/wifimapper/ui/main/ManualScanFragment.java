@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +22,22 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.riba2reality.exeterlocatecore.DataStores.Constants;
-import com.riba2reality.wifimapper.R;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
+import com.riba2reality.wifimapper.R;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Manual Scan Fragment {@link Fragment} subclass.
@@ -39,6 +53,34 @@ public class ManualScanFragment extends Fragment {
     private int selectedLocation = -1;
 
     boolean scanCompleted = true;
+
+    private MapView map;
+    private IMapController mapController;
+
+
+    //==============================================================================================
+    public void onResume() {
+        super.onResume();
+        //this will refresh the osmdroid configuration on resuming.
+        //if you make changes to the configuration, use
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        if (map != null)
+            map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+    }// end of onResume
+    //==============================================================================================
+
+    //==============================================================================================
+    public void onPause() {
+        super.onPause();
+        //this will refresh the osmdroid configuration on resuming.
+        //if you make changes to the configuration, use
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Configuration.getInstance().save(this, prefs);
+        if (map != null)
+            map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+    }// end of onPause
+    //==============================================================================================
 
     //==============================================================================================
 //    @Override
@@ -105,6 +147,23 @@ public class ManualScanFragment extends Fragment {
 
         Log.d("Trace", "ManualScanFragment.onCreateView()");
 
+
+        //load/initialize the osmdroid configuration, this can be done
+        Context ctx = getActivity().getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        //setting this before the layout is inflated is a good idea
+        //it 'should' ensure that the map has a writable location for the map cache, even without
+        // permissions
+        //if no tiles are displayed, you can try overriding the cache path using
+        // Configuration.getInstance().setCachePath
+        //see also StorageUtils
+        //note, the load method also sets the HTTP User Agent to your application's package name,
+        // abusing osm's tile servers will get you banned based on this string
+
+        //inflate and create the map
+
+
+
         // Inflate the layout for this fragment
         View rootView =
                 inflater.inflate(R.layout.fragment_manual_scan, container, false);
@@ -149,10 +208,97 @@ public class ManualScanFragment extends Fragment {
                 new IntentFilter(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE)
         );
 
+        //-------------------------
 
+        //set up map
+
+        map = rootView.findViewById(R.id.mapView);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        mapController = map.getController();
+        mapController.setZoom(16);
+
+
+        //Constants.stethamCampusCenterPoint.latitude
+        //GeoPoint startPoint = new GeoPoint(51496994, -134733);
+
+        float lat   = (float)Constants.stethamCampusCenterPoint.latitude;   //in DecimalDegrees
+        float lng   = (float)Constants.stethamCampusCenterPoint.longitude;   //in DecimalDegrees
+        GeoPoint startPoint = new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
+
+        mapController.setCenter(startPoint);
+
+
+        setup_map_points();
 
         return rootView;
     }// end of on create view
+    //==============================================================================================
+
+
+
+    //==============================================================================================
+    private void setup_map_points(){
+
+
+        Map<String, LatLng> tempMap = Constants.Fiducal_locations;
+
+        ArrayList<OverlayItem> overlayItemArrayList = new ArrayList<>();
+
+        for (String key : tempMap.keySet()) {
+            //
+
+            Log.d("Trace", "ManualScanFragment.setup_map_points() "+key);
+
+            LatLng point = tempMap.get(key);
+
+            //Log.d("Trace", "ManualScanFragment.setup_map_points() "+point.latitude+", "+point.longitude);
+
+            float lat   = (float)point.latitude;   //in DecimalDegrees
+            float lng   = (float)point.longitude;
+
+            GeoPoint geoPoint = new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
+
+            OverlayItem overlayItem = new OverlayItem("Location:"+key, "California", geoPoint);
+            Drawable markerDrawable =
+                    getContext().getDrawable(
+                            R.drawable.ic_menu_mylocation);
+            overlayItem.setMarker(markerDrawable);
+
+
+            overlayItemArrayList.add(overlayItem);
+
+
+
+        }// end of looping fiducial locations
+
+
+        ItemizedOverlay<OverlayItem> locationOverlay =
+                new ItemizedIconOverlay<OverlayItem>(
+                        overlayItemArrayList,
+                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>()
+                        {
+            @Override
+            public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
+
+                Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
+                return true; // Handled this event.
+            }
+
+            @Override
+            public boolean onItemLongPress(int i, OverlayItem overlayItem) {
+                return false;
+            }
+        }, getActivity().getApplicationContext());
+
+        map.getOverlays().add(locationOverlay);
+        //mMapView.getOverlays().add(locationOverlay);
+
+
+
+
+    }// end of setup_map_points
     //==============================================================================================
 
 
@@ -182,7 +328,7 @@ public class ManualScanFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedLocation = position;
 
-            ImageView mImageView= (ImageView) getActivity().findViewById(R.id.imageView);
+            //ImageView mImageView= (ImageView) getActivity().findViewById(R.id.imageView);
 
 
             String imageName = getCharForNumber(position);
@@ -198,7 +344,7 @@ public class ManualScanFragment extends Fragment {
 
 
 
-            mImageView.setImageResource(image_id);
+            //mImageView.setImageResource(image_id);
 
             //-------------------------------------------------
 

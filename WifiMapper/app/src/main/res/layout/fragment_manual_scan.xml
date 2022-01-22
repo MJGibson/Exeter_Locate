@@ -31,29 +31,38 @@
 
         >
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_margin="0dp"
-                android:layout_width="160pt"
-                android:layout_height="wrap_content"
+<!--            <ImageView-->
+<!--                android:id="@+id/imageView"-->
+<!--                android:layout_margin="0dp"-->
+<!--                android:layout_width="160pt"-->
+<!--                android:layout_height="wrap_content"-->
 
 
-                android:layout_gravity="center"
+<!--                android:layout_gravity="center"-->
 
-                app:layout_constraintBottom_toTopOf="@+id/imageViewPic"
-                app:layout_constraintEnd_toStartOf="@+id/imageViewPic"
+<!--                app:layout_constraintBottom_toTopOf="@+id/imageViewPic"-->
+<!--                app:layout_constraintEnd_toStartOf="@+id/imageViewPic"-->
 
-                app:layout_constraintStart_toEndOf="@+id/spinner1"
-                app:layout_constraintTop_toBottomOf="@+id/spinner1"
-                app:srcCompat="@drawable/example_image"
-                android:adjustViewBounds="true"
-                android:scaleType="center"
-            />
+<!--                app:layout_constraintStart_toEndOf="@+id/spinner1"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/spinner1"-->
+<!--                app:srcCompat="@drawable/example_image"-->
+<!--                android:adjustViewBounds="true"-->
+<!--                android:scaleType="center"-->
+<!--            />-->
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:clickable="true"
+            android:focusable="true" />
 
 
             <ImageView
                 android:id="@+id/imageViewPic"
                 android:layout_margin="0dp"
+                android:layout_weight="50"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
