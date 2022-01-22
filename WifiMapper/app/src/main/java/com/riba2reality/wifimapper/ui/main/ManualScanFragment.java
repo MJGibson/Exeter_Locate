@@ -621,6 +621,8 @@ public class ManualScanFragment extends Fragment {
                 scanButton.setEnabled(true);
             }
 
+            ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
+            progressBar.setProgress(100);
 
 
         }// end of onRecieve
