@@ -23,7 +23,7 @@ public class Constants {
 
 
 
-    public static final String database = "alpha";
+    public static final String database = "beta";
 
     //public static final String port = ":5000";
     public static final String port = "";
