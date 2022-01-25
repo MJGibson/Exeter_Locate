@@ -18,4 +18,32 @@
         <item>O	NW corner of junction</item>
 
     </string-array>
+
+    <string-array name="locations2">
+
+        <item>A	Corner of Stocker and NPR</item>
+        <item>B	Stairs to Laver Building</item>
+        <item>C	SW corner of Harrison car park road</item>
+        <item>D Rennes Drive: path to car park D</item>
+        <item>E	Rennes Drive: Armory Building Entrance</item>
+        <item>F	Near Hockey pitch changing rooms</item>
+        <item>G	Entrace to Sand Astro Pitch</item>
+        <item>H	Rennes Drive - Stocker Road Roundabout</item>
+        <item>I	Digital Humanities Lab back of Queens Building</item>
+        <item>J	Entrance to Building One</item>
+        <item>K	Entrance to the Forum</item>
+        <item>L	Entrance to the Into Centre</item>
+        <item>M	Corner of Queens Building</item>
+        <item>N	Queen Drive near clock tower</item>
+        <item>O	Peter Chalk Centre</item>
+        <item>P	Entrance to Physics Building</item>
+        <item>Q	Entrance to Sports Park</item>
+        <item>R	SW corner of car park A</item>
+        <item>S	Back of the Forum bottom of Costa steps</item>
+        <item>T	Path down from back of Harrison</item>
+        <item>U	Rennes drive - Upper terrace Southern Junc</item>
+        <item>V	North park Road - Rennes Drive Roundabout</item>
+
+    </string-array>
+
 </resources>

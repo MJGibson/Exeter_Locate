@@ -130,15 +130,15 @@
             app:showSeekBarValue="true"
             app:title="Time interval between Magnetic Scans (seconds)" />
 
-        <SeekBarPreference
-            android:max="@integer/max"
-            app:adjustable="true"
-            app:defaultValue="@integer/defaultVal_accel"
-            app:isPreferenceVisible="true"
-            app:key="interval_accel"
-            app:min="@integer/min"
-            app:showSeekBarValue="true"
-            app:title="Time interval between Accelerometer Scans (seconds)" />
+<!--        <SeekBarPreference-->
+<!--            android:max="@integer/max"-->
+<!--            app:adjustable="true"-->
+<!--            app:defaultValue="@integer/defaultVal_accel"-->
+<!--            app:isPreferenceVisible="true"-->
+<!--            app:key="interval_accel"-->
+<!--            app:min="@integer/min"-->
+<!--            app:showSeekBarValue="true"-->
+<!--            app:title="Time interval between Accelerometer Scans (seconds)" />-->
 
 
     </PreferenceCategory>

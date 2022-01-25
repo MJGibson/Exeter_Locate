@@ -402,40 +402,40 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         //----------------------------------------------------------------
 
 
-        SeekBarPreference pref_interval_accel = getPreferenceManager().findPreference("interval_accel");
-
-        //System.out.println("Post interval: "+Integer.toString(postInterval));
-
-        int accelInterval = SP.getInt("defaultVal_accel", -1);
-        if (accelInterval == -1) {
-            accelInterval = getContext().getResources().getInteger(R.integer.defaultVal_accel);
-        }
-        pref_interval_accel.setValue(accelInterval);
-
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
-        {
-            // Success! There's a magnetometer.
-            prefs.edit().putBoolean("accelAvailable", true).apply();
-        } else {
-            // Failure! No magnetometer.
-            pref_interval_accel.setEnabled(false);
-            prefs.edit().putBoolean("accelAvailable", false).apply();
-
-        }
-
-        // set lister for end results
-        pref_interval_accel.setOnPreferenceChangeListener(
-                new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        SPeditor.putInt("defaultVal_accel", (int) newValue);
-                        SPeditor.apply();
-                        stopLocationService();
-                        return true;
-                    }
-                }
-
-        );
+//        SeekBarPreference pref_interval_accel = getPreferenceManager().findPreference("interval_accel");
+//
+//        //System.out.println("Post interval: "+Integer.toString(postInterval));
+//
+//        int accelInterval = SP.getInt("defaultVal_accel", -1);
+//        if (accelInterval == -1) {
+//            accelInterval = getContext().getResources().getInteger(R.integer.defaultVal_accel);
+//        }
+//        pref_interval_accel.setValue(accelInterval);
+//
+//        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+//        {
+//            // Success! There's a magnetometer.
+//            prefs.edit().putBoolean("accelAvailable", true).apply();
+//        } else {
+//            // Failure! No magnetometer.
+//            pref_interval_accel.setEnabled(false);
+//            prefs.edit().putBoolean("accelAvailable", false).apply();
+//
+//        }
+//
+//        // set lister for end results
+//        pref_interval_accel.setOnPreferenceChangeListener(
+//                new Preference.OnPreferenceChangeListener() {
+//                    @Override
+//                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+//                        SPeditor.putInt("defaultVal_accel", (int) newValue);
+//                        SPeditor.apply();
+//                        stopLocationService();
+//                        return true;
+//                    }
+//                }
+//
+//        );
 
 
         //----------------------------------------------------------------

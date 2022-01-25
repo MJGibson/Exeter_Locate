@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -21,111 +23,170 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.riba2reality.exeterlocatecore.DataStores.Constants;
-import com.riba2reality.wifimapper.R;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
+import com.riba2reality.wifimapper.R;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Manual Scan Fragment {@link Fragment} subclass.
  * Use the {@link ManualScanFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ *
+ *
  */
 public class ManualScanFragment extends Fragment {
 
 
     private int selectedLocation = -1;
 
-    //private TrackerScannerSingle scans;
-
-
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
-
     boolean scanCompleted = true;
 
-    @Override
-    public void onStart() {
-        super.onStart();
-//        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver((receiver),
-//                new IntentFilter(TrackerScanner.TRACKERSCANNER_SINGLE_SCAN_RESULT)
-//        );
+    private MapView map;
+    private IMapController mapController;
 
-        Log.d("Trace", "ManualScanFragment.onStart()");
+    ArrayList<OverlayItem> overlayItemArrayList = new ArrayList<>();
 
-    }
-
-    @Override
-    public void onStop() {
-//        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(receiver);
-        super.onStop();
-    }
 
     //==============================================================================================
+    public void onResume() {
+        super.onResume();
+        //this will refresh the osmdroid configuration on resuming.
+        //if you make changes to the configuration, use
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        if (map != null)
+            map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+    }// end of onResume
+    //==============================================================================================
+
+    //==============================================================================================
+    public void onPause() {
+        super.onPause();
+        //this will refresh the osmdroid configuration on resuming.
+        //if you make changes to the configuration, use
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Configuration.getInstance().save(this, prefs);
+        if (map != null)
+            map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+    }// end of onPause
+    //==============================================================================================
+
+    //==============================================================================================
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        Log.d("Trace", "ManualScanFragment.onStart()");
+//
+//    }// end of onStart
+    //==============================================================================================
+
+    //==============================================================================================
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//    }// end of onStop
+    //==============================================================================================
+
+    //==============================================================================================
+    /**
+     * No Arguement contrustor
+     */
     public ManualScanFragment() {
         // Required empty public constructor
 
-
-
-    }
+    }// enf of main constructor
     //==============================================================================================
 
 
     //==============================================================================================
+    /**
+     * Factory method which return a new instance of this Manual Scan Fragment
+     * @param index
+     * @return
+     */
     public static ManualScanFragment newInstance(int index) {
         ManualScanFragment fragment = new ManualScanFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SECTION_NUMBER, index);
-        fragment.setArguments(bundle);
         return fragment;
     }
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        if (getArguments() != null) {
-//            // TODO: Rename and change types of parameters
-//            String mParam1 = getArguments().getString(ARG_PARAM1);
-//            String mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-    }
+    }// end of onCreate
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * onCreateView sets up the fragment
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         Log.d("Trace", "ManualScanFragment.onCreateView()");
 
+
+        //load/initialize the osmdroid configuration, this can be done
+        Context ctx = getActivity().getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        //setting this before the layout is inflated is a good idea
+        //it 'should' ensure that the map has a writable location for the map cache, even without
+        // permissions
+        //if no tiles are displayed, you can try overriding the cache path using
+        // Configuration.getInstance().setCachePath
+        //see also StorageUtils
+        //note, the load method also sets the HTTP User Agent to your application's package name,
+        // abusing osm's tile servers will get you banned based on this string
+
+        //inflate and create the map
+
+
+
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_manual_scan, container, false);
+        View rootView =
+                inflater.inflate(R.layout.fragment_manual_scan, container, false);
 
         Spinner dropdown = rootView.findViewById(R.id.spinner1);
 
         // Create an ArrayAdapter using the string array and a default spinner
         ArrayAdapter<CharSequence> staticAdapter = ArrayAdapter
-                .createFromResource(this.getActivity(), R.array.locations1,
+                .createFromResource(this.getActivity(), R.array.locations2,
                         android.R.layout.simple_spinner_item);
 
         // Specify the layout to use when the list of choices appears
-        staticAdapter
-                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        staticAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Apply the adapter to the spinner
         dropdown.setAdapter(staticAdapter);
 
         dropdown.setOnItemSelectedListener(dropDownListerner);
 
-        //--------
+        //-------------------------
 
         Button scanButton = rootView.findViewById(R.id.manualScanButton);
 
@@ -137,19 +198,6 @@ public class ManualScanFragment extends Fragment {
         });
 
         scanButton.setEnabled(scanCompleted);
-
-        //scans = new TrackerScannerSingle(getActivity());
-        //
-
-//        rootView.findViewById(R.id.manualPostButton).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                postManualScans();
-//            }
-//        });
-
-        //requestUpdate();
-
 
         //-------------------------
 
@@ -163,20 +211,149 @@ public class ManualScanFragment extends Fragment {
                 new IntentFilter(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_TIMER_UPDATE)
         );
 
+        //-------------------------
 
+        //set up map
+
+        map = rootView.findViewById(R.id.mapView);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        mapController = map.getController();
+        mapController.setZoom(16);
+
+
+        //Constants.stethamCampusCenterPoint.latitude
+        //GeoPoint startPoint = new GeoPoint(51496994, -134733);
+
+        float lat   = (float)Constants.stethamCampusCenterPoint.latitude;   //in DecimalDegrees
+        float lng   = (float)Constants.stethamCampusCenterPoint.longitude;   //in DecimalDegrees
+        GeoPoint startPoint = new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
+
+        mapController.setCenter(startPoint);
+
+
+        setup_map_points();
 
         return rootView;
     }// end of on create view
     //==============================================================================================
 
 
+
     //==============================================================================================
+    private void setup_map_points(){
+
+
+        Map<String, LatLng> tempMap = Constants.Fiducal_locations;
+
+
+
+        for (String key : tempMap.keySet()) {
+            //
+
+            Log.d("Trace", "ManualScanFragment.setup_map_points() "+key);
+
+            LatLng point = tempMap.get(key);
+
+            //Log.d("Trace", "ManualScanFragment.setup_map_points() "+point.latitude+", "+point.longitude);
+
+            float lat   = (float)point.latitude;   //in DecimalDegrees
+            float lng   = (float)point.longitude;
+
+            GeoPoint geoPoint = new GeoPoint((int)(lat * 1E6), (int)(lng * 1E6));
+
+            OverlayItem overlayItem = new OverlayItem("Location:"+key, key, geoPoint);
+            Drawable markerDrawable =
+                    getContext().getDrawable(R.drawable.main_location);
+
+
+            overlayItem.setMarker(markerDrawable);
+
+
+            overlayItemArrayList.add(overlayItem);
+
+
+
+        }// end of looping fiducial locations
+
+
+        ItemizedOverlay<OverlayItem> locationOverlay =
+                new ItemizedIconOverlay<OverlayItem>(
+                        overlayItemArrayList,
+                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>()
+                        {
+            @Override
+            public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
+
+                Drawable markerDrawable =
+                        getContext().getDrawable(R.drawable.main_location);
+
+                Drawable selectedMarkerDrawable =
+                        getContext().getDrawable(R.drawable.green_location_foreground);
+                //selectedMarkerDrawable.setBounds(0, 0, 10, 10);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    selectedMarkerDrawable.setColorFilter(
+//                            getContext().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+//                }
+
+                //for(OverlayItem item: overlayItemArrayList){
+//                OverlayItem item;
+//                for(int index = 0; index < overlayItemArrayList.size(); ++index){
+//                    item = overlayItemArrayList.get(index);
+//                    if(index == i) {
+//                        item.setMarker(selectedMarkerDrawable);
+//                    }else {
+//                        item.setMarker(markerDrawable);
+//                    }
+//                }
+
+                for(OverlayItem item: overlayItemArrayList){
+                    item.setMarker(markerDrawable);
+                }
+
+                //Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
+
+                overlayItem.setMarker(selectedMarkerDrawable);
+
+                map.invalidate();
+
+                Spinner dropdown = getActivity().findViewById(R.id.spinner1);
+
+                int index = getNumberForChar(overlayItem.getSnippet());
+
+
+                Log.d("Trace", "ManualScanFragment.onItemSingleTapUp() "+index);
+
+                dropdown.setSelection(index,true);
+
+                return true; // Handled this event.
+            }
+
+            @Override
+            public boolean onItemLongPress(int i, OverlayItem overlayItem) {
+                return false;
+            }
+        }, getActivity().getApplicationContext());
+
+        map.getOverlays().add(locationOverlay);
+        //mMapView.getOverlays().add(locationOverlay);
+
+
+
+
+    }// end of setup_map_points
+    //==============================================================================================
+
+
+    //==============================================================================================
+    /**
+     * Request and updated from the Backend
+     */
     private void requestUpdate() {
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
         intent.setAction(Constants.ACTION_REQUEST_UPDATE);
-
-        //intent.putExtra("message", imageName);
 
         getActivity().startService(intent);
     }
@@ -185,6 +362,9 @@ public class ManualScanFragment extends Fragment {
 
 
     //==============================================================================================
+    /**
+     * Drop down listener which changes the images depending on the drop downs selection
+     */
     private AdapterView.OnItemSelectedListener dropDownListerner = new AdapterView.OnItemSelectedListener() {
 
 
@@ -192,7 +372,7 @@ public class ManualScanFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             selectedLocation = position;
 
-            ImageView mImageView= (ImageView) getActivity().findViewById(R.id.imageView);
+            //ImageView mImageView= (ImageView) getActivity().findViewById(R.id.imageView);
 
 
             String imageName = getCharForNumber(position);
@@ -201,23 +381,15 @@ public class ManualScanFragment extends Fragment {
                 return;//bail
             }
 
-
-
-//            if(imageName.compareTo("n")==0){
-//                imageName="o"; // there is no "n"
-//            }
-
-            //imageName += ".png";
-
-            //Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
             Log.d("locImage: ", imageName);
 
-            int image_id = getResources().getIdentifier(imageName, "drawable", getActivity().getPackageName());
+            int image_id = getResources().getIdentifier("fig_" + imageName, "drawable",
+                    getActivity().getPackageName());
 
 
 
 
-            mImageView.setImageResource(image_id);
+            //mImageView.setImageResource(image_id);
 
             //-------------------------------------------------
 
@@ -227,13 +399,57 @@ public class ManualScanFragment extends Fragment {
             //-------------------------------------------------
 
             ImageView mImageViewPic= (ImageView) getActivity().findViewById(R.id.imageViewPic);
-            String pictureName = imageName + "_pic";
+
+            //String pictureName = imageName + "_pic";
+            String pictureName = imageName ;
+
             int picture_id = getResources().getIdentifier(pictureName, "drawable", getActivity().getPackageName());
 
             mImageViewPic.setImageResource(picture_id);
 
 
 
+
+            //-------------------------------------------------
+
+            Drawable markerDrawable =
+                    getContext().getDrawable(R.drawable.main_location);
+
+            Drawable selectedMarkerDrawable =
+                    getContext().getDrawable(R.drawable.green_location_foreground);
+            //selectedMarkerDrawable.setBounds(0, 0, 10, 10);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    selectedMarkerDrawable.setColorFilter(
+//                            getContext().getColor(R.color.green), PorterDuff.Mode.MULTIPLY);
+//                }
+
+            //for(OverlayItem item: overlayItemArrayList){
+//                OverlayItem item;
+//                for(int index = 0; index < overlayItemArrayList.size(); ++index){
+//                    item = overlayItemArrayList.get(index);
+//                    if(index == i) {
+//                        item.setMarker(selectedMarkerDrawable);
+//                    }else {
+//                        item.setMarker(markerDrawable);
+//                    }
+//                }
+
+            for(OverlayItem item: overlayItemArrayList){
+
+                if(item.getSnippet().compareToIgnoreCase(imageName)==0){
+                    item.setMarker(selectedMarkerDrawable);
+                }else{
+                    item.setMarker(markerDrawable);
+                }
+
+
+            }
+
+            //Toast.makeText(getActivity(), "Item's Title : "+overlayItem.getTitle() +"\nItem's Desc : "+overlayItem.getSnippet(), Toast.LENGTH_SHORT).show();
+
+            //overlayItem.setMarker(selectedMarkerDrawable);
+
+            map.invalidate();
 
             //-------------------------------------------------
 
@@ -248,17 +464,37 @@ public class ManualScanFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * Returns the lower case letter of alphabet at the given index(@param i)
+     * @param i Index of the alphabet
+     * @return return the letter of the alphabet at the given index
+     */
     private String getCharForNumber(int i) {
         String returnVal = i >= 0 && i < 27 ? String.valueOf((char)(i + 97)) : null;
-        if(returnVal.compareTo("n")==0){
-            returnVal="o"; // there is no "n"
-        }
+//        if(returnVal.compareTo("n")==0){
+//            returnVal="o"; // there is no "n"
+//        }
         return returnVal;
     }
     //==============================================================================================
 
+    //==============================================================================================
+    /**
+     * Returns the index in the alphabet of the first character in the given string(@param s),
+     * assuming captial letters of the alphabet
+     * @param s the string with atleast 1 character
+     * @return return the index in the alphabet
+     */
+    private int getNumberForChar(String s) {
+        int returnVal = ((int)s.charAt(0))-65;
+        return returnVal;
+    }
+    //==============================================================================================
 
     //==============================================================================================
+    /**
+     * Initiates a manual scan with the currently selected location
+     */
     private void manualScan(){
 
         Log.d("Trace", "ManualScan()");
@@ -271,6 +507,8 @@ public class ManualScanFragment extends Fragment {
         String imageName = getCharForNumber(selectedLocation);
 
 
+        //----------------------------------------------------------
+
         String[] server_values = getResources().getStringArray(R.array.server_values);
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
@@ -282,6 +520,7 @@ public class ManualScanFragment extends Fragment {
             Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
             return;
         }
+        //----------------------------------------------------------
 
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
@@ -301,44 +540,54 @@ public class ManualScanFragment extends Fragment {
         //----------------------------------------------------------
 
 
+        intent.putExtra("MODE", false); // disengage citizen mode, thus dev mode
+
+        //String[] server_values = getResources().getStringArray(com.riba2reality.exeterlocatecore.R.array.server_values);
+        //SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String address = SP.getString("ServerAddress", server_values[1]);
+
+        String dataBase = SP.getString("database", "alpha");
+
+        String deviceID = SP.getString("DeviceID", "");
+
+        boolean useSSL = SP.getBoolean("SSL_switch", true);
+
+        String postType = SP.getString("post_type", "POST");
+
+        // get the packagename of the main activity, note this is a fragment
+        String packageName =  getActivity().getClass().getName();
+
+        intent.putExtra("ServerAddress", address);
+        intent.putExtra("database", dataBase);
+        intent.putExtra("DeviceID", deviceID);
+        intent.putExtra("SSL_switch", useSSL);
+
+        intent.putExtra("PACKAGE", packageName);
+
+
+        intent.putExtra("post_type", postType);
+
+
+
+        //----------------------------------------------------------
+
+
         getActivity().startService(intent);
 
 
-
-        //Toast.makeText(getActivity(), "Started single scan set", Toast.LENGTH_SHORT).show();
-
-
-
-//
-//        if(scans==null) {
-//            scans = new TrackerScannerSingle(getActivity());
-//        }
-//
-//
-
-//        scans.scanAll(imageName);
 
     }// end of manual scan
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     *  Post the manual scans to the server
+     */
     private void postManualScans(){
 
         Log.d("Trace", "postManualScans()");
 
 
-
-//        String[] server_values = getResources().getStringArray(R.array.server_values);
-//
-//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-//        String serverAddress = SP.getString("ServerAddress", server_values[1]);
-//
-//        //System.out.println("ServerAddress: "+serverAddress);
-//
-//        if (serverAddress.isEmpty() || serverAddress.equals(server_values[0])) {
-//            Toast.makeText(getActivity(), "Please set Server Address", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
 
         Intent intent = new Intent(getActivity().getApplicationContext(), TrackerScanner.class);
 
@@ -354,6 +603,9 @@ public class ManualScanFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * BroadcastReceiver for when manual scan is completed
+     */
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -362,18 +614,6 @@ public class ManualScanFragment extends Fragment {
 
             scanCompleted = true;
 
-            //String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
-
-            //String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-
-
-            //TextView logTextView = findViewById(R.id.log);
-            //final ScrollView scroll = findViewById(R.id.logScroll);
-
-            //scanButton.setEnabled(true);
-            //postButton.setText("Post Data - ("+String.valueOf(combinedScanResultQueue.size())+")");
-
-
 
             Button scanButton = getActivity().findViewById(R.id.manualScanButton);
 
@@ -381,18 +621,8 @@ public class ManualScanFragment extends Fragment {
                 scanButton.setEnabled(true);
             }
 
-            //getActivity().findViewById(R.id.manualPostButton).setEnabled(true);
-
-//            int combinedQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_COMBINED_QUEUE_COUNT,-1);
-//
-//            int resendQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_RESEND_QUEUE_COUNT,-1);
-//
-//            String postButtonTextUpdate = "Post Data - ("+String.valueOf(combinedQueueSize)+"),["
-//                    +String.valueOf(resendQueueSize)+"]";
-//
-//            Button postButton = getActivity().findViewById(R.id.manualPostButton);
-//            postButton.setText(postButtonTextUpdate);
-
+            ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
+            progressBar.setProgress(100);
 
 
         }// end of onRecieve
@@ -400,6 +630,9 @@ public class ManualScanFragment extends Fragment {
     //==============================================================================================
 
     //==============================================================================================
+    /**
+     * BroadcastReceiver for when the backend sends updates about the manual scan
+     */
     BroadcastReceiver updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -409,6 +642,7 @@ public class ManualScanFragment extends Fragment {
             //
 
             String buttonStandardText = getResources().getString(R.string.perform_scan);
+            String imageName = getCharForNumber(selectedLocation);
 
             double remainingDuration = ((double)intent.getLongExtra(TrackerScanner.TRACKERSCANNER_MANUAL_SCAN_REMAINING,-1))/1000.0;
 
@@ -419,14 +653,33 @@ public class ManualScanFragment extends Fragment {
             int bleQueueSize = intent.getIntExtra(TrackerScanner.TRACKERSCANNER_BLE_QUEUE_COUNT,-1);
 
             String buttonMessage = buttonStandardText
+                    + "{" + imageName + "}"
                     + " L["+locationQueueSize+ "]"
                     + " W["+wifiQueueSize+ "]"
                     + " M["+magQueueSize+ "]"
 //                    + " A["+accelQueueSize+ "]"
                     + " b["+bleQueueSize+ "]"
-                    + " Time remaining["+remainingDuration+ "]";
+                    //+ " Time remaining["+remainingDuration+ "]"
+                    ;
 
+            ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
 
+            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+
+            int manualScanDuration = getResources().getInteger(R.integer.defaultVal_manual_scan);
+            manualScanDuration = SP.getInt("duration_manual_scan", manualScanDuration);
+
+//            Log.d("test", "manualScanDuration "+ manualScanDuration);
+//            Log.d("test", "(manualScanDuration- remainingDuration) "+
+//                    (manualScanDuration- remainingDuration));
+//            Log.d("test", "(manualScanDuration / (manualScanDuration- remainingDuration)) "
+//                    + (manualScanDuration / (manualScanDuration- remainingDuration)));
+
+            double progress = ((manualScanDuration- remainingDuration) /manualScanDuration)*100.0;
+
+            Log.d("test", "progress "+ progress);
+
+            progressBar.setProgress((int)Math.round(progress));
 
             Button scanButton = getActivity().findViewById(R.id.manualScanButton);
 

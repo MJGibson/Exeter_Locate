@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.3";
+    public static final String libraryVersion = "1.6.5";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -1793,11 +1793,11 @@ public class TrackerScanner extends Service implements LocationListener {
             sendResult("Ble: Scan complete.");
         }
 
-        if(_mode){
+//        if(_mode){
 
             stopBLEScanning(false);
 
-        }
+//        }
 
 
     }// end of completeBLEScan
@@ -3038,7 +3038,18 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         break;
 
-                    case Constants.ACTION_SINGLE_SCAN: // shouldn't need single scan any more deprecated...
+                    case Constants.ACTION_SINGLE_SCAN: // used by wifiMapper for manual scans
+
+                        _mode = intent.getBooleanExtra("MODE", false);
+
+                        _serverAddress = intent.getStringExtra("ServerAddress");
+                        _database = intent.getStringExtra("database");
+                        _deviceID = intent.getStringExtra("DeviceID");
+                        _useSSL = intent.getBooleanExtra("SSL_switch", true);
+
+                        _callingPackage = intent.getStringExtra("PACKAGE");
+
+                        _postType = intent.getStringExtra("post_type");
 
 
                         if(!running){
