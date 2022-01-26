@@ -405,7 +405,14 @@ public class ManualScanFragment extends Fragment {
 
             int picture_id = getResources().getIdentifier(pictureName, "drawable", getActivity().getPackageName());
 
+            //-------------------------------------------------
+
             mImageViewPic.setImageResource(picture_id);
+
+            //-------------------------------------------------
+
+
+
 
 
 
