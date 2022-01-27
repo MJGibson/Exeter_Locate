@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
@@ -265,7 +266,8 @@ public class ManualScanFragment extends Fragment {
 
             OverlayItem overlayItem = new OverlayItem("Location:"+key, key, geoPoint);
             Drawable markerDrawable =
-                    getContext().getDrawable(R.drawable.main_location);
+                    //getContext().getDrawable(R.drawable.main_location);
+                    ContextCompat.getDrawable(this.getActivity(),R.drawable.main_location);
 
 
             overlayItem.setMarker(markerDrawable);
@@ -287,10 +289,12 @@ public class ManualScanFragment extends Fragment {
             public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
 
                 Drawable markerDrawable =
-                        getContext().getDrawable(R.drawable.main_location);
+                        //getContext().getDrawable(R.drawable.main_location);
+                        ContextCompat.getDrawable(getActivity(),R.drawable.main_location);
 
                 Drawable selectedMarkerDrawable =
-                        getContext().getDrawable(R.drawable.green_location_foreground);
+                        //getContext().getDrawable(R.drawable.green_location_foreground);
+                        ContextCompat.getDrawable(getActivity(),R.drawable.green_location_foreground);
                 //selectedMarkerDrawable.setBounds(0, 0, 10, 10);
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                    selectedMarkerDrawable.setColorFilter(
@@ -420,10 +424,12 @@ public class ManualScanFragment extends Fragment {
             //-------------------------------------------------
 
             Drawable markerDrawable =
-                    getContext().getDrawable(R.drawable.main_location);
+                    //getContext().getDrawable(R.drawable.main_location);
+                    ContextCompat.getDrawable(getActivity(),R.drawable.main_location);
 
             Drawable selectedMarkerDrawable =
-                    getContext().getDrawable(R.drawable.green_location_foreground);
+                    //getContext().getDrawable(R.drawable.green_location_foreground);
+                    ContextCompat.getDrawable(getActivity(),R.drawable.green_location_foreground);
             //selectedMarkerDrawable.setBounds(0, 0, 10, 10);
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                    selectedMarkerDrawable.setColorFilter(

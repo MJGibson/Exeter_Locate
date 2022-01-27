@@ -1,6 +1,7 @@
 package com.riba2reality.wifimapper.ui.main;
 
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -32,9 +33,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     private final Fragment manualScan;
 
-    private final Fragment qrScan;
+    private Fragment qrScan = null;
 
-    private final Fragment bluetoothScan;
+    //private final Fragment bluetoothScan;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -51,9 +52,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         manualScan = ManualScanFragment.newInstance(++i);
 
-        qrScan = QRScannerFragment.newInstance(++i);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            qrScan = QRScannerFragment.newInstance(++i);
+        }
 
-        bluetoothScan = BluetoothTabFragment.newInstance(++i);
+//        bluetoothScan = BluetoothTabFragment.newInstance(++i);
 
     }
 
@@ -105,6 +108,12 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 2 total pages.
-        return 4;
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+            return 3;
+        }else {
+
+            return 4;
+        }
     }
 }
