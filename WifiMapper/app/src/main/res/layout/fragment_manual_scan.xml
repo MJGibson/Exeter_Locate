@@ -66,16 +66,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                app:srcCompat="@drawable/fig_a"
+                app:srcCompat="@drawable/a"
 
 
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-                app:layout_constraintEnd_toStartOf="@+id/linearLayout"
 
-                app:layout_constraintStart_toEndOf="@+id/imageViewPic"
+
+
                 app:layout_constraintTop_toBottomOf="@+id/imageViewPic"
                 android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
+                android:scaleType="centerInside"
+
+
             />
 
         <ProgressBar
@@ -84,6 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:max="100"
+
             />
 
     </LinearLayout>
@@ -105,7 +108,7 @@
 
         <Button
             android:id="@+id/manualScanButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/perform_scan" />
