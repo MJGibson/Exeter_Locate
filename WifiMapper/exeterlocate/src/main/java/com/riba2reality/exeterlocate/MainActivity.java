@@ -1235,7 +1235,7 @@ public class MainActivity extends AppCompatActivity {
 
         String address = "riba2reality.com";
 
-        String dataBase = "devTest";
+        String dataBase = "beta";
 
         String postType = "POST";
 
