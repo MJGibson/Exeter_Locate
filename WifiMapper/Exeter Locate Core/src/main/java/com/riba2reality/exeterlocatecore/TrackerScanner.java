@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.5";
+    public static final String libraryVersion = "1.6.6";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -116,6 +116,9 @@ public class TrackerScanner extends Service implements LocationListener {
     private int ble_duration = 10;
     private int mag_lambda = 60;
 //    private int accel_lambda = 60;
+
+    private int _number_of_GPS_Scan_attempts = 5;
+    private int _current_GPS_Scan_attempts = 0;
 
     public static boolean _test = false;
 
@@ -514,8 +517,13 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
+
+    //##############################################################################################
     //##############################################################################################
     // runnable periodic updates
+    //##############################################################################################
+    //##############################################################################################
+
 
 
     //==============================================================================================
@@ -531,6 +539,30 @@ public class TrackerScanner extends Service implements LocationListener {
 
         return k - 1;
     }// end of getPoisson
+    //==============================================================================================
+
+    //==============================================================================================
+    private final Runnable finaliseLocationScans = new Runnable() {
+        @Override
+        public void run() {
+
+            Log.d("mgdev", "finaliseLocationScans.run()");
+
+            stopLocationServices();
+
+            if(!geoFenceChecked){
+
+                if(_current_GPS_Scan_attempts >= _number_of_GPS_Scan_attempts){
+                    // reset the counter and don't try again
+                    _current_GPS_Scan_attempts = 0;
+                }else {
+                    // try again, while within number of attempts
+                    requestlocation();
+                }
+            }
+
+        }// end of run
+    };// end of finaliseLocationScans
     //==============================================================================================
 
 
@@ -1188,7 +1220,15 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
             // only used in citizen science mode
-            this.stopGPSScanTime = SystemClock.elapsedRealtime() + (gPS_duration * 1000);
+            //this.stopGPSScanTime = SystemClock.elapsedRealtime() + (gPS_duration * 1000);
+            //this.stopGPSScanTime = (gPS_duration * 1000) - SystemClock.elapsedRealtime();
+            this.stopGPSScanTime = gPS_duration * 1000 - SystemClock.elapsedRealtime() % 1000;
+
+            _current_GPS_Scan_attempts += 1;
+
+
+            handler.postDelayed(finaliseLocationScans, this.stopGPSScanTime);
+
 
 
             // TODO: Check if permission available
@@ -1226,21 +1266,22 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
 
-            durationRemaining = stopGPSScanTime - SystemClock.elapsedRealtime();
-
-            Log.d("mgdev", "TrackerScanner.onLocationChanged(),durationRemaining: "+durationRemaining);
-
-            if (durationRemaining <= 0) {
-
-                stopLocationServices();
-
-            } // end of if over gps scan time
-            else {
+//            durationRemaining = stopGPSScanTime - SystemClock.elapsedRealtime();
+//
+//            Log.d("mgdev", "TrackerScanner.onLocationChanged(),durationRemaining: "+durationRemaining);
+//
+//            if (durationRemaining <= 0) {
+//
+//                stopLocationServices();
+//
+//
+//            } // end of if over gps scan time
+//            else {
                 // only add the location result, if inside geo fence
                 if(insideGeoFence) {
                     addLocationResult(location);
                 }
-            }
+//            }
 
 
 

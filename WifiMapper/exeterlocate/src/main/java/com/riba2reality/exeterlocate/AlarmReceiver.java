@@ -34,7 +34,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 
         boolean weekend = false;
-        if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SATURDAY){
+        if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY){
             weekend = true;
         }
 

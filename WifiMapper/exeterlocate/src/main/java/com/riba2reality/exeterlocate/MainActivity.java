@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        // ensuring a device id is created
         // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
             SPeditor.putString("DeviceID", _deviceID);
             SPeditor.apply();
         }
+
 
         Log.d("mgdev", "MainActivity.onCreate._deviceID="+_deviceID);
 
@@ -294,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
         //this.unregisterReceiver(receiverTermsAcceptance);
     }
     //==============================================================================================
+
+
 
 
     //##############################################################################################
@@ -732,6 +736,53 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("mgdev", "MainActivity.startAlarms");
 
+        startReminderAlarms(context);
+
+        startResetAlarms(context);
+
+
+    }// end of startAlarms
+    //==============================================================================================
+
+
+    //==============================================================================================
+    public static void startResetAlarms(Context context){
+
+        //we are using alarm manager for the notification
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        //this intent will be called when taping the notification
+        Intent notificationIntent = new Intent(context, ResetAlarmReceiver.class);
+        //this pendingIntent will be called by the broadcast receiver
+        PendingIntent broadcast = PendingIntent.getBroadcast(context, 100,
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar cal = Calendar.getInstance();//getting calender instance
+
+        cal.setTimeInMillis(System.currentTimeMillis());//setting the time from device
+        cal.set(Calendar.HOUR_OF_DAY, 3); // cal.set NOT cal.add
+        cal.set(Calendar.MINUTE,30);
+        cal.set(Calendar.SECOND, 0);
+
+        // add a day to make it tomorrow
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+
+        //Log.d("mgdev", "Alarms: "+cal.toString());
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                cal.getTimeInMillis(),
+                //10000,
+                AlarmManager.INTERVAL_DAY,
+                broadcast);//alarm manager will repeat the notification each day at the set time
+
+    }// end of startResetAlarms
+    //==============================================================================================
+
+
+    //==============================================================================================
+    public static void startReminderAlarms(Context context){
+
         //we are using alarm manager for the notification
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -760,8 +811,7 @@ public class MainActivity extends AppCompatActivity {
                 AlarmManager.INTERVAL_DAY,
                 broadcast);//alarm manager will repeat the notification each day at the set time
 
-
-    }// end of startAlarms
+    }// end of startReminderAlarms
     //==============================================================================================
 
 
@@ -1150,6 +1200,28 @@ public class MainActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
+    public static void startService(Context context){
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        String deviceID = SP.getString("DeviceID", "");
+        if(deviceID.isEmpty()){
+            deviceID = UUID.randomUUID().toString();
+            SPeditor.putString("DeviceID", deviceID);
+            SPeditor.apply();
+        }
+
+        String packageName =  "com.riba2reality.exeterlocate.MainActivity";
+
+        Log.d("mgdev", "MainActivity.static.startService: "+packageName );
+
+        luanchService(packageName, context, deviceID);
+
+    }// end of static startService
+    //==============================================================================================
+
+    //==============================================================================================
     public static void luanchService(String packageName, Context context, String deviceID){
 
 
@@ -1220,9 +1292,18 @@ public class MainActivity extends AppCompatActivity {
     }
     //==============================================================================================
 
+    //==============================================================================================
+    private void stopLocationService(){
 
+        stopLocationService(this);
+
+        checkButtons();
+
+    }
     //==============================================================================================
 
+
+    //==============================================================================================
     /**
      * stopLocationService method
      *
@@ -1230,22 +1311,22 @@ public class MainActivity extends AppCompatActivity {
      * 'running' to false, and the start/stop button back to "start"
      *
      */
-    private void stopLocationService() {
+    public static void stopLocationService(Context context) {
 
 
-        if (isLocationServiceRunning(this)) {
+        if (isLocationServiceRunning(context)) {
 
 //            startStopButton.setText(R.string.start_button_initial_text);
 //            running = false;
 
-            Intent intent = new Intent(getApplicationContext(), TrackerScanner.class);
+            Intent intent = new Intent(context.getApplicationContext(), TrackerScanner.class);
             intent.setAction(
-                    getResources().getString(R.string.action_stop_location_service)
+                    context.getResources().getString(R.string.action_stop_location_service)
             );
-            startService(intent);
-            Toast.makeText(this, "Location service stopped", Toast.LENGTH_SHORT).show();
+            context.startService(intent);
+            Toast.makeText(context, "Location service stopped", Toast.LENGTH_SHORT).show();
 
-            checkButtons();
+
 
         }// end of if isLocationServiceRunning
     }// end of startLocationService
