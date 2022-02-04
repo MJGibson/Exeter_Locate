@@ -1,5 +1,7 @@
 package com.riba2reality.wifimapper.ui.main;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
@@ -27,15 +29,13 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import com.riba2reality.exeterlocatecore.DataStores.Constants;
-import com.riba2reality.wifimapper.R;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
+import com.riba2reality.wifimapper.R;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,6 +68,8 @@ public class HomescreenFragment extends Fragment {
 
     private Button startButton;
     private Button stopButton;
+
+
 
 
     //==============================================================================================
@@ -187,6 +189,35 @@ public class HomescreenFragment extends Fragment {
 
         return rootView;
     }
+    //==============================================================================================
+
+
+    //==============================================================================================
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // enable the text box content to be save when rotating screen
+        // we can then extract the value and write it to the text box
+        // instead of having an empty text box after rotation
+        TextView log = getActivity().findViewById(R.id.log);
+        if(log!=null) {
+            outState.putCharSequence("textbox_contents", (log).getText());
+        }
+    }// end of onSaveInstanceState
+    //==============================================================================================
+
+    //==============================================================================================
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // if we've saved the state before (e.g. we rotated the screen),
+        // then load up the text previously in the text box
+        if (savedInstanceState != null) {
+            TextView logTextView = view.findViewById(R.id.log);
+            if(logTextView != null )
+                logTextView.setText(savedInstanceState.getCharSequence("textbox_contents"));
+        }
+    }// end of onViewCreated
     //==============================================================================================
 
     //==============================================================================================

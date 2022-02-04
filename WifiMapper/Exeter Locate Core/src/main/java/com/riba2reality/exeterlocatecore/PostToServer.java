@@ -2,6 +2,7 @@ package com.riba2reality.exeterlocatecore;
 
 import android.os.AsyncTask;
 
+import com.riba2reality.exeterlocatecore.DataStores.LimitedCapacityConcurrentLinkedQueue;
 import com.riba2reality.exeterlocatecore.DataStores.ServerMessage;
 
 import java.io.BufferedInputStream;
@@ -190,6 +191,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
         boolean useSSL = this._useSSL;
         final String address = this._address;
 
+        LimitedCapacityConcurrentLinkedQueue queue;
 
         //final String method = "POST";
         final String method = _postType.name().toString();
@@ -337,8 +339,13 @@ public class PostToServer extends AsyncTask<String, String, String> {
         } catch (Exception e) {
 
             // put it back in the queue
-            this.trackerscannerContainer.get().messageResendQueue.add( serverMessage );
+            TrackerScanner trackerScanner = this.trackerscannerContainer.get();
+            if(trackerScanner != null) {
 
+                queue = this.trackerscannerContainer.get().messageResendQueue;
+                queue.add( serverMessage );
+                //this.trackerscannerContainer.get().messageResendQueue.add( serverMessage );
+            }
             e.printStackTrace();
             System.out.println(e.getMessage());
             return "Exception: " + e.getMessage();

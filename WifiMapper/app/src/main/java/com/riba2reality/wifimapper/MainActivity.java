@@ -5,22 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.riba2reality.exeterlocatecore.DataStores.Constants;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 import com.riba2reality.wifimapper.ui.main.HomescreenFragment;
 import com.riba2reality.wifimapper.ui.main.SectionsPagerAdapter;
-
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,28 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    // enable the text box content to be save when rotating screen
-    // we can then extract the value and write it to the text box
-    // instead of having an empty text box after rotation
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        TextView log = findViewById(R.id.log);
-        if(log!=null) {
-            outState.putCharSequence("textbox_contents", (log).getText());
-        }
-    }
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        // if we've saved the state before (e.g. we rotated the screen),
-        // then load up the text previously in the text box
-        if (savedInstanceState != null) {
-            TextView logTextView = findViewById(R.id.log);
-            logTextView.setText(savedInstanceState.getCharSequence("textbox_contents"));
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
