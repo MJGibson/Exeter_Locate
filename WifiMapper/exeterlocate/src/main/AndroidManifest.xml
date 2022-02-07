@@ -43,6 +43,8 @@
 
         <receiver android:name=".AlarmReceiver" />
 
+        <receiver android:name=".ResetAlarmReceiver" />
+
         <receiver android:name=".RebootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

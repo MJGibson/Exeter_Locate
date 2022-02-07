@@ -37,7 +37,7 @@ public class ResetAlarmReceiver extends BroadcastReceiver {
             // reset the service
 
 
-            MainActivity.stopLocationService(context);
+            //MainActivity.stopLocationService(context);
 
             MainActivity.startService(context);
 
