@@ -765,6 +765,10 @@ public class MainActivity extends AppCompatActivity {
         cal.set(Calendar.MINUTE,30);
         cal.set(Calendar.SECOND, 0);
 
+//        if(System.currentTimeMillis() > cal.getTimeInMillis() ){
+//            return;
+//        }
+
         // add a day to make it tomorrow
         cal.add(Calendar.DAY_OF_MONTH, 1);
 
@@ -775,6 +779,13 @@ public class MainActivity extends AppCompatActivity {
                 //10000,
                 AlarmManager.INTERVAL_DAY,
                 broadcast);//alarm manager will repeat the notification each day at the set time
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+//                    cal.getTimeInMillis(),
+//                    //10000,
+//                    //AlarmManager.INTERVAL_DAY,
+//                    broadcast);//alarm manager will repeat the notification each day at the set time
+//        }
 
     }// end of startResetAlarms
     //==============================================================================================

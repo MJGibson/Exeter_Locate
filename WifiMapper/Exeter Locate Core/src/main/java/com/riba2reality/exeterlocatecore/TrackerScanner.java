@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.7";
+    public static final String libraryVersion = "1.6.8";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -550,7 +550,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
             stopLocationServices();
 
-            if(!geoFenceChecked){
+            if(!geoFenceChecked && running){
 
                 if(_current_GPS_Scan_attempts >= _number_of_GPS_Scan_attempts){
                     // reset the counter and don't try again
@@ -2617,6 +2617,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         handler.removeCallbacks(periodicUpdate);
 
+        handler.removeCallbacks(finaliseLocationScans);
+
         running = false;
 
         // always stop others here?
@@ -2953,6 +2955,8 @@ public class TrackerScanner extends Service implements LocationListener {
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wifiScanner:TrackerScanner");
         wl.acquire();
+
+        _current_GPS_Scan_attempts = 0;
 
         // activate the location service
         if(_mode){
