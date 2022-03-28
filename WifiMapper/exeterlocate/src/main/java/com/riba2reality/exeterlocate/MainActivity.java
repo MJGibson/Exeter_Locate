@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-            SPeditor.putBoolean("termsAcceptance", _termsAccepted);
+            SPeditor.putBoolean("termsAccept", _termsAccepted);
             SPeditor.apply();
 
             // assuming the terms are accepted, then start the location service already...
@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean("termsAccept", false);
 
         if(!_termsAccepted){
 
@@ -832,113 +832,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TermsActivity.class);
 
         startActivity(intent);
-
-
-//        //---------------------------------------
-//
-//
-//
-//        AlertDialog.Builder alert = new AlertDialog.Builder(this,
-//                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
-//
-//        WebView webView = new WebView(this);
-//        //webView.setId(R.id.);
-//
-//        webView.loadUrl("file:///android_asset/ExeterLocateConcentPage.html");
-//        webView.setWebViewClient(new WebViewClient(){
-//            @Override
-//            public boolean shouldOverrideUrlLoading(WebView view, String url){
-//                view.loadUrl(url);
-//                return true;
-//            }
-//        });
-//        alert.setView(webView);
-//
-//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
-//        final SharedPreferences.Editor SPeditor = SP.edit();
-//
-//        alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                _termsAccepted = true;
-//                SPeditor.putBoolean("termsAcceptance", _termsAccepted);
-//                SPeditor.apply();
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        alert.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                finish();
-//
-//                //System.exit(0);
-//            }
-//        });
-//
-//        alert.setCancelable(false);
-//
-//        AlertDialog dialog = alert.create();
-//
-//        //dialog.getWindow().setBackgroundDrawable(getDrawable(R.color.white));
-//
-//        dialog.show();
-//
-//        // Access the button and set it to invisible
-//        final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-//        button.setVisibility(View.INVISIBLE);
-//
-//        webView.getViewTreeObserver().addOnScrollChangedListener(
-//                new ViewTreeObserver.OnScrollChangedListener() {
-//                    @Override
-//                    public void onScrollChanged() {
-//
-//                        //Log.v("mgdev", "+++ scrollchanged "+webView.getScrollY());
-//
-//                        int maxScrollExtent =
-//                                (int) ((webView.getContentHeight() *
-//                                        webView.getResources().getDisplayMetrics().density)
-//                                        - webView.getHeight())-1;
-//
-//                        int diff = ((int)(maxScrollExtent * 0.9)) - webView.getScrollY();
-//
-//                        //Log.v("mgdev", "-----------------------::"+diff);
-//                        //Log.v("mgdev", "maxScrollExtent"+maxScrollExtent);
-//                        //Log.v("mgdev", "webView.getScrollY()"+webView.getScrollY());
-//
-//                        // if diff is zero, then the bottom has been reached
-//                        if (diff <= 0 && maxScrollExtent != 0) {
-//
-//                                //Log.v("mgdev", "Accept?!?!");
-//
-//                                button.setVisibility(View.VISIBLE);
-//
-//                            }// end of if diff = 0
-//                    }// end of onScrollChanged
-//                }// end of ViewTreeObserver.OnScrollChangedListener
-//        );// end of addOnScrollChangedListener
-//
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-//            webView.getViewTreeObserver().addOnWindowFocusChangeListener(
-//                    new ViewTreeObserver.OnWindowFocusChangeListener() {
-//                        @Override
-//                        public void onWindowFocusChanged(boolean hasFocus) {
-//
-//                            Log.v("mgdev", "dialog.onWindowFocusChanged");
-//
-//                            if(hasFocus && _termsAccepted){
-//                                dialog.hide();
-//                            }
-//
-//
-//                        }// end of onWindowFocusChanged
-//                    }//end of OnWindowFocusChangeListener
-//            );// end of addOnWindowFocusChangeListener
-//        }
-
-
-
 
     }// end of startTermsAcceptance
     //==============================================================================================

@@ -2421,7 +2421,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+    public static String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         boolean first = true;
         for(Map.Entry<String, String> entry : params.entrySet()){
@@ -2504,7 +2504,8 @@ public class TrackerScanner extends Service implements LocationListener {
                     serverMessage,
                     _useSSL,
                     _serverAddress,
-                    urlString
+                    urlString,
+                    null
 
             );
 

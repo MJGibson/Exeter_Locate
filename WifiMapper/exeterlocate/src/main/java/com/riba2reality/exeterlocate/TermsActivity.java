@@ -1,8 +1,10 @@
 package com.riba2reality.exeterlocate;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -10,10 +12,20 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ScrollView;
+import android.widget.Switch;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.riba2reality.exeterlocatecore.DataStores.Constants;
+import com.riba2reality.exeterlocatecore.DataStores.ServerMessage;
+import com.riba2reality.exeterlocatecore.PostToServer;
+import com.riba2reality.exeterlocatecore.TrackerScanner;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
@@ -194,13 +206,110 @@ public class TermsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
+
+            Switch optOutSwitch = findViewById(R.id.optoutSwitch);
+            boolean outOut = optOutSwitch.isChecked();
+
+
+            String address = "riba2reality.com";
+            boolean useSSL = true;
+
+            String protocol = "http";
+            if (useSSL) {
+                protocol += "s";
+            }
+
+            String port = Constants.port;
+
+            //String message = "";
+            String endpoint = "/user/";
+
+            String urlString = protocol + "://" + address + port + endpoint;
+
             //
+            PostToServer thisPost = new PostToServer(null,
+                    getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.nginxselfsigned),
+                    getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.user),
+                    encodeResult(outOut),
+                    useSSL,
+                    address,
+                    urlString,
+                    null
+
+            );
+
+            PostToServer.TYPE postType = PostToServer.TYPE.POST;
+            thisPost.setPostType(postType);
+
+            thisPost.execute();
+
+
+
+
+
+
+
+
+            // notify the main activity and close this activtiy
             sendResult();
             finish();
 
 
         }// end of onClick
     };// end of allowWifiButtonPressed click listener
+    //==============================================================================================
+
+    //==============================================================================================
+    private ServerMessage encodeResult(boolean result){
+
+        String message = "";
+
+        ServerMessage serverMessage = new ServerMessage();
+
+        //------------------------------------------------------------------
+        // build message...
+
+        HashMap<String, String> parameters = new HashMap<>();
+
+        // ensuring a device id is created
+        // check if we already have a UUID, if not make a new one and store it
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+        String _deviceID = SP.getString("DeviceID", "");
+        if(_deviceID.isEmpty()){
+            _deviceID = UUID.randomUUID().toString();
+            SPeditor.putString("DeviceID", _deviceID);
+            SPeditor.apply();
+        }
+
+        parameters.put("UUID", _deviceID);
+
+        String database = "beta";
+
+        parameters.put("DATABASE", database);
+
+        //parameters.put("MESSAGE", this.manualScanMessage);
+
+        parameters.put("OPT_OUT", String.valueOf(result));
+
+        //------------
+
+        try {
+            message = TrackerScanner.getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        //------------------------------------------------------------------
+//        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.messageType = ServerMessage.MessageType.LOCATION;
+//        serverMessage.useSSL = _useSSL;
+//        serverMessage.address = _serverAddress;
+
+
+        return serverMessage;
+    }// end of encodeLocationResult
     //==============================================================================================
 
     //==============================================================================================

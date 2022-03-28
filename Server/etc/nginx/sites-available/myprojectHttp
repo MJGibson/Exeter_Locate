@@ -95,6 +95,16 @@ server {
 		include uwsgi_params;
 		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
     }
+	
+	location /user/ { 
+		# if the client-side certificate failed to authenticate, show a 403
+        # message to the client
+		if ($ssl_client_verify != SUCCESS) {
+			return 403;
+		}
+		include uwsgi_params;
+		uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock;
+    }
 
 }
 server {
