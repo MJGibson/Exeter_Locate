@@ -9,8 +9,12 @@ server {
 
     listen [::]:443 ssl; # managed by Certbot
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/riba2reality.com/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/riba2reality.com/privkey.pem; # managed by Certbot
+    #ssl_certificate /etc/letsencrypt/live/riba2reality.com/fullchain.pem; # managed by Certbot
+    #ssl_certificate_key /etc/letsencrypt/live/riba2reality.com/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 	
