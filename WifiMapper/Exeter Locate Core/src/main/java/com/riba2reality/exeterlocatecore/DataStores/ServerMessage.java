@@ -16,7 +16,8 @@ public class ServerMessage {
         BLUETOOTH,
         ACCEL,
         MAG,
-        COMBINED
+        COMBINED,
+        User
 
     }
 

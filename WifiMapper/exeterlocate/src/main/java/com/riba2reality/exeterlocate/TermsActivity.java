@@ -18,15 +18,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.riba2reality.exeterlocatecore.DataStores.Constants;
-import com.riba2reality.exeterlocatecore.DataStores.ServerMessage;
-import com.riba2reality.exeterlocatecore.PostToServer;
-import com.riba2reality.exeterlocatecore.TrackerScanner;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.UUID;
-
 /**
  * Exeter Locate App - Is a citizen science driven project, which allows uses to donate their
  * anonymized Location, Wi-Fi, Bluetooth, accelerometer and magnetometer data. By many citizens
@@ -208,47 +199,43 @@ public class TermsActivity extends AppCompatActivity {
 
 
             Switch optOutSwitch = findViewById(R.id.optoutSwitch);
-            boolean outOut = optOutSwitch.isChecked();
+            boolean optOut = optOutSwitch.isChecked();
+//
+//
+//            String address = "riba2reality.com";
+//            boolean useSSL = true;
+//
+//            String protocol = "http";
+//            if (useSSL) {
+//                protocol += "s";
+//            }
+//
+//            String port = Constants.port;
+//
+//            //String message = "";
+//            String endpoint = "/user/";
+//
+//            String urlString = protocol + "://" + address + port + endpoint;
+//
+//            //
+//            PostToServer thisPost = new PostToServer(null,
+//                    getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.nginxselfsigned),
+//                    getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.user),
+//                    encodeResult(outOut),
+//                    useSSL,
+//                    address,
+//                    urlString,
+//                    null
+//
+//            );
+//
+//            PostToServer.TYPE postType = PostToServer.TYPE.POST;
+//            thisPost.setPostType(postType);
+//
+//            thisPost.execute();
 
-
-            String address = "riba2reality.com";
-            boolean useSSL = true;
-
-            String protocol = "http";
-            if (useSSL) {
-                protocol += "s";
-            }
-
-            String port = Constants.port;
-
-            //String message = "";
-            String endpoint = "/user/";
-
-            String urlString = protocol + "://" + address + port + endpoint;
-
-            //
-            PostToServer thisPost = new PostToServer(null,
-                    getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.nginxselfsigned),
-                    getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.user),
-                    encodeResult(outOut),
-                    useSSL,
-                    address,
-                    urlString,
-                    null
-
-            );
-
-            PostToServer.TYPE postType = PostToServer.TYPE.POST;
-            thisPost.setPostType(postType);
-
-            thisPost.execute();
-
-
-
-
-
-
-
+            // save the opt-out option
+            SaveOptOutOption(optOut);
 
             // notify the main activity and close this activtiy
             sendResult();
@@ -260,57 +247,70 @@ public class TermsActivity extends AppCompatActivity {
     //==============================================================================================
 
     //==============================================================================================
-    private ServerMessage encodeResult(boolean result){
+    private void SaveOptOutOption(boolean optOut){
 
-        String message = "";
-
-        ServerMessage serverMessage = new ServerMessage();
-
-        //------------------------------------------------------------------
-        // build message...
-
-        HashMap<String, String> parameters = new HashMap<>();
-
-        // ensuring a device id is created
-        // check if we already have a UUID, if not make a new one and store it
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        String _deviceID = SP.getString("DeviceID", "");
-        if(_deviceID.isEmpty()){
-            _deviceID = UUID.randomUUID().toString();
-            SPeditor.putString("DeviceID", _deviceID);
-            SPeditor.apply();
-        }
 
-        parameters.put("UUID", _deviceID);
-
-        String database = "beta";
-
-        parameters.put("DATABASE", database);
-
-        //parameters.put("MESSAGE", this.manualScanMessage);
-
-        parameters.put("OPT_OUT", String.valueOf(result));
-
-        //------------
-
-        try {
-            message = TrackerScanner.getPostDataString(parameters);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //------------------------------------------------------------------
-//        serverMessage.urlString = urlString;
-        serverMessage.message = message;
-        serverMessage.messageType = ServerMessage.MessageType.LOCATION;
-//        serverMessage.useSSL = _useSSL;
-//        serverMessage.address = _serverAddress;
+        SPeditor.putBoolean("OPT-OUT", optOut);
+        SPeditor.apply();
 
 
-        return serverMessage;
-    }// end of encodeLocationResult
+    }// end of SaveOptOutOption
     //==============================================================================================
+
+//    //==============================================================================================
+//    private ServerMessage encodeResult(boolean result){
+//
+//        String message = "";
+//
+//        ServerMessage serverMessage = new ServerMessage();
+//
+//        //------------------------------------------------------------------
+//        // build message...
+//
+//        HashMap<String, String> parameters = new HashMap<>();
+//
+//        // ensuring a device id is created
+//        // check if we already have a UUID, if not make a new one and store it
+//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+//        final SharedPreferences.Editor SPeditor = SP.edit();
+//        String _deviceID = SP.getString("DeviceID", "");
+//        if(_deviceID.isEmpty()){
+//            _deviceID = UUID.randomUUID().toString();
+//            SPeditor.putString("DeviceID", _deviceID);
+//            SPeditor.apply();
+//        }
+//
+//        parameters.put("UUID", _deviceID);
+//
+//        String database = "beta";
+//
+//        parameters.put("DATABASE", database);
+//
+//        //parameters.put("MESSAGE", this.manualScanMessage);
+//
+//        parameters.put("OPT_OUT", String.valueOf(result));
+//
+//        //------------
+//
+//        try {
+//            message = TrackerScanner.getPostDataString(parameters);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //------------------------------------------------------------------
+////        serverMessage.urlString = urlString;
+//        serverMessage.message = message;
+//        serverMessage.messageType = ServerMessage.MessageType.LOCATION;
+////        serverMessage.useSSL = _useSSL;
+////        serverMessage.address = _serverAddress;
+//
+//
+//        return serverMessage;
+//    }// end of encodeLocationResult
+//    //==============================================================================================
 
     //==============================================================================================
     /**

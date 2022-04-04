@@ -204,13 +204,13 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         BufferedReader reader = null;
 
-        boolean returnMatch = false;
+//        boolean returnMatch = false;
 
         String returnVal = "";
 
         //------------------------------------------------------------------
 
-        while(returnMatch == false) {
+//        while(returnMatch == false) {
 
             try {
 
@@ -340,22 +340,22 @@ public class PostToServer extends AsyncTask<String, String, String> {
                 {
                     sb.append(line).append("\n");
                 }// end of looping lines of returned message
-                //------------------------------------------------------------------
-
-
-                // if no string supplied to check then don't loop again
-                if(_checkReturn == null)
-                {
-                    returnMatch = true;
-                }
-                else{
-                    // if string supplied then check it matches, otherwise try again.
-                    if(sb.toString().equals(_checkReturn))
-                    {
-                        returnMatch = true;
-                    }
-
-                }
+//                //------------------------------------------------------------------
+//
+//
+//                // if no string supplied to check then don't loop again
+//                if(_checkReturn == null)
+//                {
+//                    returnMatch = true;
+//                }
+//                else{
+//                    // if string supplied then check it matches, otherwise try again.
+//                    if(sb.toString().equals(_checkReturn))
+//                    {
+//                        returnMatch = true;
+//                    }
+//
+//                }
 
 
 
@@ -387,7 +387,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
                     }// end of try within finally
                 }// end of if reader not null
             }// end of try-catch-finally
-        }// end of while loop
+
+//        }// end of while loop
 
         return returnVal;
 

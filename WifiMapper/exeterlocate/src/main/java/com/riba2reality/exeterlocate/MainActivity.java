@@ -361,9 +361,26 @@ public class MainActivity extends AppCompatActivity {
                     TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE_FIRST,
                     false);
 
+            // check for comfirmation of User Data being received by server.
+            String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
+
+            if(message.equals("Server: USER data stored successfully."))
+            {
+                //selfRef
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(selfRef);
+                final SharedPreferences.Editor SPeditor = SP.edit();
+
+                SPeditor.putBoolean("OPT-OUT-RECEIVED", true);
+                SPeditor.apply();
+
+
+            }
+
+
+
 
         }// end of onReceive
-    };
+    };// end of receiverGeoFenceUpdates
     //==============================================================================================
 
     //==============================================================================================
@@ -1154,6 +1171,17 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("PACKAGE", packageName);
 
         intent.putExtra("post_type", postType);
+
+        SharedPreferences SP =
+                android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+        boolean outOut = SP.getBoolean("OPT-OUT", false);
+        boolean outOutReceived = SP.getBoolean("OPT-OUT-RECEIVED", false);
+
+        intent.putExtra("OPT-OUT", outOut);
+        intent.putExtra("OPT-OUT-RECEIVED", outOutReceived);
+
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
