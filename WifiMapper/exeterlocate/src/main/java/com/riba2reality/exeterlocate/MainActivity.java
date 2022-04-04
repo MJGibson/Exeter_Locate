@@ -1154,14 +1154,16 @@ public class MainActivity extends AppCompatActivity {
         );
         intent.putExtra("MODE", true); // engage citizen mode
 
-        String address = "riba2reality.com";
+        //String address = "riba2reality.com";
+        String address = Constants.address;
 
-        String dataBase = "beta";
+        //String dataBase = "beta";
+        String dataBase = Constants.database;
 
         String postType = "POST";
 
 
-        boolean useSSL = true;
+        boolean useSSL = Constants.useSSL;
 
         intent.putExtra("ServerAddress", address);
         intent.putExtra("database", dataBase);

@@ -1959,7 +1959,8 @@ public class TrackerScanner extends Service implements LocationListener {
 
         //----------------------------------------
 
-        String address = "riba2reality.com";
+        //String address = "riba2reality.com";
+        String address = _serverAddress;
 
 
         String protocol = "http";
@@ -1975,7 +1976,7 @@ public class TrackerScanner extends Service implements LocationListener {
         String urlString = protocol + "://" + address + port + endpoint;
 
         //
-        PostToServer thisPost = new PostToServer(null,
+        PostToServer thisPost = new PostToServer(this,
                 getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.nginxselfsigned),
                 getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.user),
                 encodeResult(_optOut),

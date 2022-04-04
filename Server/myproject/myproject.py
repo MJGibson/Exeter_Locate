@@ -197,10 +197,29 @@ def user():
             db = client[jsonData["DATABASE"]]
         else:
             db = client[dataBase]
+            
+        # collection aisngment
+        collection = db[userCollection]
+
+        # check if user already exists
+        documents = collection.find({"UUID":jsonData["UUID"]})
+        documentsCount = documents.count_documents();
+        
+        #print(documentsCount)
+        if(documentsCount > 0):
+            
+            filter = { 'UUID': jsonData["UUID"] }
+             
+            # Values to be updated.
+            newvalues = { "$set": { 'OPT_OUT': jsonData["OPT_OUT"] } }
+            
+            # Using update_one() method for single
+            # updation.
+            collection.update_one(filter, newvalues)
 
 
         # ---- post data to the GPS table
-        collection = db[userCollection]
+        
         collection.insert_one(
             {
                 "UUID": jsonData["UUID"],

@@ -24,9 +24,15 @@ public class Constants {
 
 
     public static final String database = "beta";
-
-    //public static final String port = ":5000";
     public static final String port = "";
+    public static final String address = "riba2reality.com";
+    public static final boolean useSSL = true;
+
+    // Test settings
+    //public static final String database = "devTest";
+    //public static final String port = ":5000";
+    //public static final String address = "10.0.2.2";
+    //public static final boolean useSSL = false;
 
 
     public static final List<LatLng> stethamCampusPolygon = Arrays.asList(
