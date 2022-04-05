@@ -1,5 +1,17 @@
 package com.riba2reality.exeterlocate;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeUp;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static com.google.common.truth.Truth.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static java.lang.Thread.sleep;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Instrumentation;
@@ -30,6 +42,7 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
 import com.riba2reality.exeterlocate.messages.GpsMessageActivity;
+import com.riba2reality.exeterlocatecore.DataStores.Constants;
 import com.riba2reality.exeterlocatecore.TrackerScanner;
 
 import junit.framework.TestCase;
@@ -38,18 +51,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.swipeUp;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static com.google.common.truth.Truth.assertThat;
-import static java.lang.Thread.sleep;
-import static org.hamcrest.Matchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 //@RunWith(MockitoJUnitRunner.class)
@@ -178,7 +179,7 @@ public class MainActivityTests extends TestCase {
         final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.putBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
         SPeditor.apply();
 
 
@@ -211,7 +212,7 @@ public class MainActivityTests extends TestCase {
         final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.putBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
         SPeditor.apply();
 
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
@@ -267,7 +268,7 @@ public class MainActivityTests extends TestCase {
         onView(withText("Accept")).perform(click());
 
 
-        boolean termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         assertTrue("Terms should be accepted after Accept click", termsAccepted);
 
@@ -303,7 +304,7 @@ public class MainActivityTests extends TestCase {
         final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-        SPeditor.putBoolean("termsAcceptance", false);
+        SPeditor.putBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
         SPeditor.apply();
 
         ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class);
@@ -367,7 +368,7 @@ public class MainActivityTests extends TestCase {
         final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-        SPeditor.putBoolean("termsAcceptance", true);
+        SPeditor.putBoolean(Constants.ACTION_TERMS_ACCEPTED, true);
         SPeditor.apply();
 
         GpsMessageActivity._test = true;

@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-            SPeditor.putBoolean("termsAccept", _termsAccepted);
+            SPeditor.putBoolean(Constants.ACTION_TERMS_ACCEPTED, _termsAccepted);
             SPeditor.apply();
 
             // assuming the terms are accepted, then start the location service already...
@@ -438,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAccept", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         if(!_termsAccepted){
 
@@ -562,7 +562,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted && !GpsMessageActivity._test) {
@@ -586,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -609,7 +609,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -631,7 +631,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
 
 

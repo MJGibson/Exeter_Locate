@@ -22,6 +22,9 @@ public class Constants {
     public static final String ACTION_REQUEST_GEOFENCE_UPDATE = "geoFenceUpdate";
 
 
+    public static final String ACTION_TERMS_ACCEPTED = "termsAccept";
+
+
 
     public static final String database = "beta";
     public static final String port = "";
