@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.6.8";
+    public static final String libraryVersion = "1.7.0";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -275,6 +275,9 @@ public class TrackerScanner extends Service implements LocationListener {
     private boolean gpsIsOn = false;
 
     private boolean has_periodicUpdate_gps = false;
+
+    private boolean _optOut = false;
+    private boolean _optOutReceived = false;
 
     //----------------------------------------------------------------------------------------------
 
@@ -1950,6 +1953,92 @@ public class TrackerScanner extends Service implements LocationListener {
     // post result functions
 
     //==============================================================================================
+    private void sendOptOutOption(){
+
+
+
+        //----------------------------------------
+
+        //String address = "riba2reality.com";
+        String address = _serverAddress;
+
+
+        String protocol = "http";
+        if (_useSSL) {
+            protocol += "s";
+        }
+
+        String port = Constants.port;
+
+        //String message = "";
+        String endpoint = "/user/";
+
+        String urlString = protocol + "://" + address + port + endpoint;
+
+        //
+        PostToServer thisPost = new PostToServer(this,
+                getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.nginxselfsigned),
+                getResources().openRawResource(com.riba2reality.exeterlocatecore.R.raw.user),
+                encodeResult(_optOut),
+                _useSSL,
+                address,
+                urlString,
+                null
+
+        );
+
+        PostToServer.TYPE postType = PostToServer.TYPE.POST;
+        thisPost.setPostType(postType);
+
+        thisPost.execute();
+
+
+
+
+    }// end of sendOptOutOption
+    //==============================================================================================
+
+    //==============================================================================================
+    private ServerMessage encodeResult(boolean result){
+
+        String message = "";
+
+        ServerMessage serverMessage = new ServerMessage();
+
+        //------------------------------------------------------------------
+        // build message...
+
+        HashMap<String, String> parameters = new HashMap<>();
+
+        parameters.put("UUID", _deviceID);
+
+        parameters.put("DATABASE", _database);
+
+        //parameters.put("MESSAGE", this.manualScanMessage);
+
+        parameters.put("OPT_OUT", String.valueOf(result));
+
+        //------------
+
+        try {
+            message = TrackerScanner.getPostDataString(parameters);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        //------------------------------------------------------------------
+//        serverMessage.urlString = urlString;
+        serverMessage.message = message;
+        serverMessage.messageType = ServerMessage.MessageType.User;
+//        serverMessage.useSSL = _useSSL;
+//        serverMessage.address = _serverAddress;
+
+
+        return serverMessage;
+    }// end of encodeResult
+    //==============================================================================================
+
+    //==============================================================================================
     private ServerMessage encodeLocationResult(LocationResult locationResult){
 
         String message = "";
@@ -2421,7 +2510,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
     //==============================================================================================
-    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+    public static String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         boolean first = true;
         for(Map.Entry<String, String> entry : params.entrySet()){
@@ -2493,18 +2582,23 @@ public class TrackerScanner extends Service implements LocationListener {
                     endpoint = "/ble/";
                     message = "Bluetooth";
                     break;
+                case User:
+                    endpoint = "/user/";
+                    message = "User";
+                    break;
 
             }
 
             String urlString = protocol + "://" + _serverAddress + port + endpoint;
 
             PostToServer thisPost = new PostToServer(this,
-                    getResources().openRawResource(R.raw.fullchain),
+                    getResources().openRawResource(R.raw.nginxselfsigned),
                     getResources().openRawResource(R.raw.user),
                     serverMessage,
                     _useSSL,
                     _serverAddress,
-                    urlString
+                    urlString,
+                    null
 
             );
 
@@ -2985,8 +3079,16 @@ public class TrackerScanner extends Service implements LocationListener {
             scanOthers();
         }
 
-    }
+        //
+        if(!_optOutReceived)
+            sendOptOutOption();
+
+
+    }// end of startScanning
     //==============================================================================================
+
+
+
 
 
     //==============================================================================================
@@ -3036,6 +3138,27 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
 
 
+    //==============================================================================================
+    private void getDataFromIntent(Intent intent){
+
+        _mode = intent.getBooleanExtra("MODE", false);
+
+        _serverAddress = intent.getStringExtra("ServerAddress");
+        _database = intent.getStringExtra("database");
+        _deviceID = intent.getStringExtra("DeviceID");
+        _useSSL = intent.getBooleanExtra("SSL_switch", true);
+
+        _callingPackage = intent.getStringExtra("PACKAGE");
+
+        _postType = intent.getStringExtra("post_type");
+
+        _optOut = intent.getBooleanExtra("OPT-OUT", false);
+        _optOutReceived = intent.getBooleanExtra("OPT-OUT-RECEIVED", false);
+
+
+    }// end of getDataFromIntent
+    //==============================================================================================
+
 
     //==============================================================================================
     @Override
@@ -3052,16 +3175,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         Log.d("mgdev", "TrackerScanner.onStartCommand().ACTION_START_LOCATION_SERVICE");
 
-                        _mode = intent.getBooleanExtra("MODE", false);
-
-                        _serverAddress = intent.getStringExtra("ServerAddress");
-                        _database = intent.getStringExtra("database");
-                        _deviceID = intent.getStringExtra("DeviceID");
-                        _useSSL = intent.getBooleanExtra("SSL_switch", true);
-
-                        _callingPackage = intent.getStringExtra("PACKAGE");
-
-                        _postType = intent.getStringExtra("post_type");
+                        getDataFromIntent(intent);
 
 
                         startScanning();
@@ -3085,17 +3199,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
                     case Constants.ACTION_SINGLE_SCAN: // used by wifiMapper for manual scans
 
-                        _mode = intent.getBooleanExtra("MODE", false);
-
-                        _serverAddress = intent.getStringExtra("ServerAddress");
-                        _database = intent.getStringExtra("database");
-                        _deviceID = intent.getStringExtra("DeviceID");
-                        _useSSL = intent.getBooleanExtra("SSL_switch", true);
-
-                        _callingPackage = intent.getStringExtra("PACKAGE");
-
-                        _postType = intent.getStringExtra("post_type");
-
+                        getDataFromIntent(intent);
 
                         if(!running){
                             //continueScanning=true;

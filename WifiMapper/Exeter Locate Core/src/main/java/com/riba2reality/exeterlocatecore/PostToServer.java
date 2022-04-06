@@ -29,7 +29,7 @@ import javax.net.ssl.TrustManagerFactory;
 public class PostToServer extends AsyncTask<String, String, String> {
 
 
-    enum TYPE {
+    public enum TYPE {
         GET,
         POST,
         PUT,
@@ -52,6 +52,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
     private boolean _useSSL;
     private String _address;
     private String _urlString;
+    private String _checkReturn;
 
     private TYPE _postType = TYPE.POST;
 
@@ -77,7 +78,8 @@ public class PostToServer extends AsyncTask<String, String, String> {
                         ServerMessage serverMessage,
                         boolean useSSL,
                         String address,
-                        String urlString
+                        String urlString,
+                        String checkReturn
                         ) {
 
         this.trackerscannerContainer = new WeakReference<>(trackerScanner);
@@ -93,6 +95,7 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         this._address = address;
         this._urlString = urlString;
+        this._checkReturn = checkReturn;
 
 
     }// end of PostToServer Constructor
@@ -201,164 +204,193 @@ public class PostToServer extends AsyncTask<String, String, String> {
 
         BufferedReader reader = null;
 
+//        boolean returnMatch = false;
+
+        String returnVal = "";
 
         //------------------------------------------------------------------
 
-        try {
+//        while(returnMatch == false) {
 
-            //------------------------------------------------------------------
-
-            //System.out.println(System.getProperty("user.dir"));
-
-
-            // Load CAs from an InputStream
-            // (could be from a resource or ByteArrayInputStream or ...)
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-
-            //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
-
-            //InputStream is = this.getResources().openRawResource(R.raw.sample);
-            //BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
-
-            //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
-
-            //InputStream caInput = new BufferedInputStream(this.inputSteamContrainer.get());
-            InputStream caInput = new BufferedInputStream(this.is);
-
-
-            Certificate ca;
             try {
-                ca = cf.generateCertificate(caInput);
-                //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-            } finally {
-                caInput.close();
-            }
 
-            //------------------------------------------------------------------
+                //------------------------------------------------------------------
 
-            // Create a KeyStore containing our trusted public server certificate
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
+                //System.out.println(System.getProperty("user.dir"));
 
 
-            // client authentication for server
-            String keyPassphrase = "";
-            KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
-            keyStoreClient.load(_userPFX, keyPassphrase.toCharArray());
+                // Load CAs from an InputStream
+                // (could be from a resource or ByteArrayInputStream or ...)
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                // From https://www.washington.edu/itconnect/security/ca/load-der.crt
 
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keyStoreClient, keyPassphrase.toCharArray());
+                //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
 
-
-            // Create a TrustManager that trusts the CAs in our KeyStore
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
-
-            // Create an SSLContext that uses our TrustManager
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+                //InputStream is = this.getResources().openRawResource(R.raw.sample);
+                //BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
 
+                //InputStream caInput = new BufferedInputStream(new FileInputStream("cert.pem"));
+
+                //InputStream caInput = new BufferedInputStream(this.inputSteamContrainer.get());
+                InputStream caInput = new BufferedInputStream(this.is);
 
 
-            //------------------------------------------------------------------
-
-
-            // Create an HostnameVerifier that hardwires the expected hostname.
-            // Note that is different than the URL's hostname:
-            // example.com versus example.org
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    // at least check that the server address matches what we expect
-                    return hostname.equals(address);
-
-                }// end of verify
-            };
-
-
-            //------------------------------------------------------------------
-            // set up connection
-
-//            if (method.equals("GET")) {
-//                urlString += "?" + this.getEncodedParams(parameters);
-//                //As mentioned before, this only executes if the request method has been
-//                //set to GET
-//            }
-
-            URL url = new URL(urlString);
-            HttpURLConnection con;
-            con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod(method);
-            // set time outs
-            con.setReadTimeout(timeOut);
-            con.setConnectTimeout(timeOut);
-
-            if (useSSL) {
-                // set certificate
-                ((HttpsURLConnection) con).setSSLSocketFactory(context.getSocketFactory());
-
-                // set host name
-                ((HttpsURLConnection) con).setHostnameVerifier(hostnameVerifier);
-
-
-            }
-
-            //------------------------------------------------------------------
-            // post the message
-
-            if (method.equals("POST") || method.equals("PUT")  ) {
-                con.setDoOutput(true);
-                OutputStreamWriter writer =
-                        new OutputStreamWriter(con.getOutputStream());
-
-                writer.write(message);
-
-                writer.flush();
-            }
-
-            //------------------------------------------------------------------
-            // get the returned message
-
-            StringBuilder sb = new StringBuilder();
-            reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }// end of looping lines of returned message
-
-            return sb.toString();
-
-        } catch (Exception e) {
-
-            // put it back in the queue
-            TrackerScanner trackerScanner = this.trackerscannerContainer.get();
-            if(trackerScanner != null) {
-
-                queue = this.trackerscannerContainer.get().messageResendQueue;
-                queue.add( serverMessage );
-                //this.trackerscannerContainer.get().messageResendQueue.add( serverMessage );
-            }
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return "Exception: " + e.getMessage();
-        }finally {
-            if (reader != null) {
+                Certificate ca;
                 try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }// end of try within finally
-            }// end of if reader not null
-        }// end of try-catch-finally
+                    ca = cf.generateCertificate(caInput);
+                    //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+                } finally {
+                    caInput.close();
+                }
+
+                //------------------------------------------------------------------
+
+                // Create a KeyStore containing our trusted public server certificate
+                String keyStoreType = KeyStore.getDefaultType();
+                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+                keyStore.load(null, null);
+                keyStore.setCertificateEntry("ca", ca);
+
+
+                // client authentication for server
+                String keyPassphrase = "";
+                KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
+                keyStoreClient.load(_userPFX, keyPassphrase.toCharArray());
+
+                KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                kmf.init(keyStoreClient, keyPassphrase.toCharArray());
+
+
+                // Create a TrustManager that trusts the CAs in our KeyStore
+                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                tmf.init(keyStore);
+
+                // Create an SSLContext that uses our TrustManager
+                SSLContext context = SSLContext.getInstance("TLS");
+                context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+
+                //------------------------------------------------------------------
+
+
+                // Create an HostnameVerifier that hardwires the expected hostname.
+                // Note that is different than the URL's hostname:
+                // example.com versus example.org
+                HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        // at least check that the server address matches what we expect
+                        return hostname.equals(address);
+
+                    }// end of verify
+                };
+
+
+                //------------------------------------------------------------------
+                // set up connection
+
+                //            if (method.equals("GET")) {
+                //                urlString += "?" + this.getEncodedParams(parameters);
+                //                //As mentioned before, this only executes if the request method has been
+                //                //set to GET
+                //            }
+
+                URL url = new URL(urlString);
+                HttpURLConnection con;
+                con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod(method);
+                // set time outs
+                con.setReadTimeout(timeOut);
+                con.setConnectTimeout(timeOut);
+
+                if (useSSL) {
+                    // set certificate
+                    ((HttpsURLConnection) con).setSSLSocketFactory(context.getSocketFactory());
+
+                    // set host name
+                    ((HttpsURLConnection) con).setHostnameVerifier(hostnameVerifier);
+
+
+                }
+
+                //------------------------------------------------------------------
+                // post the message
+
+                if (method.equals("POST") || method.equals("PUT")) {
+                    con.setDoOutput(true);
+                    OutputStreamWriter writer =
+                            new OutputStreamWriter(con.getOutputStream());
+
+                    writer.write(message);
+
+                    writer.flush();
+                }
+
+                //------------------------------------------------------------------
+                // get the returned message
+
+                StringBuilder sb = new StringBuilder();
+                reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                String line;
+
+                while ((line = reader.readLine()) != null)
+                {
+                    sb.append(line).append("\n");
+                }// end of looping lines of returned message
+//                //------------------------------------------------------------------
+//
+//
+//                // if no string supplied to check then don't loop again
+//                if(_checkReturn == null)
+//                {
+//                    returnMatch = true;
+//                }
+//                else{
+//                    // if string supplied then check it matches, otherwise try again.
+//                    if(sb.toString().equals(_checkReturn))
+//                    {
+//                        returnMatch = true;
+//                    }
+//
+//                }
+
+
+
+                //------------------------------------------------------------------
+                returnVal = sb.toString();
+
+            } catch (Exception e) {
+
+                // put it back in the queue
+                if(this.trackerscannerContainer != null) {
+                    TrackerScanner trackerScanner = this.trackerscannerContainer.get();
+                    if (trackerScanner != null && _checkReturn == null) {
+
+                        queue = this.trackerscannerContainer.get().messageResendQueue;
+                        queue.add(serverMessage);
+                        //this.trackerscannerContainer.get().messageResendQueue.add( serverMessage );
+                    }
+                }
+                e.printStackTrace();
+                System.out.println(e.getMessage());
+                return "Exception: " + e.getMessage();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    }// end of try within finally
+                }// end of if reader not null
+            }// end of try-catch-finally
+
+//        }// end of while loop
+
+        return returnVal;
 
     }// end of do in background method
     //==============================================================================================

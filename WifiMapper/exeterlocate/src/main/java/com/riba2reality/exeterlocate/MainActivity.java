@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             final SharedPreferences.Editor SPeditor = SP.edit();
 
 
-            SPeditor.putBoolean("termsAcceptance", _termsAccepted);
+            SPeditor.putBoolean(Constants.ACTION_TERMS_ACCEPTED, _termsAccepted);
             SPeditor.apply();
 
             // assuming the terms are accepted, then start the location service already...
@@ -361,9 +361,26 @@ public class MainActivity extends AppCompatActivity {
                     TrackerScanner.TRACKERSCANNER_GEOFENCE_UPDATE_FIRST,
                     false);
 
+            // check for comfirmation of User Data being received by server.
+            String message = intent.getStringExtra(TrackerScanner.TRACKERSCANNER_MESSAGE);
+
+            if(message.equals("Server: USER data stored successfully."))
+            {
+                //selfRef
+                SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(selfRef);
+                final SharedPreferences.Editor SPeditor = SP.edit();
+
+                SPeditor.putBoolean("OPT-OUT-RECEIVED", true);
+                SPeditor.apply();
+
+
+            }
+
+
+
 
         }// end of onReceive
-    };
+    };// end of receiverGeoFenceUpdates
     //==============================================================================================
 
     //==============================================================================================
@@ -421,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         if(!_termsAccepted){
 
@@ -545,7 +562,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && _termsAccepted && !GpsMessageActivity._test) {
@@ -569,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -592,7 +609,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -614,7 +631,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor SPeditor = SP.edit();
-        boolean _termsAccepted = SP.getBoolean("termsAcceptance", false);
+        boolean _termsAccepted = SP.getBoolean(Constants.ACTION_TERMS_ACCEPTED, false);
 
 
 
@@ -832,113 +849,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TermsActivity.class);
 
         startActivity(intent);
-
-
-//        //---------------------------------------
-//
-//
-//
-//        AlertDialog.Builder alert = new AlertDialog.Builder(this,
-//                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Background );
-//
-//        WebView webView = new WebView(this);
-//        //webView.setId(R.id.);
-//
-//        webView.loadUrl("file:///android_asset/ExeterLocateConcentPage.html");
-//        webView.setWebViewClient(new WebViewClient(){
-//            @Override
-//            public boolean shouldOverrideUrlLoading(WebView view, String url){
-//                view.loadUrl(url);
-//                return true;
-//            }
-//        });
-//        alert.setView(webView);
-//
-//        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
-//        final SharedPreferences.Editor SPeditor = SP.edit();
-//
-//        alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                _termsAccepted = true;
-//                SPeditor.putBoolean("termsAcceptance", _termsAccepted);
-//                SPeditor.apply();
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        alert.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                finish();
-//
-//                //System.exit(0);
-//            }
-//        });
-//
-//        alert.setCancelable(false);
-//
-//        AlertDialog dialog = alert.create();
-//
-//        //dialog.getWindow().setBackgroundDrawable(getDrawable(R.color.white));
-//
-//        dialog.show();
-//
-//        // Access the button and set it to invisible
-//        final Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-//        button.setVisibility(View.INVISIBLE);
-//
-//        webView.getViewTreeObserver().addOnScrollChangedListener(
-//                new ViewTreeObserver.OnScrollChangedListener() {
-//                    @Override
-//                    public void onScrollChanged() {
-//
-//                        //Log.v("mgdev", "+++ scrollchanged "+webView.getScrollY());
-//
-//                        int maxScrollExtent =
-//                                (int) ((webView.getContentHeight() *
-//                                        webView.getResources().getDisplayMetrics().density)
-//                                        - webView.getHeight())-1;
-//
-//                        int diff = ((int)(maxScrollExtent * 0.9)) - webView.getScrollY();
-//
-//                        //Log.v("mgdev", "-----------------------::"+diff);
-//                        //Log.v("mgdev", "maxScrollExtent"+maxScrollExtent);
-//                        //Log.v("mgdev", "webView.getScrollY()"+webView.getScrollY());
-//
-//                        // if diff is zero, then the bottom has been reached
-//                        if (diff <= 0 && maxScrollExtent != 0) {
-//
-//                                //Log.v("mgdev", "Accept?!?!");
-//
-//                                button.setVisibility(View.VISIBLE);
-//
-//                            }// end of if diff = 0
-//                    }// end of onScrollChanged
-//                }// end of ViewTreeObserver.OnScrollChangedListener
-//        );// end of addOnScrollChangedListener
-//
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-//            webView.getViewTreeObserver().addOnWindowFocusChangeListener(
-//                    new ViewTreeObserver.OnWindowFocusChangeListener() {
-//                        @Override
-//                        public void onWindowFocusChanged(boolean hasFocus) {
-//
-//                            Log.v("mgdev", "dialog.onWindowFocusChanged");
-//
-//                            if(hasFocus && _termsAccepted){
-//                                dialog.hide();
-//                            }
-//
-//
-//                        }// end of onWindowFocusChanged
-//                    }//end of OnWindowFocusChangeListener
-//            );// end of addOnWindowFocusChangeListener
-//        }
-
-
-
 
     }// end of startTermsAcceptance
     //==============================================================================================
@@ -1244,14 +1154,16 @@ public class MainActivity extends AppCompatActivity {
         );
         intent.putExtra("MODE", true); // engage citizen mode
 
-        String address = "riba2reality.com";
+        //String address = "riba2reality.com";
+        String address = Constants.address;
 
-        String dataBase = "beta";
+        //String dataBase = "beta";
+        String dataBase = Constants.database;
 
         String postType = "POST";
 
 
-        boolean useSSL = true;
+        boolean useSSL = Constants.useSSL;
 
         intent.putExtra("ServerAddress", address);
         intent.putExtra("database", dataBase);
@@ -1261,6 +1173,17 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("PACKAGE", packageName);
 
         intent.putExtra("post_type", postType);
+
+        SharedPreferences SP =
+                android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences.Editor SPeditor = SP.edit();
+
+        boolean outOut = SP.getBoolean("OPT-OUT", false);
+        boolean outOutReceived = SP.getBoolean("OPT-OUT-RECEIVED", false);
+
+        intent.putExtra("OPT-OUT", outOut);
+        intent.putExtra("OPT-OUT-RECEIVED", outOutReceived);
+
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

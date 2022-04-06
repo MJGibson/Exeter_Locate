@@ -8,6 +8,9 @@ app = Flask(__name__)
 
 dataBase = "phoneTest_home"
 
+
+userCollection = "users"
+
 wifiMacCollection = "wifiMacs"
 
 wifiCollection = "wifi"
@@ -22,6 +25,11 @@ bleMacCollection = "bleMacs"
 DEFAULT_GET_RESPONSE = (
     "<h1 style='color:blue'>RIBA2Reality Server Active!</h1>"
 )
+
+KEYS_REQUIRED_FOR_USER = [
+    "UUID",
+    "OPT_OUT",
+]
 
 KEYS_REQUIRED_FOR_GPS = [
     "UUID",
@@ -158,6 +166,71 @@ def print_and_jsonify(msg):
     # return a flask request
     print(msg)
     return jsonify({"ERROR": str(msg)})
+
+
+#-------------------------------------------------------------------------------------
+
+@app.route("/user/", methods=["GET", "POST"])
+def user():
+    if request.method == "POST":
+        # ---- Error checking
+
+        # check we can parse the request
+        try:
+            jsonData = parse_request(request)
+        except Exception as e:
+            return print_and_jsonify(e)
+
+        # check all the required fields are there
+        for key in KEYS_REQUIRED_FOR_USER:
+            if key not in jsonData.keys():
+                msg = f"Missing: {key:s}"
+                return print_and_jsonify(msg)
+
+        # check the magic number matches
+        #if jsonData["MAGIC_NUM"] != magicNum:
+        #    return print_and_jsonify("magic number mismatch")
+
+        # ---- connect to the db
+        client = MongoClient("localhost", 27017)
+        if "DATABASE" in jsonData.keys():
+            db = client[jsonData["DATABASE"]]
+        else:
+            db = client[dataBase]
+            
+        # collection aisngment
+        collection = db[userCollection]
+
+        # check if user already exists
+        documents = collection.find({"UUID":jsonData["UUID"]})
+        documentsCount = documents.count_documents();
+        
+        #print(documentsCount)
+        if(documentsCount > 0):
+            
+            filter = { 'UUID': jsonData["UUID"] }
+             
+            # Values to be updated.
+            newvalues = { "$set": { 'OPT_OUT': jsonData["OPT_OUT"] } }
+            
+            # Using update_one() method for single
+            # updation.
+            collection.update_one(filter, newvalues)
+
+
+        # ---- post data to the GPS table
+        
+        collection.insert_one(
+            {
+                "UUID": jsonData["UUID"],
+                "OPT_OUT": jsonData["OPT_OUT"],
+            }
+        )
+        return format_message("Server: USER data stored successfully.")
+
+    return DEFAULT_GET_RESPONSE
+
+
 
 
 #-------------------------------------------------------------------------------------
