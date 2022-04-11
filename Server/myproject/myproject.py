@@ -203,7 +203,7 @@ def user():
 
         # check if user already exists
         documents = collection.find({"UUID":jsonData["UUID"]})
-        documentsCount = documents.count_documents();
+        documentsCount = documents.count();
         
         #print(documentsCount)
         if(documentsCount > 0):
