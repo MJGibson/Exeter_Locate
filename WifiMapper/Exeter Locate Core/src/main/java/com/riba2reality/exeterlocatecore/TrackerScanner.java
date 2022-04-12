@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.7.0";
+    public static final String libraryVersion = "1.7.1";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -603,7 +603,7 @@ public class TrackerScanner extends Service implements LocationListener {
                 sendManualScanResult();
 
                 if (stopScanning) {
-                    stopScanning();
+                    stopScanning(true);
                 }
 
             } else {
@@ -2685,17 +2685,44 @@ public class TrackerScanner extends Service implements LocationListener {
     // service functions
 
     //==============================================================================================
-    private void stopNotificationService() {
+    private void stopNotificationService(boolean stopSelf) {
 
         stopForeground(true);
-        stopSelf();
+        if(stopSelf) {
 
-        this.unregisterReceiver(receiverBle);
-        this.unregisterReceiver(receiverWifi);
+            stopSelf();
+        }
+        try{
+            this.unregisterReceiver(receiverBle);
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        try{
+            this.unregisterReceiver(receiverWifi);
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        try{
         this.unregisterReceiver(receiverGPS);
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        try{
         this.unregisterReceiver(receiverTurnOnBle);
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        try{
         this.unregisterReceiver(receiverTurnOnGPS);
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        try{
         this.unregisterReceiver(receiverTurnOnWifi);
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
 
 
     }// end of stopNotificationService
@@ -3042,6 +3069,8 @@ public class TrackerScanner extends Service implements LocationListener {
     //==============================================================================================
     private void startScanning(){
 
+        geoFenceChecked = false;
+
         running = true;
         startNotificationService();
 
@@ -3121,7 +3150,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
 
     //==============================================================================================
-    private void stopScanning(){
+    private void stopScanning(boolean stopSelf){
         // empty the queues before the lose them
         //postCombinedResult();
         //postWifiResult();
@@ -3129,7 +3158,7 @@ public class TrackerScanner extends Service implements LocationListener {
         postALL();
 
 
-        stopNotificationService();
+        stopNotificationService(stopSelf);
 
         stopService();
 
@@ -3177,6 +3206,9 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         getDataFromIntent(intent);
 
+                        if(running){
+                            stopScanning(false);
+                        }
 
                         startScanning();
 
@@ -3192,7 +3224,7 @@ public class TrackerScanner extends Service implements LocationListener {
 
                         this.sendResult("Stopping scanning... sending all remaining scans.");
 
-                        stopScanning();
+                        stopScanning(true);
 
 
                         break;
