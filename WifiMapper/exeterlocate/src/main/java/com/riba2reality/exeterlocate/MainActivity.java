@@ -45,6 +45,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.OnFailureListener;
 import com.google.android.play.core.tasks.OnSuccessListener;
 import com.google.android.play.core.tasks.Task;
 import com.riba2reality.exeterlocate.messages.BluetoothMessageActivity;
@@ -465,15 +466,35 @@ public class MainActivity extends AppCompatActivity {
 
         appUpdateInfoTask.addOnSuccessListener(updateListener);
 
+        appUpdateInfoTask.addOnFailureListener(failureListener);
+
 
 
     }// end of checkForUpdates
     //==============================================================================================
 
     //==============================================================================================
+    OnFailureListener failureListener = new OnFailureListener(){
+
+
+        @Override
+        public void onFailure(Exception e) {
+            Log.d("mgdev", "MainActivity.failureListener.onFailure: "+e.toString());
+
+
+
+        }
+
+    };
+    //==============================================================================================
+
+    //==============================================================================================
     OnSuccessListener<AppUpdateInfo> updateListener = new OnSuccessListener<AppUpdateInfo>() {
         @Override
         public void onSuccess(AppUpdateInfo appUpdateInfo) {
+
+
+            Log.d("mgdev", "MainActivity.updateListener.onSuccess: "+ appUpdateInfo.toString());
 
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                     // This example applies an immediate update. To apply a flexible update
