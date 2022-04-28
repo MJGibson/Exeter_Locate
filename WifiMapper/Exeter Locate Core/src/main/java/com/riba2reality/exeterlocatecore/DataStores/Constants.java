@@ -28,7 +28,7 @@ public class Constants {
 
     public static final String database = "beta";
     public static final String port = "";
-    public static final String address = "riba2reality.com";
+    public static final String address = "api.riba2reality.com";
     public static final boolean useSSL = true;
 
     // Test settings
