@@ -41,11 +41,11 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "com.riba2reality.wifimapper"
+        applicationId "com.riba2reality.wifi_mapper"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 19
-        versionName '1.6.4'
+        versionCode 20
+        versionName '1.7.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
