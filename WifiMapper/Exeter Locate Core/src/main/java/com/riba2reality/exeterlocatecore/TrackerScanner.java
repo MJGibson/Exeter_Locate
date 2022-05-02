@@ -98,7 +98,7 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.7.1";
+    public static final String libraryVersion = "1.7.2";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
@@ -2685,13 +2685,13 @@ public class TrackerScanner extends Service implements LocationListener {
     // service functions
 
     //==============================================================================================
-    private void stopNotificationService(boolean stopSelf) {
+//    private void stopNotificationService(boolean stopSelf) {
+    private void stopNotificationService() {
 
+//        if(stopSelf) {
         stopForeground(true);
-        if(stopSelf) {
-
-            stopSelf();
-        }
+        stopSelf();
+//        }
         try{
             this.unregisterReceiver(receiverBle);
         } catch(IllegalArgumentException e) {
@@ -3158,7 +3158,9 @@ public class TrackerScanner extends Service implements LocationListener {
         postALL();
 
 
-        stopNotificationService(stopSelf);
+        if(stopSelf)
+            stopNotificationService();
+
 
         stopService();
 

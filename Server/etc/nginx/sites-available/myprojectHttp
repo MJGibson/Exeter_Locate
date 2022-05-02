@@ -2,13 +2,13 @@ server {
 
     
 
-    server_name riba2reality.com riba2reality www.riba2reality.com 3.9.100.243 3.9.100.243.com;
+    server_name api.riba2reality.com api.riba2reality api.3.9.100.243 api.3.9.100.243.com;
     root /var/www/html;
 	
 
 
-    listen [::]:443 ssl; # managed by Certbot
-    listen 443 ssl; # managed by Certbot
+    #listen [::]:443 ssl; # managed by Certbot
+    listen *:443 ssl; # managed by Certbot
     #ssl_certificate /etc/letsencrypt/live/riba2reality.com/fullchain.pem; # managed by Certbot
     #ssl_certificate_key /etc/letsencrypt/live/riba2reality.com/privkey.pem; # managed by Certbot
     ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
@@ -24,15 +24,15 @@ server {
 	# who fail authentication
 	ssl_verify_client optional;
 	
-	if ($host = 3.9.100.243) {
-        return 301 https://www.riba2reality.com$request_uri;
+	if ($host = api.3.9.100.243) {
+        return 301 https://api.riba2reality.com$request_uri;
     } # managed by Certbot
-	if ($host = 3.9.100.243.com) {
-        return 301 https://www.riba2reality.com$request_uri;
+	if ($host = api.3.9.100.243.com) {
+        return 301 https://api.riba2reality.com$request_uri;
     } # managed by Certbot
-	if ($host = www.3.9.100.243.com) {
-        return 301 https://www.riba2reality.com$request_uri;
-    } # managed by Certbot
+	#if ($host = www.3.9.100.243.com) {
+    #    return 301 https://www.riba2reality.com$request_uri;
+    #} # managed by Certbot
 
 
 	
@@ -107,24 +107,80 @@ server {
     }
 
 }
+
 server {
-    if ($host = riba2reality.com) {
-        return 301 https://riba2reality.com$request_uri;
-    } # managed by Certbot
+
+    
+
+    server_name riba2reality.com riba2reality www.riba2reality.com www.3.9.100.243 www.3.9.100.243.com;
+    root /var/www/html;
 	
-	if ($host = www.riba2reality.com) {
-        return 301 https://www.riba2reality.com$request_uri;
-    } # managed by Certbot
+
+
+    #listen [::]:443 ssl; # managed by Certbot
+    listen *:443 ssl; # managed by Certbot
+    #ssl_certificate /etc/letsencrypt/live/riba2reality.com/fullchain.pem; # managed by Certbot
+    #ssl_certificate_key /etc/letsencrypt/live/riba2reality.com/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+	
+	# client certificate
+	ssl_client_certificate /etc/ssl/certs/ca.crt;
+	# make verification optional, so we can display a 403 message to those
+	# who fail authentication
+	ssl_verify_client off;
+	
+
+	location /privacy/ {
+	
+		root /home/ubuntu/myproject/data/;
+
+	
+	}
+
+
+}
+
+server {
+    #if ($host = riba2reality.com) {
+    #    return 301 https://riba2reality.com$request_uri;
+    #} # managed by Certbot
+	
+	#if ($host = www.riba2reality.com) {
+    #    return 301 https://www.riba2reality.com$request_uri;
+    #} # managed by Certbot
 
 
     server_name riba2reality www.riba2reality.com riba2reality.com;
 	
-	listen 80 ;
-    listen [::]:80 ;
-    return 301 https://riba2reality.com$request_uri;
 	
-	location / {
-		return 301 https://www.riba2reality.com$request_uri;
+	# client certificate
+	ssl_client_certificate /etc/ssl/certs/ca.crt;
+	# make verification optional, so we can display a 403 message to those
+	# who fail authentication
+	ssl_verify_client off;
+	
+	if ($host = www.3.9.100.243.com) {
+        return 301 https://www.riba2reality.com$request_uri;
+    } # managed by Certbot
+	
+	listen *:80 ;
+    #listen [::]:80 ;
+    #return 301 https://riba2reality.com$request_uri;
+	
+	#location / {
+	#	return 301 https://www.riba2reality.com$request_uri;
+	#}
+	
+	location /privacy/ {
+	
+		root /home/ubuntu/myproject/data/;
+
+	
 	}
 
 
