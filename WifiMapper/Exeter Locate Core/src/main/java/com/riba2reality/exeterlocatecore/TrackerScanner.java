@@ -98,13 +98,13 @@ public class TrackerScanner extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------
 
     // as we can no longer access BuildConfig.VERSION_NUM for libraries
-    public static final String libraryVersion = "1.7.2";
+    public static final String libraryVersion = "1.7.3";
 
     //public static final int REQUEST_ENABLE_BT = 11;
 
     private final int queueByteLimit = 1024 * 1024 * 10; // 10 MB
 
-    private int gPS_lambda = 900;   // gps and combined
+    private int gPS_lambda = 300;   // gps and combined
     private int gPS_duration = 60;
     private int gPS_scan_interval = 5;
 
